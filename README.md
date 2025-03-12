@@ -1,36 +1,53 @@
-## Next.js + Supabase Auth Example
+<h1> Purple Eclipse</h1>
+<p> Visconn, a web application provides a centralized, structured, and secured platform for students to interact, where they can share experiences, seek help, and engage in meaningful social discussion. Additionally, it fosters diversity in social discussions and provides a safe space for students in VSU.
+</p>
+<table> 
+  <tr>
+    <th>
+      Initial Release Code
+    </th>
+    <th>
+      Date Released
+    </th>
+  </tr>
+  <tr>
+    <td> PE.010.001 </td>
+    <td> 2025-03-12</td>
+  </tr>
+</table>
 
-[Video Tutorial](https://youtu.be/WWwDL9G9xkU)
+<h2> PE.010.001 Release Notes </h2>
+<ul>
+  <li> What's New </li>
+  <ul>
+    <li> Added assets and Supabase intialization </li>
+    <li> Added Structured Folders and File Structure </li>
+    <li> Added Responsive Page Layout UI </li>
+    <li> Added Authentication </l1>
+    <li> Added initial authentication page </li>
+    <li> Added Homepage </li><br>
+  </ul>
+  
+  <li> Known Issues </li>
+  <ul>
+    <li> Google login skips the username and password registration step. </li>
+    <li> Lacking forgot password feature. </li>
+  </ul>
+</ul>
 
-First, run the development server:
+<h2> PE.010.000 Release Notes </h2>
+<ul>
+    <li> Add assets </li>
+    <li> Update README file </li>
+    <li> Update [file name] Markdown file</li>
+    <li> Add Markdown files </li>
+    <li> Add README file </li>
+</ul>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+<h4> Important Links </h4>
+<ul>
+  <li>
+    Design Specs: 
+    <a href="https://github.com/Davidty143/purple-eclipsee"> https://github.com/Davidty143/purple-eclipsee</a>
+  </li>
+</ul>
