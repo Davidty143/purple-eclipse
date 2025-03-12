@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  account_id                  String   @id @unique @db.Uuid
+  account_username            String?  @unique
+  account_email               String?  @unique
+  account_photo_url           String?
+  account_status              AccountStatus
+  account_is_deleted          Boolean
+  account_iscreated_timestamp DateTime? @default(now()) @db.Timestamptz(6)
+  account_modified_timestamp  DateTime? @default(now()) @db.Timestamptz(6)
+
+  account_role_id             String   @db.Uuid // Foreign Key to Role (UUID type)
+  account_role                Role     @relation(fields: [account_role_id], references: [role_id]) // Relation to Role
+}
+
+model Role {
+  role_id       String      @id @unique @db.Uuid // UUID type for role_id
+  role_type     RoleType
+  previlege_id  String      @db.Uuid // Foreign Key to Previlage (UUID type)
+  previlege     Previlage   @relation(fields: [previlege_id], references: [previlege_id]) // Relation to Previlage
+
+  accounts      Account[]   // One-to-many relation with Account (A Role can have many Accounts)
+}
+
+model Previlage {
+  previlege_id          String  @id @unique @db.Uuid // UUID type for previlege_id
+  previlege_name        String?
+  previlege_description String?
+
+  roles                 Role[]  // One-to-many relation with Role (A Previlage can be assigned to many Roles)
+}
+
+enum AccountStatus {
+  ACTIVE
+  BANNED
+  RESTRICTED
+}
+
+enum RoleType {
+  ADMIN 
+  USER
+  GUEST
+}
+

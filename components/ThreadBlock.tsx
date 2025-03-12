@@ -1,0 +1,26 @@
+import React from "react";
+import ThreadRow from "@/components/ThreadRow";
+
+const ThreadBlock = () => {
+  return (
+    <div className="border-2 rounded-md">
+      <div className="thread-block py-2 px-4 rounded-md border-2 border-t-0 bg-gray-100 border-l-0 border-r-0  rounded-b-none">
+        {/* Forum Title Section with background color */}
+        <div className="forum-title py-2">
+          <h2 className="text-sm font-semibold">Forum Title</h2>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="thread-content text-gray-600">
+        <ThreadRow />
+        <ThreadRow />
+        <ThreadRow />
+        <ThreadRow />
+        <ThreadRow />
+      </div>
+    </div>
+  );
+};
+
+export default ThreadBlock;
