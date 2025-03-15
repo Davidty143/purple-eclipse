@@ -1,5 +1,5 @@
 "use client";
-import { updatePassword } from "@/utils/actions";
+import { updatePassword } from "@/lib/auth-actions";
 import { useActionState } from "react";
 
 const Page = () => {

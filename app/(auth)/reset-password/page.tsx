@@ -1,15 +1,27 @@
 "use client";
-import { sendResetPasswordEmail } from "@/utils/actions";
+import { sendResetPasswordEmail } from "@/lib/auth-actions";
 import { useActionState } from "react";
 
+// Wrap the sendResetPasswordEmail function for use with useActionState
+const sendResetPassword = async (
+  state: { error: string; success: string },
+  formData: FormData
+) => {
+  // Call the original sendResetPasswordEmail function and return the result
+  const { error, success } = await sendResetPasswordEmail(formData);
+
+  return {
+    error,
+    success,
+  };
+};
+
 const Page = () => {
-  const [state, formAction, isPending] = useActionState(
-    sendResetPasswordEmail,
-    {
-      error: "",
-      success: "",
-    }
-  );
+  // Use the wrapped function with useActionState
+  const [state, formAction, isPending] = useActionState(sendResetPassword, {
+    error: "",
+    success: "",
+  });
 
   const { error, success } = state;
 

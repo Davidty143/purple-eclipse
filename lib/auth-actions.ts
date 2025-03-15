@@ -81,3 +81,67 @@ export async function signInWithGoogle() {
 
   redirect(data.url);
 }
+
+const sendResetPasswordEmail = async (formData: FormData) => {
+  const supabase = await createClientForServer();
+
+  const email = formData.get("email");
+
+  // Validate email to ensure it's a string
+  if (email === null || typeof email !== "string") {
+    return {
+      success: "",
+      error: "Email is required.",
+    };
+  }
+
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+
+  if (error) {
+    console.log("error", error);
+
+    return {
+      success: "",
+      error: error.message,
+    };
+  }
+
+  return {
+    success: "Please check your email",
+    error: "",
+  };
+};
+
+const updatePassword = async (formData: FormData) => {
+  const supabase = await createClientForServer();
+
+  const password = formData.get("password");
+
+  // Ensure password is a string or undefined
+  if (password === null) {
+    return {
+      success: "",
+      error: "Password is required", // You could add some validation here if you want
+    };
+  }
+
+  const { data, error } = await supabase.auth.updateUser({
+    password: password as string, // Casting password to string if not null
+  });
+
+  if (error) {
+    console.log("error", error);
+
+    return {
+      success: "",
+      error: error.message,
+    };
+  }
+
+  return {
+    success: "Password updated",
+    error: "",
+  };
+};
+
+export { updatePassword, sendResetPasswordEmail };
