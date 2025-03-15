@@ -1,4 +1,4 @@
-//real
+//reset-password.tsx
 "use client";
 import { sendResetPasswordEmail } from "@/lib/auth-actions";
 import { useActionState } from "react";
