@@ -112,16 +112,20 @@ const sendResetPasswordEmail = async (formData: FormData) => {
   };
 };
 
-const updatePassword = async (formData: FormData) => {
+// Refactor to accept state and formData
+const updatePassword = async (
+  state: { error: string; success: string },
+  formData: FormData
+) => {
   const supabase = await createClientForServer();
 
   const password = formData.get("password");
 
-  // Ensure password is a string or undefined
-  if (password === null) {
+  if (password === null || typeof password !== "string") {
     return {
+      ...state,
       success: "",
-      error: "Password is required", // You could add some validation here if you want
+      error: "Password is required",
     };
   }
 
@@ -131,14 +135,15 @@ const updatePassword = async (formData: FormData) => {
 
   if (error) {
     console.log("error", error);
-
     return {
+      ...state,
       success: "",
       error: error.message,
     };
   }
 
   return {
+    ...state,
     success: "Password updated",
     error: "",
   };

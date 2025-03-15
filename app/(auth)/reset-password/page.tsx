@@ -1,3 +1,4 @@
+//real
 "use client";
 import { sendResetPasswordEmail } from "@/lib/auth-actions";
 import { useActionState } from "react";
@@ -26,11 +27,11 @@ const Page = () => {
   const { error, success } = state;
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen gap-4">
+    <div className="flex flex-col items-center justify-center h-screen gap-4 bg-gray-300">
       <form action={formAction} className="flex flex-col gap-2">
         <label className="form-control w-full max-w-xs">
           <div className="label">
-            <span className="label-text">Email</span>
+            <span className="label  -text">Email</span>
           </div>
           <input
             type="email"

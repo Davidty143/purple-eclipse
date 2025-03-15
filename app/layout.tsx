@@ -31,6 +31,7 @@ export default function RootLayout({
             <div
               className={cn(
                 "menu-header",
+                "bg-blue-200",
                 "h-16",
                 "w-full",
                 "flex",
@@ -42,6 +43,7 @@ export default function RootLayout({
               <div
                 className={cn(
                   "menu-header",
+                  "bg-blue-500",
                   "h-full", // Use full height for inner div
                   "w-[1250px]",
                   "2xl:w-[80%]",
@@ -54,6 +56,7 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
+                    "bg-red-300",
                     "h-full", // Take full height of the parent
                     "w-[150px]", // Width as 10% of parent
                     "flex",
@@ -68,6 +71,7 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
+                    "bg-violet-300",
                     "h-full", // Take full height of the parent
                     "w-[300px]", // Width as 10% of parent
                     "flex",
@@ -86,6 +90,7 @@ export default function RootLayout({
             <div
               className={cn(
                 "menu-header",
+                "bg-green-200",
                 "h-16",
                 "w-full",
                 "flex",
@@ -96,6 +101,7 @@ export default function RootLayout({
               <div
                 className={cn(
                   "menu-header",
+                  "bg-yellow-200",
                   "h-full", // Use full height for inner div
                   "w-[1250px]",
                   "2xl:w-[80%]",
@@ -108,6 +114,7 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
+                    "bg-pink-300",
                     "h-full", // Take full height of the parent
                     "w-[200px]", // Width as 10% of parent
                     "flex",
@@ -120,6 +127,7 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
+                    "bg-orange-300",
                     "h-full", // Take full height of the parent
                     "w-[300px]", // Width as 10% of parent
                     "flex",
