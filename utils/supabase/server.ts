@@ -1,33 +1,24 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-export async function createClient() {
-  // Await cookies() to ensure proper retrieval of the cookie store in server-side context
-  const cookieStore = await cookies(); // Await the cookies store
+export async function createClientForServer() {
+  const cookieStore = await cookies(); // Await the cookies() Promise
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        // Get a specific cookie value
-        get(name: string) {
-          return cookieStore.get(name)?.value;
+        getAll() {
+          return cookieStore.getAll(); // Now it's safe to call getAll() on the resolved cookieStore
         },
-        // Set a cookie with specified options
-        set(name: string, value: string, options: CookieOptions) {
+        setAll(cookiesToSet) {
           try {
-            cookieStore.set({ name, value, ...options });
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options); // Set cookies using the cookieStore
+            });
           } catch (error) {
-            // Handle error when `set` is called from a server-side component
-          }
-        },
-        // Remove a specific cookie
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: "", ...options });
-          } catch (error) {
-            // Handle error when `remove` is called from a server-side component
+            console.error("Error setting cookies:", error);
           }
         },
       },

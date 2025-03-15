@@ -1,36 +1,39 @@
+import { createClientForServer } from "@/utils/supabase/server";
 import Image from "next/image";
-import BodyHeader from "@/components/BodyHeader";
-import ThreadBlock from "@/components/ThreadBlock";
-import ThreadNameBlock from "@/components/ThreadNameBlock";
 
-export default function Home() {
-  return (
-    <main>
-      {/* Main Wrapper */}
-      <div className=" min-h-screen flex justify-center">
-        {/* Focus Content */}
-        <div className="w-[1250px] 2xl:w-[80%] flex flex-col gap-4">
-          {/* Main Body */}
-          <div className="w-full flex flex-col lg:flex-row justify-between gap-6">
-            {/* Content Body */}
-            <div className=" w-full flex flex-col gap-4 mt-4">
-              <BodyHeader />
-              <ThreadBlock />
-              <ThreadBlock />
-              <ThreadBlock />
-              <ThreadBlock />
-            </div>
-            {/* Sidebar Body */}
-            <div className=" lg:w-[300px] flex-shrink-0 lg:mt-4">
-              <ThreadNameBlock />
-            </div>
-          </div>
-          {/* Footer */}
-          <div className="border-2 justify-center text-center w-full h-[10vh]">
-            FOOTER
-          </div>
-        </div>
+export default async function Home() {
+  const supabase = await createClientForServer();
+
+  const session = await supabase.auth.getUser();
+
+  if (!session.data.user)
+    return (
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <h1 className="text-4xl font-bold">Not Authenticated</h1>
       </div>
-    </main>
+    );
+
+  const {
+    data: {
+      user: { user_metadata, app_metadata },
+    },
+  } = session;
+
+  const { name, email, user_name, avatar_url } = user_metadata;
+
+  const userName = user_name ? `@${user_name}` : "User Name Not Set";
+
+  // console.log(session)
+
+  return (
+    <div className="">
+      {/* continer at the center of the page  */}
+      <div className="flex flex-col items-center justify-center h-screen gap-4">
+        <h1 className="text-4xl font-bold">{name}</h1>
+        <p className="text-xl">User Name: {userName}</p>
+        <p className="text-xl">Email: {email}</p>
+        <p className="text-xl">Created with: {app_metadata.provider}</p>
+      </div>
+    </div>
   );
 }
