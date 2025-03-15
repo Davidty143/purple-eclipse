@@ -1,35 +1,32 @@
 "use client";
-import { sendResetPasswordEmail } from "@/utils/actions";
+import { updatePassword } from "@/utils/actions";
 import { useActionState } from "react";
 
 const Page = () => {
-  const [state, formAction, isPending] = useActionState(
-    sendResetPasswordEmail,
-    {
-      error: "",
-      success: "",
-    }
-  );
+  const [state, formAction, isPending] = useActionState(updatePassword, {
+    error: "",
+    success: "",
+  });
 
   const { error, success } = state;
 
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4">
-      <form action={formAction} className="flex flex-col gap-2">
+      <form action={formAction}>
         <label className="form-control w-full max-w-xs">
           <div className="label">
-            <span className="label-text">Email</span>
+            <span className="label-text">New Password</span>
           </div>
           <input
-            type="email"
-            name="email"
+            name="password"
+            type="password"
             className="input input-bordered w-full max-w-xs"
           />
         </label>
 
         <button type="submit" className="btn mt-2" disabled={isPending}>
           {isPending && <span className="loading loading-spinner"></span>}
-          Reset Password
+          Update Password
         </button>
 
         {error && (
