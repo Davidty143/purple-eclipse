@@ -7,6 +7,7 @@ import SignupButton from "@/components/SignupButton";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import "@radix-ui/themes/styles.css";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -64,7 +65,12 @@ export default function RootLayout({
                     "justify-center"
                   )}
                 >
-                  LOGO
+                  <Image
+                    src="/images/VISCONN.jpg"
+                    alt="Logo"
+                    width={150} // Set a width for the image
+                    height={150} // Set a height for the image
+                  />
                 </div>
 
                 {/* Login Section */}
