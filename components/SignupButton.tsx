@@ -34,8 +34,9 @@ const Signup = () => {
       onClick={() => {
         router.push("/signup");
       }}
+      className="focus:outline-none focus:ring-0 focus:border-none border-none"
     >
-      <MdOutlineLogin className="text-lg mr-2" /> {/* Icon */}
+      <MdOutlineLogin className="text-lg mr-2 border-none" /> {/* Icon */}
       <span>Register</span> {/* Text */}
     </Button>
   );
