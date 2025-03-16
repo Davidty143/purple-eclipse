@@ -26,7 +26,7 @@ const Header = () => {
   ];
 
   return (
-    <header className="flex text-sm justify-between items-center py-4 bg-gray-400 min-w-full max-h-full space-x-4">
+    <header className="flex text-sm justify-between items-center py-4 min-w-full max-h-full space-x-4">
       {/* First Dropdown Menu with custom trigger text and main link */}
       <HeaderDropdownMenu
         menuItems={menu1}

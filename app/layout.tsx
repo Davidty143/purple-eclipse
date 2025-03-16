@@ -7,6 +7,7 @@ import SignupButton from "@/components/SignupButton";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import "@radix-ui/themes/styles.css";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,16 +25,17 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn("bg-background", inter.className)}>
         {/* Wrapper div to hold all elements */}
-        <div className="w-full px-2">
+        <div className="w-full">
           {/* Wrapper for both headers */}
-          <div className="header-wrapper">
+          <div className="w-full header-wrapper border-b border-gray-300">
             {/* Menu Header */}
             <div
               className={cn(
                 "menu-header",
-                "bg-blue-200",
                 "h-16",
                 "w-full",
+                "border-b",
+                "border-gray-300",
                 "flex",
                 "items-center",
                 "justify-center"
@@ -43,7 +45,6 @@ export default function RootLayout({
               <div
                 className={cn(
                   "menu-header",
-                  "bg-blue-500",
                   "h-full", // Use full height for inner div
                   "w-[1250px]",
                   "2xl:w-[80%]",
@@ -56,22 +57,26 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-red-300",
-                    "h-full", // Take full height of the parent
+                    "h-[60px]", // Take full height of the parent
                     "w-[150px]", // Width as 10% of parent
                     "flex",
                     "items-center",
-                    "justify-center"
+                    "justify-start",
+                    "py-5"
                   )}
                 >
-                  LOGO
+                  <Image
+                    src="/images/VISCONN.png"
+                    alt="Logo"
+                    width={150} // Set a width for the image
+                    height={150} // Set a height for the image
+                  />
                 </div>
 
                 {/* Login Section */}
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-violet-300",
                     "h-full", // Take full height of the parent
                     "w-[300px]", // Width as 10% of parent
                     "flex",
@@ -90,7 +95,6 @@ export default function RootLayout({
             <div
               className={cn(
                 "menu-header",
-                "bg-green-200",
                 "h-16",
                 "w-full",
                 "flex",
@@ -101,7 +105,7 @@ export default function RootLayout({
               <div
                 className={cn(
                   "menu-header",
-                  "bg-yellow-200",
+
                   "h-full", // Use full height for inner div
                   "w-[1250px]",
                   "2xl:w-[80%]",
@@ -114,7 +118,6 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-pink-300",
                     "h-full", // Take full height of the parent
                     "w-[200px]", // Width as 10% of parent
                     "flex",
@@ -127,7 +130,6 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-orange-300",
                     "h-full", // Take full height of the parent
                     "w-[300px]", // Width as 10% of parent
                     "flex",
