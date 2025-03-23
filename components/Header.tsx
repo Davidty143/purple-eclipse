@@ -1,5 +1,3 @@
-// Header.tsx
-
 import HeaderDropdownMenu from "./HeaderDropDownMenu";
 
 const Header = () => {
@@ -27,37 +25,40 @@ const Header = () => {
 
   return (
     <header className="flex text-sm justify-between items-center py-4 min-w-full max-h-full space-x-4">
-      {/* First Dropdown Menu with custom trigger text and main link */}
-      <HeaderDropdownMenu
-        menuItems={menu1}
-        triggerText="Home"
-        dropdownPosition="left-[-73px]"
-        triggerLink="/"
-      />
+      {/* Container for horizontal scroll on mobile, with max-width set to 300px */}
+      <div className="flex overflow-x-auto sm:overflow-x-visible sm:flex-nowrap space-x-4 max-w-[200px] sm:max-w-full">
+        {/* First Dropdown Menu with custom trigger text and main link */}
+        <HeaderDropdownMenu
+          menuItems={menu1}
+          triggerText="Home"
+          dropdownPosition="left-[-73px]"
+          triggerLink="/"
+        />
 
-      {/* Second Dropdown Menu with custom trigger text and main link */}
-      <HeaderDropdownMenu
-        menuItems={menu2}
-        triggerText="Forums"
-        triggerLink="/forums"
-        dropdownPosition="left-[-84px]" // Custom position class
-      />
+        {/* Second Dropdown Menu with custom trigger text and main link */}
+        <HeaderDropdownMenu
+          menuItems={menu2}
+          triggerText="Forums"
+          triggerLink="/forums"
+          dropdownPosition="left-[-84px]" // Custom position class
+        />
 
-      {/* Third Dropdown Menu with custom trigger text and main link */}
-      <HeaderDropdownMenu
-        menuItems={menu3}
-        triggerText="Trending"
-        triggerLink="/trending"
-        dropdownPosition="left-[-95px]" // Custom position class
-      />
+        {/* Third Dropdown Menu with custom trigger text and main link */}
+        <HeaderDropdownMenu
+          menuItems={menu3}
+          triggerText="Trending"
+          triggerLink="/trending"
+          dropdownPosition="left-[-95px]" // Custom position class
+        />
 
-      {/* Fourth Dropdown Menu with custom trigger text and main link */}
-      <HeaderDropdownMenu
-        menuItems={menu4}
-        triggerText="Latest"
-        triggerLink="/latest"
-        dropdownPosition="left-[-74.014px]" // Custom position class
-      />
+        {/* Fourth Dropdown Menu with custom trigger text and main link */}
+        <HeaderDropdownMenu
+          menuItems={menu4}
+          triggerText="Latest"
+          triggerLink="/latest"
+          dropdownPosition="left-[-74.014px]" // Custom position class
+        />
+      </div>
     </header>
   );
 };

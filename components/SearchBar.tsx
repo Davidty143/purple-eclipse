@@ -7,7 +7,7 @@ export default function Component() {
       <Input
         type="search"
         placeholder="Search..."
-        className="w-full border-0 h-8 font-semibold bg-gray-50"
+        className="w-full border-0 h-6 font-semibold bg-gray-50"
       />
     </div>
   );

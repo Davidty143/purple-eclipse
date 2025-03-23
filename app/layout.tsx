@@ -94,7 +94,7 @@ export default function RootLayout({
             </div>
 
             {/* Bottom Green Header */}
-            {/* <div
+            <div
               className={cn(
                 "menu-header",
                 "h-16",
@@ -121,7 +121,7 @@ export default function RootLayout({
                   className={cn(
                     "menu-header",
                     "h-full", // Take full height of the parent
-                    "w-[200px]", // Width as 10% of parent
+                    "w-300px", // Width as 10% of parent
                     "flex",
                     "items-center",
                     "justify-center"
@@ -132,11 +132,10 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
+                    "py-4",
                     "h-full", // Take full height of the parent
-                    "w-full", // Width as 10% of parent
+                    "w-300px", // Width as 10% of parent
                     "flex",
-                    "max-w-[1250px]",
-                    "2xl:w-[80%]",
                     "items-center",
                     "justify-center"
                   )}
@@ -144,7 +143,7 @@ export default function RootLayout({
                   <SearchBar />
                 </div>
               </div>
-            </div> */}
+            </div>
           </div>{" "}
           {/* End of header-wrapper */}
           {/* Children content */}
