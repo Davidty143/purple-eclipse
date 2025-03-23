@@ -33,6 +33,7 @@ export async function signup(formData: FormData) {
   const data = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
+    password_confirm: formData.get("password_confirm") as string,
     options: {
       data: {
         username: formData.get("username") as string,
@@ -41,10 +42,14 @@ export async function signup(formData: FormData) {
     },
   };
 
+  if (formData.get("password") !== formData.get("password_confirm")) {
+    throw new Error("Passwords do not match");
+  }
+
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect("/error");
+    redirect("/signup");
   }
 
   revalidatePath("/", "layout");
