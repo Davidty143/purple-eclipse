@@ -15,7 +15,7 @@ import SignInWithGoogleButton from "./SignInWithGoogleButton";
 
 export function LoginForm() {
   return (
-    <Card className="mx-auto w-full">
+    <Card className="mx-auto w-[350px] sm:w-[400px] h-[500px] sm-h-[600px]">
       <CardHeader>
         <CardTitle className="text-2xl text-center font-semibold">
           VISCONN

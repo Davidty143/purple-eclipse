@@ -136,6 +136,7 @@ export default function RootLayout({
                     "h-full", // Take full height of the parent
                     "w-300px", // Width as 10% of parent
                     "flex",
+                    "pl-2",
                     "items-center",
                     "justify-center"
                   )}
