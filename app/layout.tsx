@@ -46,8 +46,10 @@ export default function RootLayout({
                 className={cn(
                   "menu-header",
                   "h-full", // Use full height for inner div
-                  "w-[1250px]",
-                  "2xl:w-[80%]",
+                  "w-full", // Make it responsive to available width
+                  "max-w-[1250px]", // Max width for larger screens
+                  "xl:w-[80%]", // 80% width on xl screens
+                  "p-4",
                   "flex",
                   "justify-between", // Space out the children in the flex container
                   "items-center" // Center the items vertically
@@ -57,8 +59,8 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "h-[60px]", // Take full height of the parent
-                    "w-[150px]", // Width as 10% of parent
+                    "h-[60px]", // Height for logo container
+                    "w-auto", // Width should be auto to avoid fixed size
                     "flex",
                     "items-center",
                     "justify-start",
@@ -78,7 +80,7 @@ export default function RootLayout({
                   className={cn(
                     "menu-header",
                     "h-full", // Take full height of the parent
-                    "w-[300px]", // Width as 10% of parent
+                    "w-[220px]", // Width as 10% of parent
                     "flex",
                     "items-center",
                     "justify-end",
@@ -92,12 +94,13 @@ export default function RootLayout({
             </div>
 
             {/* Bottom Green Header */}
-            <div
+            {/* <div
               className={cn(
                 "menu-header",
                 "h-16",
                 "w-full",
                 "flex",
+                "p-4",
                 "items-center",
                 "justify-center"
               )}
@@ -105,7 +108,6 @@ export default function RootLayout({
               <div
                 className={cn(
                   "menu-header",
-
                   "h-full", // Use full height for inner div
                   "w-[1250px]",
                   "2xl:w-[80%]",
@@ -131,8 +133,10 @@ export default function RootLayout({
                   className={cn(
                     "menu-header",
                     "h-full", // Take full height of the parent
-                    "w-[300px]", // Width as 10% of parent
+                    "w-full", // Width as 10% of parent
                     "flex",
+                    "max-w-[1250px]",
+                    "2xl:w-[80%]",
                     "items-center",
                     "justify-center"
                   )}
@@ -140,7 +144,7 @@ export default function RootLayout({
                   <SearchBar />
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>{" "}
           {/* End of header-wrapper */}
           {/* Children content */}
