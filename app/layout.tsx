@@ -110,7 +110,7 @@ export default function RootLayout({
                   "menu-header",
                   "h-full", // Use full height for inner div
                   "w-[1250px]",
-                  "2xl:w-[80%]",
+                  "xl:w-[80%]",
                   "flex",
                   "justify-between", // Space out the children in the flex container
                   "items-center" // Center the items vertically

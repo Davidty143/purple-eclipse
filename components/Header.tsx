@@ -26,7 +26,7 @@ const Header = () => {
   return (
     <header className="flex text-sm justify-between items-center py-4 min-w-full max-h-full space-x-4">
       {/* Container for horizontal scroll on mobile, with max-width set to 300px */}
-      <div className="flex overflow-x-auto sm:overflow-x-visible sm:flex-nowrap space-x-4 max-w-[200px] sm:max-w-full">
+      <div className="flex overflow-x-auto md:overflow-x-visible md:flex-nowrap space-x-4 max-w-[200px] md:max-w-full">
         {/* First Dropdown Menu with custom trigger text and main link */}
         <HeaderDropdownMenu
           menuItems={menu1}
