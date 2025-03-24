@@ -1,6 +1,3 @@
 {
-  "extends": "next/core-web-vitals",
-    "rules": {
-    "no-barrel-file-imports": "error"
-  }
+  "extends": "next/core-web-vitals"
 }

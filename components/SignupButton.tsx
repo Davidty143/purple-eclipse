@@ -20,7 +20,7 @@ const Signup = () => {
       setUser(user);
     };
     fetchUser();
-  }, []); // Only run once on mount
+  }, [supabase.auth]); // Only run once on mount
 
   // If user is logged in, don't show the button
   if (user) {
