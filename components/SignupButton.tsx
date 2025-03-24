@@ -3,10 +3,14 @@ import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { signout } from "@/lib/auth-actions";
 import { MdOutlineLogin } from "react-icons/md";
 
-const Signup = () => {
+// Declare SignupProps interface
+interface SignupProps {
+  className?: string; // Accept className as an optional prop
+}
+
+const Signup: React.FC<SignupProps> = ({ className }) => {
   const [user, setUser] = useState<any>(null); // Track user state
   const router = useRouter();
   const supabase = createClient();
@@ -34,8 +38,9 @@ const Signup = () => {
       onClick={() => {
         router.push("/signup");
       }}
+      className={`focus:outline-none focus:ring-0 focus:border-none border-none ${className}`}
     >
-      <MdOutlineLogin className="text-lg mr-2" /> {/* Icon */}
+      <MdOutlineLogin className="text-lg mr-2 border-none" /> {/* Icon */}
       <span>Register</span> {/* Text */}
     </Button>
   );
