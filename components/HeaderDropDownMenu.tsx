@@ -31,12 +31,12 @@ const HeaderDropdownMenu = ({
       {/* Link for the main trigger to navigate to its page */}
       <Link
         href={triggerLink}
-        className="bg-gray-600 p-3 rounded flex items-center cursor-pointer relative"
+        className="bg-[#D9D9D9] py-2 px-4 rounded flex items-center cursor-pointer relative"
       >
         {/* Dropdown trigger (icon and title) */}
-        <span className="text-white">{triggerText}</span>
+        <span className="text-black">{triggerText}</span>
         <DropdownMenuTrigger>
-          <RiArrowDropDownFill className="ml-2 text-2xl text-white" />
+          <RiArrowDropDownFill className="ml-2 text-2xl text-black" />
         </DropdownMenuTrigger>
       </Link>
 

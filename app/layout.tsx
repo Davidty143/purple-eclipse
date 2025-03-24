@@ -25,16 +25,17 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn("bg-background", inter.className)}>
         {/* Wrapper div to hold all elements */}
-        <div className="w-full px-2">
+        <div className="w-full">
           {/* Wrapper for both headers */}
-          <div className="header-wrapper">
+          <div className="w-full header-wrapper border-b border-gray-300">
             {/* Menu Header */}
             <div
               className={cn(
                 "menu-header",
-                "bg-blue-200",
                 "h-16",
                 "w-full",
+                "border-b",
+                "border-gray-300",
                 "flex",
                 "items-center",
                 "justify-center"
@@ -44,10 +45,11 @@ export default function RootLayout({
               <div
                 className={cn(
                   "menu-header",
-                  "bg-blue-500",
                   "h-full", // Use full height for inner div
-                  "w-[1250px]",
-                  "2xl:w-[80%]",
+                  "w-full", // Make it responsive to available width
+                  "max-w-[1250px]", // Max width for larger screens
+                  "xl:w-[80%]", // 80% width on xl screens
+                  "p-4",
                   "flex",
                   "justify-between", // Space out the children in the flex container
                   "items-center" // Center the items vertically
@@ -57,16 +59,16 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-red-300",
-                    "h-full", // Take full height of the parent
-                    "w-[150px]", // Width as 10% of parent
+                    "h-[60px]", // Height for logo container
+                    "w-auto", // Width should be auto to avoid fixed size
                     "flex",
                     "items-center",
-                    "justify-center"
+                    "justify-start",
+                    "py-5"
                   )}
                 >
                   <Image
-                    src="/images/VISCONN.jpg"
+                    src="/images/VISCONN.png"
                     alt="Logo"
                     width={150} // Set a width for the image
                     height={150} // Set a height for the image
@@ -77,9 +79,8 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-violet-300",
                     "h-full", // Take full height of the parent
-                    "w-[300px]", // Width as 10% of parent
+                    "w-[220px]", // Width as 10% of parent
                     "flex",
                     "items-center",
                     "justify-end",
@@ -96,10 +97,10 @@ export default function RootLayout({
             <div
               className={cn(
                 "menu-header",
-                "bg-green-200",
                 "h-16",
                 "w-full",
                 "flex",
+                "p-4",
                 "items-center",
                 "justify-center"
               )}
@@ -107,10 +108,9 @@ export default function RootLayout({
               <div
                 className={cn(
                   "menu-header",
-                  "bg-yellow-200",
                   "h-full", // Use full height for inner div
                   "w-[1250px]",
-                  "2xl:w-[80%]",
+                  "xl:w-[80%]",
                   "flex",
                   "justify-between", // Space out the children in the flex container
                   "items-center" // Center the items vertically
@@ -120,9 +120,8 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-pink-300",
                     "h-full", // Take full height of the parent
-                    "w-[200px]", // Width as 10% of parent
+                    "w-300px", // Width as 10% of parent
                     "flex",
                     "items-center",
                     "justify-center"
@@ -133,10 +132,11 @@ export default function RootLayout({
                 <div
                   className={cn(
                     "menu-header",
-                    "bg-orange-300",
+                    "py-4",
                     "h-full", // Take full height of the parent
-                    "w-[300px]", // Width as 10% of parent
+                    "w-300px", // Width as 10% of parent
                     "flex",
+                    "pl-2",
                     "items-center",
                     "justify-center"
                   )}

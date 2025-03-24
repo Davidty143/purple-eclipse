@@ -31,12 +31,14 @@ const LoginButton = () => {
       </Button>
     );
   }
+
   return (
     <Button
       variant="outline"
       onClick={() => {
         router.push("/login");
       }}
+      className="focus:outline-none focus:ring-0 focus:border-none !outline-none !ring-0 !border-none" // Force styles to remove outline and border
     >
       <AiOutlineUserAdd className="text-xl mr-2" />
       <span>Login</span>
