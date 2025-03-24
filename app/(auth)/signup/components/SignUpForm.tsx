@@ -45,7 +45,7 @@ export function SignUpForm() {
   return (
     <Card className="mx-auto w-[350px] sm:w-[400px] h-[500px]">
       <CardHeader>
-        <CardTitle className="text-xl text-center">Visconn</CardTitle>
+        <CardTitle className="text-2xl text-center">VISCONN</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="text-start text-sm font-semibold text-gray-900 py-2">
