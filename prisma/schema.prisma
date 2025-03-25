@@ -28,7 +28,6 @@ model Previlage {
   previlege_id          String   @id @default(uuid()) @db.Uuid
   previlege_name        String?  // Make nullable
   previlege_description String?  // Make nullable
-
   roles                 Role[]  // Make nullable
 }
 
