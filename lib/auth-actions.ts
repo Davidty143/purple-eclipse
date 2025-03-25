@@ -154,4 +154,39 @@ const updatePassword = async (
   };
 };
 
+export async function updateUsername(formData: FormData) {
+  const supabase = await createClientForServer();
+
+  const username = formData.get("username") as string;
+
+  // Ensure the username is not empty
+  if (!username || username.trim().length === 0) {
+    throw new Error("Username cannot be empty.");
+  }
+
+  // Get the current user session
+  const { data: session, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !session?.user) {
+    throw new Error("User not authenticated.");
+  }
+
+  // Update the user's metadata with the new username
+  const { error } = await supabase.auth.updateUser({
+    data: {
+      username: username,
+    },
+  });
+
+  if (error) {
+    console.log("Error updating username:", error);
+    throw new Error(error.message);
+  }
+
+  // Revalidate the layout path (re-render components if needed)
+  revalidatePath("/");
+
+  // Redirect to the profile or home page after successful update
+  redirect("/");
+}
+
 export { updatePassword, sendResetPasswordEmail };
