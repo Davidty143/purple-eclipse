@@ -1,3 +1,4 @@
+// utils/prisma/createuser.ts
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -9,7 +10,9 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     try {
-      const { id, email, username, role } = req.body;
+      const { id, email, username, role = "USER" } = req.body; // Default role is "USER"
+
+      // Check if a user with the same email or username already exists
       const existingUser = await prisma.account.findFirst({
         where: {
           OR: [{ account_email: email }, { account_username: username }],
@@ -23,16 +26,43 @@ export default async function handler(
         });
       }
 
-      const roleRecord = await prisma.role.findUnique({
-        where: { role_type: role.toUpperCase() },
+      // Query the role based on role_type (which is an enum)
+      const roleRecord = await prisma.role.findFirst({
+        where: { role_type: role.toUpperCase() }, // Query by role_type
       });
 
+      // If the role doesn't exist, set the default role to "USER"
       if (!roleRecord) {
-        return res
-          .status(400)
-          .json({ success: false, error: "Role not found" });
+        const defaultRole = await prisma.role.findFirst({
+          where: { role_type: "USER" }, // Default to "USER"
+        });
+
+        if (!defaultRole) {
+          return res
+            .status(400)
+            .json({ success: false, error: "Role 'USER' not found" });
+        }
+
+        // Create the user and associate the default role
+        const user = await prisma.account.create({
+          data: {
+            account_id: id,
+            account_email: email,
+            account_username: username,
+            account_status: "ACTIVE",
+            account_is_deleted: false,
+            account_role: {
+              connect: {
+                role_id: defaultRole.role_id, // Connect with the default "USER" role
+              },
+            },
+          },
+        });
+
+        return res.status(200).json({ success: true, user });
       }
 
+      // If the role exists, create the user and associate the role
       const user = await prisma.account.create({
         data: {
           account_id: id,
@@ -42,7 +72,7 @@ export default async function handler(
           account_is_deleted: false,
           account_role: {
             connect: {
-              role_id: roleRecord.role_id,
+              role_id: roleRecord.role_id, // Use the role_id for the provided role
             },
           },
         },
