@@ -6,23 +6,62 @@ import { redirect } from "next/navigation";
 import { createClientForServer } from "@/utils/supabase/server";
 
 export async function login(formData: FormData) {
+  console.log("Starting login process...");
   const supabase = await createClientForServer();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  try {
+    const emailOrUsername = formData.get("emailOrUsername")?.toString().trim();
+    const password = formData.get("password")?.toString().trim();
+    console.log("Received credentials:", { emailOrUsername, password });
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+    if (!emailOrUsername) {
+      console.error("Validation failed: Missing email/username");
+      return { error: "Email or username is required" };
+    }
+    if (!password) {
+      console.error("Validation failed: Missing password");
+      return { error: "Password is required" };
+    }
 
-  if (error) {
-    redirect("/error");
+    let email = emailOrUsername;
+
+    if (!emailOrUsername.includes("@")) {
+      console.log("Username detected, looking up email...");
+      const { data: userData, error: userError } = await supabase
+        .from("Account")
+        .select("account_email")
+        .eq("account_username", emailOrUsername)
+        .single();
+
+      if (userError || !userData?.account_email) {
+        console.error(
+          "Username lookup failed:",
+          userError?.message || "No email found"
+        );
+        return { error: "Invalid credentials" };
+      }
+
+      email = userData.account_email;
+      console.log("Mapped username to email:", email);
+    }
+
+    console.log("Attempting login with email:", email);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error("Authentication failed:", error.message);
+      return { error: "Invalid credentials" };
+    }
+
+    revalidatePath("/", "layout");
+    return { success: true }; // Return success instead of redirect
+  } catch (error) {
+    console.error("Unexpected login error:", error);
+    return { error: "An unexpected error occurred. Please try again." };
   }
-
-  revalidatePath("/", "layout");
-  redirect("/");
 }
 
 export async function signup(formData: FormData) {
@@ -96,11 +135,10 @@ const sendResetPasswordEmail = async (formData: FormData) => {
     };
   }
 
-  // Redirect URL for updating the password page after user clicks the reset link
   const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`;
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: redirectUrl, // Make sure this URL points to the correct route
+    redirectTo: redirectUrl,
   });
 
   if (error) {
@@ -117,7 +155,6 @@ const sendResetPasswordEmail = async (formData: FormData) => {
   };
 };
 
-// Refactor to accept state and formData
 const updatePassword = async (
   state: { error: string; success: string },
   formData: FormData
@@ -153,5 +190,69 @@ const updatePassword = async (
     error: "",
   };
 };
+
+export async function updateUsername(formData: FormData) {
+  const supabase = await createClientForServer();
+
+  const username = formData.get("username") as string;
+
+  if (!username || username.trim().length === 0) {
+    throw new Error("Username cannot be empty.");
+  }
+
+  const { data: session, error: sessionError } = await supabase.auth.getUser();
+  if (sessionError || !session?.user) {
+    throw new Error("User not authenticated.");
+  }
+  console.log("USERNAMEE: " + username);
+
+  const { error } = await supabase.auth.updateUser({
+    data: {
+      username: username,
+    },
+  });
+
+  if (error) {
+    console.log("Error updating username:", error);
+    throw new Error(error.message);
+  }
+
+  console.log("Debugging variables:");
+  console.log("Username being set:", username);
+  console.log("Session user ID:", session?.user?.id); // Optional chaining to prevent errors
+  console.log("Table name:", "Account");
+  console.log("Supabase client initialized:", !!supabase); // Check if client exists
+
+  if (!session?.user?.id) {
+    console.error("No valid session or user ID!");
+    throw new Error("Authentication required");
+  }
+
+  const { error: accountUpdateError } = await supabase
+    .from("Account")
+    .update({
+      account_username: username,
+    })
+    .eq("account_id", session.user.id);
+
+  if (accountUpdateError) {
+    console.error("Update error details:", {
+      errorMessage: accountUpdateError.message,
+      errorCode: accountUpdateError.code,
+      attemptedUsername: username,
+      attemptedUserId: session.user.id,
+    });
+    throw new Error(accountUpdateError.message);
+  } else {
+    console.log("Update successful for:", {
+      userId: session.user.id,
+      newUsername: username,
+    });
+  }
+
+  revalidatePath("/");
+
+  redirect("/");
+}
 
 export { updatePassword, sendResetPasswordEmail };

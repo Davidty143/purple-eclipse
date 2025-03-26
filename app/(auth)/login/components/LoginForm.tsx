@@ -1,19 +1,43 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { login } from "@/lib/auth-actions";
 import SignInWithGoogleButton from "./SignInWithGoogleButton";
 
 export function LoginForm() {
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append("emailOrUsername", emailOrUsername);
+    formData.append("password", password);
+
+    try {
+      const result = await login(formData);
+
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        window.location.href = "/";
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Card className="mx-auto w-[350px] sm:w-[400px] h-[500px] sm-h-[600px]">
       <CardHeader>
@@ -26,20 +50,22 @@ export function LoginForm() {
           Login
         </div>
         <SignInWithGoogleButton />
-        <form action="">
+        <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <div className="grid gap-2 mt-4">
               <Input
-                id="email"
-                name="email"
-                type="email"
+                id="emailOrUsername"
+                name="emailOrUsername"
+                type="text"
                 placeholder="Enter email or username"
                 className="text-sm"
                 required
+                value={emailOrUsername}
+                onChange={(e) => setEmailOrUsername(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div className="grid">
-              <div className="flex items-center"></div>
               <Input
                 id="password"
                 name="password"
@@ -47,6 +73,9 @@ export function LoginForm() {
                 className="text-sm"
                 placeholder="Enter password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
               <Link
                 href="#"
@@ -55,8 +84,11 @@ export function LoginForm() {
                 Forgot your password?
               </Link>
             </div>
-            <Button type="submit" formAction={login} className="w-full">
-              Login
+
+            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Login"}
             </Button>
           </div>
         </form>
