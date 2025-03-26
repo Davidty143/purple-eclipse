@@ -204,6 +204,7 @@ export async function updateUsername(formData: FormData) {
   if (sessionError || !session?.user) {
     throw new Error("User not authenticated.");
   }
+  console.log("USERNAMEE: " + username);
 
   const { error } = await supabase.auth.updateUser({
     data: {
@@ -214,6 +215,39 @@ export async function updateUsername(formData: FormData) {
   if (error) {
     console.log("Error updating username:", error);
     throw new Error(error.message);
+  }
+
+  console.log("Debugging variables:");
+  console.log("Username being set:", username);
+  console.log("Session user ID:", session?.user?.id); // Optional chaining to prevent errors
+  console.log("Table name:", "Account");
+  console.log("Supabase client initialized:", !!supabase); // Check if client exists
+
+  if (!session?.user?.id) {
+    console.error("No valid session or user ID!");
+    throw new Error("Authentication required");
+  }
+
+  const { error: accountUpdateError } = await supabase
+    .from("Account")
+    .update({
+      account_username: username,
+    })
+    .eq("account_id", session.user.id);
+
+  if (accountUpdateError) {
+    console.error("Update error details:", {
+      errorMessage: accountUpdateError.message,
+      errorCode: accountUpdateError.code,
+      attemptedUsername: username,
+      attemptedUserId: session.user.id,
+    });
+    throw new Error(accountUpdateError.message);
+  } else {
+    console.log("Update successful for:", {
+      userId: session.user.id,
+      newUsername: username,
+    });
   }
 
   revalidatePath("/");
