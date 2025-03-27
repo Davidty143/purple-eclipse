@@ -4,10 +4,13 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import LoginButton from "@/components/LoginLogoutButton";
 import SignupButton from "@/components/SignupButton";
+import LoggedOutHeaderRight from "./layout/components/LoggedOutHeaderRight";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import "@radix-ui/themes/styles.css";
 import Image from "next/image";
+import PreloadAuth from "./layout/components/PreloadAuth";
+import PreloadAuthRoutes from "./layout/components/PreloadAuthRoutes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn("bg-background", inter.className)}>
+        <PreloadAuth />
+        <PreloadAuthRoutes />
         {/* Wrapper div to hold all elements */}
         <div className="w-full">
           {/* Wrapper for both headers */}
@@ -87,8 +92,7 @@ export default function RootLayout({
                     "flex-shrink-0"
                   )}
                 >
-                  <SignupButton />
-                  <LoginButton />
+                  <LoggedOutHeaderRight />
                 </div>
               </div>
             </div>
