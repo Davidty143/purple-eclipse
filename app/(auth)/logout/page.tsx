@@ -1,13 +1,18 @@
+//logout/page.tsx
+
 "use client";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const LogoutPage = () => {
   const router = useRouter();
+
   useEffect(() => {
-    setTimeout(() => router.push("/"), 2000);
-  }, [router]); // Add 'router' to the dependency array
-  return <div>You have logged out... redirecting in a sec.</div>;
+    const timer = setTimeout(() => router.replace("/"), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return <div>Logged out. Redirecting...</div>;
 };
 
 export default LogoutPage;

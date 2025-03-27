@@ -46,7 +46,7 @@ export function LoginForm() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-start text-sm font-semibold text-gray-900 py-2">
+        <div className="text-start text-sm font-semibold text-gray-900 pb-4">
           Login
         </div>
         <SignInWithGoogleButton />
@@ -78,7 +78,7 @@ export function LoginForm() {
                 disabled={isLoading}
               />
               <Link
-                href="#"
+                href="/reset-password"
                 className="ml-auto inline-block text-xs underline p-2"
               >
                 Forgot your password?
