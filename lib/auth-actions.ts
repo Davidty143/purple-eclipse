@@ -57,7 +57,7 @@ export async function login(formData: FormData) {
     }
 
     revalidatePath("/", "layout");
-    return { success: true }; // Return success instead of redirect
+    return { success: true };
   } catch (error) {
     console.error("Unexpected login error:", error);
     return { error: "An unexpected error occurred. Please try again." };
