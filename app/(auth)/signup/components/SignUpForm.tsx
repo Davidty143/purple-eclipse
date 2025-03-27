@@ -48,12 +48,12 @@ export function SignUpForm() {
         <CardTitle className="text-2xl text-center">VISCONN</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-start text-sm font-semibold text-gray-900 py-2">
+        <div className="text-start text-sm font-semibold text-gray-900 pb-4">
           Signup
         </div>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
-            <div className="grid gap-2 mt-4">
+            <div className="grid gap-4">
               <Input
                 name="username"
                 id="username"

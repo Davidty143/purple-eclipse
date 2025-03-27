@@ -38,7 +38,7 @@ export async function login(formData: FormData) {
           "Username lookup failed:",
           userError?.message || "No email found"
         );
-        return { error: "Invalid credentials" };
+        return { error: "Invalid username or password." };
       }
 
       email = userData.account_email;
@@ -53,7 +53,7 @@ export async function login(formData: FormData) {
 
     if (error) {
       console.error("Authentication failed:", error.message);
-      return { error: "Invalid credentials" };
+      return { error: "Invalid username or password." };
     }
 
     revalidatePath("/", "layout");
@@ -98,9 +98,9 @@ export async function signout() {
   const { error } = await supabase.auth.signOut();
   if (error) {
     console.log(error);
-    redirect("/error");
+    throw new Error("Logout failed");
   }
-
+  revalidatePath("/");
   redirect("/logout");
 }
 
@@ -160,35 +160,39 @@ const updatePassword = async (
   formData: FormData
 ) => {
   const supabase = await createClientForServer();
-
   const password = formData.get("password");
+  const confirmPassword = formData.get("confirmPassword");
 
-  if (password === null || typeof password !== "string") {
+  // Basic validation
+  if (typeof password !== "string" || password.length < 8) {
+    return { error: "Password must be at least 8 characters", success: "" };
+  }
+
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match", success: "" };
+  }
+
+  // Simplified regex without special character requirement
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+  if (!passwordRegex.test(password)) {
     return {
-      ...state,
+      error:
+        "Password must contain at least one uppercase letter and one number",
       success: "",
-      error: "Password is required",
     };
   }
 
-  const { data, error } = await supabase.auth.updateUser({
-    password: password as string, // Casting password to string if not null
+  // Update password
+  const { error } = await supabase.auth.updateUser({
+    password: password,
   });
 
   if (error) {
-    console.log("error", error);
-    return {
-      ...state,
-      success: "",
-      error: error.message,
-    };
+    console.error("Password update error:", error);
+    return { error: error.message, success: "" };
   }
 
-  return {
-    ...state,
-    success: "Password updated",
-    error: "",
-  };
+  return { error: "", success: "Password updated successfully" };
 };
 
 export async function updateUsername(formData: FormData) {
