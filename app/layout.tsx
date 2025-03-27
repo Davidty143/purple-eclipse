@@ -11,6 +11,7 @@ import "@radix-ui/themes/styles.css";
 import Image from "next/image";
 import PreloadAuth from "./layout/components/PreloadAuth";
 import PreloadAuthRoutes from "./layout/components/PreloadAuthRoutes";
+import Logo from "./layout/components/Logo"; // Import the new Logo component
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -72,12 +73,7 @@ export default function RootLayout({
                     "py-5"
                   )}
                 >
-                  <Image
-                    src="/images/VISCONN.png"
-                    alt="Logo"
-                    width={150} // Set a width for the image
-                    height={150} // Set a height for the image
-                  />
+                  <Logo />
                 </div>
 
                 {/* Login Section */}
@@ -85,7 +81,6 @@ export default function RootLayout({
                   className={cn(
                     "menu-header",
                     "h-full", // Take full height of the parent
-                    "w-[220px]", // Width as 10% of parent
                     "flex",
                     "items-center",
                     "justify-end",
