@@ -9,7 +9,6 @@ interface AuthContextValue {
   isLoading: boolean;
 }
 
-// Initialize with default values
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
