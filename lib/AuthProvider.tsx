@@ -3,22 +3,35 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js"; // Import the User type from Supabase
 
 interface AuthContextValue {
-  user: any;
+  user: User | null;
   isLoading: boolean;
+}
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+  serverUser?: User | null; // Add serverUser prop
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({
+  children,
+  serverUser = null,
+}: AuthProviderProps) {
   const [state, setState] = useState<AuthContextValue>({
-    user: null,
-    isLoading: true,
+    user: serverUser, // Initialize with serverUser if provided
+    isLoading: !serverUser, // If we have serverUser, no initial loading
   });
+
   const supabase = createClient();
 
   useEffect(() => {
+    // Skip if we already initialized with serverUser
+    if (serverUser) return;
+
     const checkAuth = async () => {
       try {
         const {
@@ -49,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
 
     return () => subscription?.unsubscribe();
-  }, []);
+  }, [serverUser]); // Add serverUser to dependencies
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 }
