@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 
-const BodyHeader = () => {
+const PostThreadButton = () => {
   return (
     <div className="">
       <Button />
@@ -9,4 +9,4 @@ const BodyHeader = () => {
   );
 };
 
-export default BodyHeader;
+export default PostThreadButton;
