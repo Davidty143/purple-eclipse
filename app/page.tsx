@@ -1,5 +1,6 @@
 import { createClientForServer } from "@/utils/supabase/server";
 import Image from "next/image";
+import LandingPage from "./(landingPage)/page";
 
 export default async function Home() {
   const supabase = await createClientForServer();
@@ -8,8 +9,8 @@ export default async function Home() {
 
   if (!session.data.user)
     return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h1 className="text-4xl font-bold">Not Authenticated</h1>
+      <div className="flex flex-col p-10 h-screen relative items-center justify-start">
+        <LandingPage/>
       </div>
     );
 

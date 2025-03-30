@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 
 const BodyHeader = () => {
   return (
-    <div className="p-body-header border-2 -bold px-5 py-3 rounded-md">
+    <div className="p-body-header border-1 px-5 py-3 rounded-md">
       <div className="p-title text-lg font-semibold flex flex-row justify-between">
         <h1 className="p-title-value ">WELCOME TO VISCONN!</h1>
         <div className="ml-auto">
-          <Button className="px-4 text-sm border bg-white text-black">
+          <Button className="px-4 text-sm border bg-white text-black ">
             Post Thread
           </Button>
         </div>
