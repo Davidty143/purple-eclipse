@@ -1,6 +1,6 @@
 const topics = [
     {
-      avatar: "https://i.pravatar.cc/40?img=1",
+      avatar: " ",
       tag: "Help",
       title: "Thesis Title Recommendation",
       user: "Benjie S",
@@ -58,6 +58,18 @@ const topics = [
       views: 46,
       time: "Yesterday",
       lastAvatar: "https://i.pravatar.cc/40?img=10",
+    },
+    {
+      avatar: " ",
+      tag: "Help",
+      title: "Thesis Title Recommendation",
+      user: "Benjie S",
+      date: "Feb 20, 2025",
+      category: "Academics",
+      replies: 15,
+      views: 102,
+      time: "2:11 AM",
+      lastAvatar: "https://i.pravatar.cc/40?img=2",
     },
   ];
 
