@@ -15,7 +15,7 @@ export function ForumTitle({ title, showActions = true }: ForumTitleProps) {
   const handleMore = () => console.log('More options clicked');
 
   return (
-    <div className="flex items-center border-2 py-4 px-6 rounded-lg">
+    <div className="flex items-center border-2 py-4 px-6 rounded-lg bg-gray-100">
       <h1 className="text-lg font-semibold ">{title}</h1>
 
       {showActions && (
