@@ -4,13 +4,21 @@ import { FeaturedTopics } from "./components/FeaturedTopics";
 
 const LandingPage = () => {
     return (
-    <div className="flex flex-row space-x-10 justify-center">
-        <div className="flex flex-1 flex-col space-y-14">
-            <LandingHeader />
-            <FeaturedTopics />
-        </div>
-        <div className="flex flex-1 flex-col space-y-14">
-            <NewTopics />
+    <div className="min-h-screen flex justify-center">
+        {/* Focus Content */}
+        <div className="w-[1250px] 2xl:w-[80%] flex flex-col">
+          {/* Main Body */}
+          <div className="w-full flex flex-col lg:flex-row justify-between gap-6">
+            {/* Content Body */}
+                <div className="w-full flex flex-col gap-4">
+                    <LandingHeader />
+                    <FeaturedTopics />
+                </div>
+                <div className="flex flex-1 flex-col space-y-14 max-h-auto h-auto">
+                    <NewTopics />
+                </div>
+            </div>
+                <div className="w-full h-[10vh]">FOOTER</div>
         </div>
     </div>
     )

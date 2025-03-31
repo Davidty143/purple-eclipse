@@ -6,7 +6,7 @@ export default async function Home() {
 
   const session = await supabase.auth.getUser();
 
-  if (!session.data.user) return <div className="flex flex-col p-10 h-screen relative items-center justify-start"></div>;
+
 
   const {
     data: {
