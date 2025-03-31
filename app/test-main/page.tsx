@@ -1,7 +1,11 @@
 import Image from "next/image";
+import { FeaturedTopics } from "../(landingPage)/components/FeaturedTopics";
+import { LandingHeader } from "../(landingPage)/components/LandingHeader";
+import { NewTopics } from "../(landingPage)/components/NewTopics";
 import BodyHeader from "@/components/BodyHeader";
 import ThreadBlock from "@/components/ThreadBlock";
 import ThreadNameBlock from "@/components/ThreadNameBlock";
+
 
 export default function TestMain() {
   return (
@@ -15,6 +19,7 @@ export default function TestMain() {
             {/* Content Body */}
             <div className="bg-blue-200 w-full flex flex-col gap-4">
               <BodyHeader />
+              <ThreadBlock />
               <ThreadBlock />
               <ThreadBlock />
               <ThreadBlock />

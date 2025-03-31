@@ -9,9 +9,7 @@ export default async function Home() {
 
   if (!session.data.user)
     return (
-      <div className="flex flex-col p-10 h-screen relative items-center justify-start">
-        <LandingPage/>
-      </div>
+      <LandingPage/>
     );
 
   const {
