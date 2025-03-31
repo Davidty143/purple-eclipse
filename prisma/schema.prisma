@@ -11,24 +11,24 @@ model Account {
   account_id       String    @id @default(uuid()) @db.Uuid
   account_username String?   @unique
   account_email    String?   @unique
-  account_status   AccountStatus? // Make nullable
-  account_is_deleted Boolean? // Make nullable
-  account_role_id  String?   @db.Uuid  // Foreign Key to Role
-  account_role     Role?     @relation(fields: [account_role_id], references: [role_id]) // Make nullable
+  account_status   AccountStatus?
+  account_is_deleted Boolean?
+  account_role_id  String?   @db.Uuid
+  account_role     Role?     @relation(fields: [account_role_id], references: [role_id])
 }
 
 model Role {
   role_id   String         @id @default(uuid()) @db.Uuid
-  role_type RoleType?      @unique // Make nullable
-  accounts  Account[]     // Make nullable
-  previleges Previlage[]  // Make nullable
+  role_type RoleType?      @unique
+  accounts  Account[]     
+  previleges Previlage[]  
 }
 
 model Previlage {
   previlege_id          String   @id @default(uuid()) @db.Uuid
-  previlege_name        String?  // Make nullable
-  previlege_description String?  // Make nullable
-  roles                 Role[]  // Make nullable
+  previlege_name        String?  
+  previlege_description String?  
+  roles                 Role[]  
 }
 
 enum AccountStatus {
@@ -44,26 +44,27 @@ enum RoleType {
   GUEST
 }
 
-
 model Forum {
-  forum_id          String    @id @default(uuid()) @db.Uuid
+  forum_id          Int       @id @default(autoincrement())
   forum_name        String?   @unique
   forum_description String? 
-  forum_is_deleted  Boolean   @default(false)
+  forum_is_deleted  Boolean   @default(false) @map("forum_deleted")
   forum_created     DateTime  @default(now()) @db.Timestamptz @map("forum_created")
   forum_modified    DateTime  @updatedAt @db.Timestamptz @map("forum_modified")
   
   subforums Subforum[]
+
+  @@map("Forum")
 }
 
 model Subforum {
   subforum_id          Int       @id @default(autoincrement())
   subforum_name        String?   @unique
   subforum_description String? 
-  subforum_isDeleted   Boolean   @default(false) @map("subforum_is_deleted")
-  subforum_createdAt   DateTime  @default(now()) @db.Timestamptz @map("subforum_created")
-  subforum_updatedAt   DateTime  @updatedAt @db.Timestamptz @map("subforum_modified")
+  subforum_isDeleted   Boolean   @default(false) @map("subforum_deleted")
+  subforum_created    DateTime  @default(now()) @db.Timestamptz @map("subforum_created")
+  subforum_modified   DateTime  @updatedAt @db.Timestamptz @map("subforum_modified")
   
   forum    Forum    @relation(fields: [forum_id], references: [forum_id])
-  forum_id String   @map("forum_id") @db.Uuid
+  forum_id Int      @map("forum_id")
 }
