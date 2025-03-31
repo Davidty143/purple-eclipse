@@ -5,17 +5,15 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { MdOutlineLogin } from "react-icons/md";
 
-// Declare SignupProps interface
 interface SignupProps {
-  className?: string; // Accept className as an optional prop
+  className?: string;
 }
 
 const Signup: React.FC<SignupProps> = ({ className }) => {
-  const [user, setUser] = useState<any>(null); // Track user state
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
   const supabase = createClient();
 
-  // Fetch user information on component mount
   useEffect(() => {
     const fetchUser = async () => {
       const {
@@ -26,12 +24,10 @@ const Signup: React.FC<SignupProps> = ({ className }) => {
     fetchUser();
   }, [supabase.auth]); // Only run once on mount
 
-  // If user is logged in, don't show the button
   if (user) {
-    return null; // You can return null or another component here
+    return null;
   }
 
-  // If user is not logged in, show the signup button
   return (
     <Button
       variant="outline"
