@@ -1,28 +1,22 @@
-import { createClientForServer } from "@/utils/supabase/server";
-import Image from "next/image";
-import LandingPage from "./(landingPage)/page";
+import { createClientForServer } from '@/utils/supabase/server';
+import Image from 'next/image';
 
 export default async function Home() {
   const supabase = await createClientForServer();
 
   const session = await supabase.auth.getUser();
 
-  if (!session.data.user)
-    return (
-      <div className="flex flex-col p-10 h-screen relative items-center justify-start">
-        <LandingPage/>
-      </div>
-    );
+  if (!session.data.user) return <div className="flex flex-col p-10 h-screen relative items-center justify-start"></div>;
 
   const {
     data: {
-      user: { user_metadata, app_metadata },
-    },
+      user: { user_metadata, app_metadata }
+    }
   } = session;
 
   const { name, email, username, avatar_url } = user_metadata;
 
-  const userName = username ? `@${username}` : "User Name Not Set";
+  const userName = username ? `@${username}` : 'User Name Not Set';
 
   // console.log(session)
 
