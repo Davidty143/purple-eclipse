@@ -43,3 +43,27 @@ enum RoleType {
   USER
   GUEST
 }
+
+
+model Forum {
+  forum_id          String    @id @default(uuid()) @db.Uuid
+  forum_name        String?   @unique
+  forum_description String? 
+  forum_is_deleted  Boolean   @default(false)
+  forum_created     DateTime  @default(now()) @db.Timestamptz @map("forum_created")
+  forum_modified    DateTime  @updatedAt @db.Timestamptz @map("forum_modified")
+  
+  subforums Subforum[]
+}
+
+model Subforum {
+  subforum_id          Int       @id @default(autoincrement())
+  subforum_name        String?   @unique
+  subforum_description String? 
+  subforum_isDeleted   Boolean   @default(false) @map("subforum_is_deleted")
+  subforum_createdAt   DateTime  @default(now()) @db.Timestamptz @map("subforum_created")
+  subforum_updatedAt   DateTime  @updatedAt @db.Timestamptz @map("subforum_modified")
+  
+  forum    Forum    @relation(fields: [forum_id], references: [forum_id])
+  forum_id String   @map("forum_id") @db.Uuid
+}
