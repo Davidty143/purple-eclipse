@@ -28,23 +28,16 @@ export function ForumComponentWrapper() {
         if (!response.ok) throw new Error('Failed to fetch forums');
         const data = await response.json();
 
-        // Print the raw API response to console
-        console.log('API Response:', data);
-
-        setForums(data);
-
-        // Also print the transformed data that will be used in the component
-        console.log(
-          'Mapped Forum Data:',
-          data.map((forum) => ({
-            id: forum.id,
-            name: forum.name,
-            subforums: forum.subforums.map((sub) => ({
-              id: sub.id,
-              name: sub.name
-            }))
+        const transformedData = data.map((forum: ForumData) => ({
+          id: forum.id,
+          name: forum.name,
+          subforums: forum.subforums.map((subforum: Subforum) => ({
+            id: subforum.id,
+            name: subforum.name
           }))
-        );
+        }));
+
+        setForums(transformedData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {

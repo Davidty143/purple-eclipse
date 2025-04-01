@@ -23,7 +23,7 @@ export function ForumTitle({ title, showActions = true, onAdd }: ForumTitleProps
       <h1 className="text-lg font-semibold">{title}</h1>
 
       {showActions && (
-        <div className="flex gap-1">
+        <div className="flex">
           <Button variant="ghost" size="icon" onClick={handleEdit} className="text-gray-500 hover:text-gray-700 hover:bg-gray-200">
             <Edit className="h-4 w-4" />
           </Button>
