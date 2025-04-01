@@ -42,7 +42,7 @@ export function CreateForumDialog() {
       }
 
       setOpen(false);
-      window.location.reload(); // Refresh the forums list
+      window.location.reload();
     } catch (error: any) {
       setErrors({
         ...errors,

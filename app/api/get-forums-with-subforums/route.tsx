@@ -1,8 +1,8 @@
-// app/api/get-forums-with-subforums/route.ts
+//get-forums-with-subforums
 import { createClientForServer } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClientForServer();
 
@@ -12,29 +12,36 @@ export async function GET() {
         `
         forum_id, 
         forum_name,
+        forum_description,
+        forum_deleted,
         Subforum (
           subforum_id,
-          subforum_name
+          subforum_name,
+          subforum_description,
+          subforum_deleted
         )
       `
       )
       .eq('forum_deleted', false)
-      .order('forum_name');
+      .order('forum_name', { ascending: true });
 
     if (error) throw error;
 
-    const forums = data.map((forum) => ({
+    const forumsWithSubforums = data.map((forum) => ({
       id: forum.forum_id,
       name: forum.forum_name,
-      subforums: forum.Subforum.map((sub) => ({
-        id: sub.subforum_id,
-        name: sub.subforum_name
+      description: forum.forum_description,
+      isDeleted: forum.forum_deleted,
+      subforums: forum.Subforum.filter((subforum) => !subforum.subforum_deleted).map((subforum) => ({
+        id: subforum.subforum_id,
+        name: subforum.subforum_name,
+        description: subforum.subforum_description,
+        isDeleted: subforum.subforum_deleted
       }))
     }));
 
-    return NextResponse.json(forums);
-  } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : 'Failed to load forums';
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return NextResponse.json(forumsWithSubforums);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Failed to fetch forums' }, { status: 500 });
   }
 }

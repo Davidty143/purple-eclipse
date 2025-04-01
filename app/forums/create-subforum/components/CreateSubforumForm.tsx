@@ -15,7 +15,7 @@ interface Forum {
 }
 
 interface CreateSubforumFormProps {
-  parentId?: number; // Add this interface for props
+  parentId?: number;
 }
 
 export default function CreateSubforumForm({ parentId }: CreateSubforumFormProps) {
@@ -24,7 +24,7 @@ export default function CreateSubforumForm({ parentId }: CreateSubforumFormProps
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    forum_id: parentId ? parentId.toString() : '' // Initialize with parentId if provided
+    forum_id: parentId ? parentId.toString() : ''
   });
   const [forums, setForums] = useState<Forum[]>([]);
   const [error, setError] = useState('');
@@ -38,7 +38,6 @@ export default function CreateSubforumForm({ parentId }: CreateSubforumFormProps
         const data = await response.json();
         setForums(data);
 
-        // If parentId is provided, verify it exists in the fetched forums
         if (parentId) {
           const parentExists = data.some((forum: Forum) => forum.id === parentId);
           if (!parentExists) {
@@ -51,13 +50,12 @@ export default function CreateSubforumForm({ parentId }: CreateSubforumFormProps
       }
     };
     fetchForums();
-  }, [parentId]); // Add parentId to dependency array
+  }, [parentId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Validation
     if (!formData.forum_id) {
       setError('Please select a parent forum');
       return;

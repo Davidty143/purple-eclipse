@@ -3,6 +3,7 @@
 import { ForumTitle } from './ForumTitle';
 import { SubforumCard } from './SubforumCard';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Subforum {
   id: number;
@@ -19,36 +20,41 @@ export function ForumComponentWrapper() {
   const [forums, setForums] = useState<ForumData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const fetchForums = async () => {
+    try {
+      const response = await fetch('/api/get-forums-with-subforums');
+      if (!response.ok) throw new Error('Failed to fetch forums');
+      const data = await response.json();
+
+      setForums(
+        data.map((forum: ForumData) => ({
+          id: forum.id,
+          name: forum.name,
+          subforums: forum.subforums.map((subforum: Subforum) => ({
+            id: subforum.id,
+            name: subforum.name
+          }))
+        }))
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchForums() {
-      try {
-        const response = await fetch('/api/get-forums-with-subforums');
-        if (!response.ok) throw new Error('Failed to fetch forums');
-        const data = await response.json();
-
-        setForums(
-          data.map((forum: ForumData) => ({
-            id: forum.id,
-            name: forum.name,
-            subforums: forum.subforums.map((subforum: Subforum) => ({
-              id: subforum.id,
-              name: subforum.name
-            }))
-          }))
-        );
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchForums();
   }, []);
 
+  const handleDeleteSuccess = () => {
+    fetchForums();
+  };
+
   const handleAddSuccess = () => {
-    window.location.reload();
+    fetchForums();
   };
 
   if (loading) return <div className="p-4">Loading forums...</div>;
@@ -59,8 +65,7 @@ export function ForumComponentWrapper() {
     <div className="space-y-8">
       {forums.map((forum) => (
         <div key={forum.id} className="space-y-4">
-          <ForumTitle title={forum.name} forumId={forum.id} onAddSuccess={handleAddSuccess} />
-
+          <ForumTitle title={forum.name} forumId={forum.id} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {forum.subforums.map((subforum) => (
               <SubforumCard key={subforum.id} name={subforum.name} />
