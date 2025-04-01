@@ -1,7 +1,6 @@
 // components/forum-header.tsx
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { CreateForumDialog } from './CreateForumDialog'; // Adjust path as needed
 
 export function ForumHeader() {

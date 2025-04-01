@@ -1,4 +1,3 @@
-// components/forum-wrapper.tsx
 'use client';
 
 import { ForumTitle } from './ForumTitle';
@@ -28,16 +27,16 @@ export function ForumComponentWrapper() {
         if (!response.ok) throw new Error('Failed to fetch forums');
         const data = await response.json();
 
-        const transformedData = data.map((forum: ForumData) => ({
-          id: forum.id,
-          name: forum.name,
-          subforums: forum.subforums.map((subforum: Subforum) => ({
-            id: subforum.id,
-            name: subforum.name
+        setForums(
+          data.map((forum: ForumData) => ({
+            id: forum.id,
+            name: forum.name,
+            subforums: forum.subforums.map((subforum: Subforum) => ({
+              id: subforum.id,
+              name: subforum.name
+            }))
           }))
-        }));
-
-        setForums(transformedData);
+        );
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
@@ -48,6 +47,10 @@ export function ForumComponentWrapper() {
     fetchForums();
   }, []);
 
+  const handleAddSuccess = () => {
+    window.location.reload();
+  };
+
   if (loading) return <div className="p-4">Loading forums...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
   if (forums.length === 0) return <div className="p-4">No forums available</div>;
@@ -56,7 +59,7 @@ export function ForumComponentWrapper() {
     <div className="space-y-8">
       {forums.map((forum) => (
         <div key={forum.id} className="space-y-4">
-          <ForumTitle title={forum.name} showActions={true} />
+          <ForumTitle title={forum.name} forumId={forum.id} onAddSuccess={handleAddSuccess} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {forum.subforums.map((subforum) => (
