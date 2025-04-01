@@ -4,7 +4,7 @@ import { ForumTitle } from './ForumTitle';
 import { SubforumCard } from './SubforumCard';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreateForumDialog } from './CreateForumDialog'; // Make sure this path is correct
+import { CreateForumDialog } from './CreateForumDialog';
 
 interface Subforum {
   id: number;
@@ -14,6 +14,7 @@ interface Subforum {
 interface ForumData {
   id: number;
   name: string;
+  description?: string;
   subforums: Subforum[];
 }
 
@@ -33,6 +34,7 @@ export function ForumComponentWrapper() {
         data.map((forum: ForumData) => ({
           id: forum.id,
           name: forum.name,
+          description: forum.description || '',
           subforums: forum.subforums.map((subforum: Subforum) => ({
             id: subforum.id,
             name: subforum.name
@@ -58,6 +60,10 @@ export function ForumComponentWrapper() {
     fetchForums();
   };
 
+  const handleEditSuccess = () => {
+    fetchForums();
+  };
+
   if (loading) return <div className="p-4">Loading forums...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
   if (forums.length === 0) return <div className="p-4">No forums available</div>;
@@ -71,7 +77,7 @@ export function ForumComponentWrapper() {
 
       {forums.map((forum) => (
         <div key={forum.id} className="space-y-4">
-          <ForumTitle title={forum.name} forumId={forum.id} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} />
+          <ForumTitle title={forum.name} forumId={forum.id} description={forum.description} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} onEditSuccess={handleEditSuccess} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {forum.subforums.map((subforum) => (
               <SubforumCard key={subforum.id} name={subforum.name} />
