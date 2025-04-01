@@ -2,7 +2,7 @@ import CreateSubforumForm from './components/CreateSubforumForm';
 
 interface PageProps {
   params: {
-    subforumId: string; // This is the parent subforum ID
+    subforumId: string;
   };
 }
 
