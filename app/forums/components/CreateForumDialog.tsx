@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
-export function CreateForumDialog() {
+interface CreateForumDialogProps {
+  onSuccess?: () => void;
+}
+
+export function CreateForumDialog({ onSuccess }: CreateForumDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     forum_name: '',
@@ -42,7 +46,8 @@ export function CreateForumDialog() {
       }
 
       setOpen(false);
-      window.location.reload();
+      setFormData({ forum_name: '', forum_description: '' });
+      onSuccess?.();
     } catch (error: any) {
       setErrors({
         ...errors,

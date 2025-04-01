@@ -4,6 +4,7 @@ import { ForumTitle } from './ForumTitle';
 import { SubforumCard } from './SubforumCard';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { CreateForumDialog } from './CreateForumDialog'; // Make sure this path is correct
 
 interface Subforum {
   id: number;
@@ -63,6 +64,11 @@ export function ForumComponentWrapper() {
 
   return (
     <div className="space-y-8">
+      <div className="flex items-center justify-between border-t-2 pt-4 mt-2">
+        <h2 className="text-lg font-semibold">Forums List</h2>
+        <CreateForumDialog onSuccess={handleAddSuccess} />
+      </div>
+
       {forums.map((forum) => (
         <div key={forum.id} className="space-y-4">
           <ForumTitle title={forum.name} forumId={forum.id} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} />
