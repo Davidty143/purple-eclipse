@@ -1,13 +1,15 @@
 import { createClientForServer } from '@/utils/supabase/server';
 import Image from 'next/image';
+import LandingPage from './(landingPage)/page';
 import BodyHeader from '@/components/BodyHeader';
 export default async function Home() {
   const supabase = await createClientForServer();
 
-  // Get the session including the user data
   const {
     data: { session }
   } = await supabase.auth.getSession();
+
+  if (!session?.user) return <LandingPage />;
 
   const user = session?.user;
   const user_metadata = user?.user_metadata || {};
