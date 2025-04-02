@@ -5,6 +5,7 @@ import { SubforumCard } from './SubforumCard';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreateForumDialog } from './CreateForumDialog';
+import { Button } from '@/components/ui/button';
 
 interface Subforum {
   id: number;
@@ -66,7 +67,13 @@ export function ForumComponentWrapper() {
 
   if (loading) return <div className="p-4">Loading forums...</div>;
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
-  if (forums.length === 0) return <div className="p-4">No forums available</div>;
+  if (forums.length === 0)
+    return (
+      <div className="p-4 text-center">
+        <p>No forums available</p>
+        <CreateForumDialog onSuccess={handleAddSuccess} />
+      </div>
+    );
 
   return (
     <div className="space-y-8">
@@ -80,7 +87,7 @@ export function ForumComponentWrapper() {
           <ForumTitle title={forum.name} forumId={forum.id} description={forum.description} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} onEditSuccess={handleEditSuccess} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {forum.subforums.map((subforum) => (
-              <SubforumCard key={subforum.id} name={subforum.name} />
+              <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} />
             ))}
           </div>
         </div>
