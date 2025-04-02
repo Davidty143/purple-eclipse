@@ -1,12 +1,13 @@
 import { createClientForServer } from '@/utils/supabase/server';
 import Image from 'next/image';
+import LandingPage from './(landingPage)/page';
 
 export default async function Home() {
   const supabase = await createClientForServer();
 
   const session = await supabase.auth.getUser();
 
-
+  if (!session.data.user) return <LandingPage />;
 
   const {
     data: {
