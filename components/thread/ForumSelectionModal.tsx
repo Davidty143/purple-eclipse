@@ -143,7 +143,6 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
                         </div>
                         <div className="text-sm text-gray-500">
                           <span className="mr-4">Threads: {subforum.thread_count}</span>
-                          <span>Posts: {subforum.post_count}</span>
                         </div>
                       </button>
                     ))}
