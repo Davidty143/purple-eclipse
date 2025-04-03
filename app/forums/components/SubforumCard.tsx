@@ -11,7 +11,7 @@ export function SubforumCard({ name, subforumId }: SubforumCardProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/subforum/${subforumId}`);
+    router.push(`/forums/subforum/${subforumId}`);
   };
 
   return (
