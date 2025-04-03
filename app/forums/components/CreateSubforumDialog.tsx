@@ -35,7 +35,7 @@ export function CreateSubforumDialog({ children, parentId, parentName, onSuccess
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/subforums', {
+      const response = await fetch('/api/get-subforums', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
