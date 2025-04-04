@@ -14,7 +14,27 @@
     <td> PE.010.001 </td>
     <td> 2025-03-12</td>
   </tr>
+  <tr>
+    <td> PE.010.002 </td>
+    <td> 2025-04-02</td>
+  </tr>
 </table>
+
+<h2> PE.010.002 Release Notes </h2>
+<ul>
+  <li> What's New </li>
+  <ul>
+    <li> Updated authentication features: (Sign-in, sign-in using Google, sign-up, sign-up verification) </li>
+    <li> Implemented relevant UI for landing and forums/subforum pages</li>
+    <li> Added a "Forgot Password" feature</li>
+    <li> Added forum and subforum features specifically view, delete, edit, and add </li><br>
+  </ul>
+  
+  <li> Known Issues </li>
+  <ul>
+    <li> Login feature can be a little laggy but can be optimized to boost performance </li>
+  </ul>
+</ul>
 
 <h2> PE.010.001 Release Notes </h2>
 <ul>

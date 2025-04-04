@@ -14,12 +14,17 @@ interface Forum {
   name: string;
 }
 
-export default function CreateSubforumForm() {
+interface CreateSubforumFormProps {
+  parentId?: number;
+}
+
+export default function CreateSubforumForm({ parentId }: CreateSubforumFormProps) {
+  // Accept the prop
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    forum_id: ''
+    forum_id: parentId ? parentId.toString() : ''
   });
   const [forums, setForums] = useState<Forum[]>([]);
   const [error, setError] = useState('');
@@ -29,30 +34,32 @@ export default function CreateSubforumForm() {
     const fetchForums = async () => {
       try {
         const response = await fetch('/api/get-forums');
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch forums');
-        }
-
+        if (!response.ok) throw new Error('Failed to fetch forums');
         const data = await response.json();
         setForums(data);
+
+        if (parentId) {
+          const parentExists = data.some((forum: Forum) => forum.id === parentId);
+          if (!parentExists) {
+            setError('The specified parent forum does not exist');
+          }
+        }
       } catch (err) {
-        console.error('Error loading forums:', err);
-        setError('Failed to load forums. Please try again.');
+        console.error('Fetch forums error:', err);
+        setError('Failed to load forums. Please refresh the page.');
       }
     };
-
     fetchForums();
-  }, []);
+  }, [parentId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
 
     if (!formData.forum_id) {
       setError('Please select a parent forum');
       return;
     }
-
     if (!formData.name.trim()) {
       setError('Subforum name is required');
       return;
@@ -60,32 +67,28 @@ export default function CreateSubforumForm() {
 
     setIsSubmitting(true);
 
-    console.log('name: ' + formData.name);
-    console.log('description:' + formData.description);
-    console.log('ID: ' + formData.forum_id);
-
     try {
-      const response = await fetch('/api/subforums', {
+      const response = await fetch('/api/get-subforums', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          subforum_name: formData.name,
-          subforum_description: formData.description,
-          forum_id: formData.forum_id
+          subforum_name: formData.name.trim(),
+          subforum_description: formData.description.trim(),
+          forum_id: Number(formData.forum_id) // Ensure it's a number
         })
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create subforum');
+        throw new Error(result.error || 'Failed to create subforum');
       }
 
       router.push('/forums');
       router.refresh();
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      console.error('Submission error:', err);
+      setError(err.message || 'Failed to create subforum. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -98,33 +101,40 @@ export default function CreateSubforumForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && <div className="p-3 bg-destructive/10 text-destructive rounded-md">{error}</div>}
+
           <div className="space-y-2">
-            <Label htmlFor="parent_id">Parent Forum *</Label>
-            <Select onValueChange={(value) => setFormData({ ...formData, forum_id: value })} value={formData.forum_id} required>
+            <Label htmlFor="forum_id">Parent Forum *</Label>
+            <Select
+              onValueChange={(value) => setFormData({ ...formData, forum_id: value })}
+              value={formData.forum_id}
+              required
+              disabled={!!parentId} // Disable if parentId is provided
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Select a forum" />
+                <SelectValue placeholder={parentId ? 'Parent forum is pre-selected' : 'Select a forum'} />
               </SelectTrigger>
-              <SelectContent>
-                {forums.map((forum) => (
-                  <SelectItem key={forum.id} value={forum.id.toString()}>
-                    {forum.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+              {!parentId && ( // Only show dropdown if no parentId
+                <SelectContent>
+                  {forums.map((forum) => (
+                    <SelectItem key={forum.id} value={forum.id.toString()}>
+                      {forum.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              )}
             </Select>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="name">Subforum Name *</Label>
-            <Input id="name" name="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Enter subforum name" required disabled={isSubmitting} />
+            <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Enter subforum name" required disabled={isSubmitting} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Describe this subforum" rows={3} disabled={isSubmitting} />
+            <Textarea id="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Describe this subforum" rows={3} disabled={isSubmitting} />
           </div>
-
-          {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => router.push('/forums')} disabled={isSubmitting}>

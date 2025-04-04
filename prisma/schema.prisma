@@ -61,7 +61,7 @@ model Subforum {
   subforum_id          Int       @id @default(autoincrement())
   subforum_name        String?   @unique
   subforum_description String? 
-  subforum_isDeleted   Boolean   @default(false) @map("subforum_deleted")
+  subforum_is_deleted   Boolean   @default(false) @map("subforum_deleted")
   subforum_created    DateTime  @default(now()) @db.Timestamptz @map("subforum_created")
   subforum_modified   DateTime  @updatedAt @db.Timestamptz @map("subforum_modified")
 
@@ -82,3 +82,4 @@ model Thread{
   subforum    Subforum @relation(fields: [subforum_id], references: [subforum_id])
   subforum_id Int      @map("subforum_id")
 }
+

@@ -2,16 +2,15 @@ import { createClientForServer } from '@/utils/supabase/server';
 import Image from 'next/image';
 import LandingPage from './(landingPage)/page';
 import BodyHeader from '@/components/BodyHeader';
+
 export default async function Home() {
   const supabase = await createClientForServer();
 
-  const {
-    data: { session }
-  } = await supabase.auth.getSession();
+  const session = await supabase.auth.getUser();
 
-  if (!session?.user) return <LandingPage />;
+  if (!session.data?.user) return <LandingPage />;
 
-  const user = session?.user;
+  const user = session?.data?.user;
   const user_metadata = user?.user_metadata || {};
   const app_metadata = user?.app_metadata || {};
 

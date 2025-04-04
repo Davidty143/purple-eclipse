@@ -1,10 +1,11 @@
 import { NewTopics } from './components/NewTopics';
-import { LandingHeader } from './components/LandingHeader';
+
 import { FeaturedTopics } from './components/FeaturedTopics';
+import { LandingHeader } from './components/LandingHeader';
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex justify-center">
+    <div className="min-h-screen flex justify-center py-5">
       {/* Focus Content */}
       <div className="w-[1250px] 2xl:w-[80%] flex flex-col">
         {/* Main Body */}
