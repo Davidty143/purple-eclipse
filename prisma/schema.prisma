@@ -15,6 +15,8 @@ model Account {
   account_is_deleted Boolean?
   account_role_id  String?   @db.Uuid
   account_role     Role?     @relation(fields: [account_role_id], references: [role_id])
+  
+  comments Comment[]
 }
 
 model Role {
@@ -81,5 +83,24 @@ model Thread{
   
   subforum    Subforum @relation(fields: [subforum_id], references: [subforum_id])
   subforum_id Int      @map("subforum_id")
+  
+  comments Comment[]
+}
+
+model Comment {
+  comment_id          Int       @id @default(autoincrement())
+  comment_content     String    @db.Text
+  comment_isDeleted   Boolean   @default(false) @map("comment_deleted")
+  comment_created     DateTime  @default(now()) @db.Timestamptz @map("comment_created")
+  comment_modified    DateTime  @updatedAt @db.Timestamptz @map("comment_modified")
+  
+  thread    Thread   @relation(fields: [thread_id], references: [thread_id])
+  thread_id Int      @map("thread_id")
+  
+  author    Account  @relation(fields: [author_id], references: [account_id])
+  author_id String   @db.Uuid @map("author_id")
+
+  @@index([thread_id])
+  @@index([author_id])
 }
 
