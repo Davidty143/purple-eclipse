@@ -12,7 +12,7 @@ const LandingPage = () => {
         {/* Main Body */}
         <div className="w-full flex flex-col lg:flex-row justify-between gap-6">
           {/* Content Body */}
-          <div className="w-full flex flex-col gap-4">
+          <div className="w-full flex flex-col gap-10">
             <LandingHeader />
             <PopularSubforumsGrid />
           </div>
