@@ -58,21 +58,17 @@ export function ThreadRow({ thread, className }: ThreadRowProps) {
             </div>
           </div>
 
-          {/* Stats and Last Reply */}
           <div className="flex gap-4 text-sm text-muted-foreground sm:ml-auto sm:pl-4">
-            {/* Replies */}
             <div className="text-center min-w-[50px]">
               <p className="font-medium">{thread.replies}</p>
               <p className="text-xs">Replies</p>
             </div>
 
-            {/* Views */}
             <div className="text-center min-w-[50px]">
               <p className="font-medium">{thread.views}</p>
               <p className="text-xs">Views</p>
             </div>
 
-            {/* Last Reply - Only shown if exists */}
             {thread.lastComment && (
               <div className="flex items-center gap-2 min-w-[120px]">
                 <div className="text-right">

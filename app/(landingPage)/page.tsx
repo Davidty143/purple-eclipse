@@ -1,6 +1,7 @@
 import { NewTopics } from './components/NewTopics';
 import { FeaturedTopics } from './components/FeaturedTopics';
 import { LandingHeader } from './components/LandingHeader';
+import { PopularSubforumsGrid } from './components/PopularSubforums';
 
 const LandingPage = () => {
   return (
@@ -12,7 +13,7 @@ const LandingPage = () => {
           {/* Content Body */}
           <div className="w-full flex flex-col gap-4">
             <LandingHeader />
-            <FeaturedTopics />
+            <PopularSubforumsGrid />
           </div>
           <div className="flex flex-1 flex-col space-y-14 max-h-auto h-auto">
             <NewTopics />
