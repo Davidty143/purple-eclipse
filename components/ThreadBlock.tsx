@@ -1,5 +1,5 @@
-import React from "react";
-import ThreadRow from "@/components/ThreadRow";
+import React from 'react';
+import ThreadRow from '@/components/ThreadRow';
 
 const ThreadBlock = () => {
   return (

@@ -1,4 +1,3 @@
-// app/forums/subforum/[subforumId]/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,6 +6,7 @@ import SubforumHeader from './components/SubforumHeader';
 import { NoSubforumData } from './components/NoSubforumData';
 import { Loader2 } from 'lucide-react';
 import { NewTopics } from '@/app/(landingPage)/components/NewTopics';
+import { SubforumTopics } from './components/SubforumTopics';
 
 interface SubforumData {
   id: string;
@@ -21,22 +21,17 @@ export default function SubforumPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Mock subforum data fetch
     const fetchData = async () => {
       try {
-        const subforumId = params.subforumId as string;
-        const res = await fetch(`/api/subforums/${subforumId}`);
+        // Simulate API delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        if (!res.ok) {
-          if (res.status === 404) {
-            setError('Subforum not found');
-          } else {
-            throw new Error('Failed to fetch subforum data');
-          }
-          return;
-        }
-
-        const data = await res.json();
-        setSubforum(data);
+        setSubforum({
+          id: params.subforumId as string,
+          name: 'ACADEMICS',
+          description: 'Ask for academic assistance, get the support you need, and help others succeed!'
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
@@ -71,8 +66,10 @@ export default function SubforumPage() {
         <div className="w-full flex flex-col lg:flex-row justify-between gap-8">
           {/* Main Content */}
           <div className="w-full flex flex-col gap-6">
-            <SubforumHeader title={subforum.name} description={subforum.description} />{' '}
+            <SubforumHeader title={subforum.name} description={subforum.description} />
+            <SubforumTopics />
           </div>
+
           {/* Sidebar */}
           <div className="flex-shrink-0 flex flex-col space-y-6">
             <NewTopics />
@@ -82,10 +79,4 @@ export default function SubforumPage() {
       </div>
     </div>
   );
-
-  //   return (
-  //     <div className="container mx-auto px-4 py-8">
-  //       <SubforumHeader title={subforum.name} description={subforum.description} />
-  //     </div>
-  //   );
 }
