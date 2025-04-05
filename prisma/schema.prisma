@@ -64,7 +64,22 @@ model Subforum {
   subforum_is_deleted   Boolean   @default(false) @map("subforum_deleted")
   subforum_created    DateTime  @default(now()) @db.Timestamptz @map("subforum_created")
   subforum_modified   DateTime  @updatedAt @db.Timestamptz @map("subforum_modified")
-  
+
   forum    Forum    @relation(fields: [forum_id], references: [forum_id])
   forum_id Int      @map("forum_id")
-} 
+
+  threads Thread[]
+}
+
+model Thread{
+  thread_id          Int       @id @default(autoincrement())
+  thread_title       String
+  thread_content     String
+  thread_isDeleted   Boolean   @default(false) @map("thread_deleted")
+  thread_created     DateTime  @default(now()) @db.Timestamptz @map("thread_created")
+  thread_modified    DateTime  @updatedAt @db.Timestamptz @map("thread_modified")
+  
+  subforum    Subforum @relation(fields: [subforum_id], references: [subforum_id])
+  subforum_id Int      @map("subforum_id")
+}
+
