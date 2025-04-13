@@ -30,7 +30,7 @@ export default async function MessagesPage() {
         {/* Main conversation area */}
         <div className="w-3/4 flex flex-col bg-background">
           <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold">Select a conversation</h2>
+            <h2 className="text-lg font-semibold">Messages</h2>
           </div>
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center p-6">
