@@ -19,7 +19,7 @@ interface Message {
 }
 
 export default function MessagePage({ params }: { params: Promise<{ userId: string }> }) {
-  const { userId } = use(params); // Unwrap the params promise
+  const { userId } = use(params);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const supabase = createClient();
@@ -44,23 +44,25 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
     };
 
     fetchData();
-  }, [userId]); // Now using the unwrapped userId
+  }, [userId]);
 
   if (!currentUser) {
     return <div className="flex items-center justify-center h-full">Loading...</div>;
   }
 
   return (
-    <div className="flex h-[calc(100vh-160px)]">
-      <div className="w-1/4 border-r">
-        <ConversationsList userId={currentUser.id} />
-      </div>
-      <div className="w-3/4 flex flex-col">
-        <div className="border-b p-4">
-          <h2 className="text-lg font-semibold">Messages</h2>
+    <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto pt-4">
+      <div className="flex h-[calc(100vh-160px)] border rounded-lg overflow-hidden">
+        <div className="w-1/4 border-r bg-background">
+          <ConversationsList userId={currentUser.id} />
         </div>
-        <MessageList messages={messages} currentUserId={currentUser.id} otherUserId={userId} setMessages={setMessages} />
-        <MessageInput receiverId={userId} currentUserId={currentUser.id} setMessages={setMessages} />
+        <div className="w-3/4 flex flex-col bg-background">
+          <div className="border-b p-4 bg-card">
+            <h2 className="text-lg font-semibold">Messages</h2>
+          </div>
+          <MessageList messages={messages} currentUserId={currentUser.id} otherUserId={userId} setMessages={setMessages} />
+          <MessageInput receiverId={userId} currentUserId={currentUser.id} setMessages={setMessages} />
+        </div>
       </div>
     </div>
   );
