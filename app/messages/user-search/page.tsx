@@ -72,10 +72,10 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
                     <AvatarFallback>{user.account_username.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">{user.account_username}</p>
-                    <p className="text-xs text-muted-foreground">{user.account_email}</p>
+                    <p className="text-sm fo  nt-medium">{user.account_username}</p>
                   </div>
                 </div>
+
                 <Button variant="ghost" size="sm" className="text-primary hover:text-primary" asChild>
                   <Link href={`/messages/${user.account_id}`}>
                     <UserPlus className="h-4 w-4 mr-1" />
