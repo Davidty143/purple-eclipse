@@ -24,29 +24,24 @@ export default function ConversationsList({ userId }: { userId: string }) {
   useEffect(() => {
     const fetchConversations = async () => {
       setLoading(true);
-
       try {
-        // Get all conversations for this user
         const { data: conversations } = await supabase.from('direct_messages').select('sender_id, receiver_id, content, created_at, is_read').or(`sender_id.eq.${userId},receiver_id.eq.${userId}`).order('created_at', { ascending: false });
 
         if (conversations) {
-          // Get unique partner IDs with last message
           const partnerMap = new Map<string, ConversationPartner>();
-
           conversations.forEach((conv) => {
             const partnerId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
             if (!partnerMap.has(partnerId) || new Date(conv.created_at) > new Date(partnerMap.get(partnerId)?.last_message_at || 0)) {
               partnerMap.set(partnerId, {
                 id: partnerId,
-                username: '', // Will be filled later
-                last_message: conv.content,
+                username: '',
+                last_message: conv.sender_id === userId ? `You: ${conv.content}` : conv.content,
                 unread_count: conv.sender_id !== userId && !conv.is_read ? 1 : 0,
                 last_message_at: conv.created_at
               });
             }
           });
 
-          // Fetch usernames
           const { data: users } = await supabase.from('Account').select('account_id, account_username').in('account_id', Array.from(partnerMap.keys()));
 
           if (users) {
@@ -66,8 +61,37 @@ export default function ConversationsList({ userId }: { userId: string }) {
 
     fetchConversations();
 
-    const channel = supabase
-      .channel('conversations_updates')
+    const handleNewMessage = (payload: any) => {
+      const newMessage = payload.new;
+      const partnerId = newMessage.sender_id === userId ? newMessage.receiver_id : newMessage.sender_id;
+
+      setPartners((prevPartners) => {
+        const partnerIndex = prevPartners.findIndex((p) => p.id === partnerId);
+        const isIncoming = newMessage.sender_id !== userId;
+
+        // If partner exists in the list
+        if (partnerIndex >= 0) {
+          const updatedPartners = [...prevPartners];
+          updatedPartners[partnerIndex] = {
+            ...updatedPartners[partnerIndex],
+            last_message: isIncoming ? newMessage.content : `You: ${newMessage.content}`,
+            last_message_at: newMessage.created_at,
+            unread_count: isIncoming && !newMessage.is_read ? (updatedPartners[partnerIndex].unread_count || 0) + 1 : 0 // Reset if it's our own message
+          };
+
+          // Move the updated conversation to the top
+          const [movedPartner] = updatedPartners.splice(partnerIndex, 1);
+          return [movedPartner, ...updatedPartners];
+        }
+
+        // If new conversation
+        return prevPartners;
+      });
+    };
+
+    // Realtime subscription for incoming messages
+    const incomingChannel = supabase
+      .channel('incoming_messages')
       .on(
         'postgres_changes',
         {
@@ -76,12 +100,28 @@ export default function ConversationsList({ userId }: { userId: string }) {
           table: 'direct_messages',
           filter: `receiver_id=eq.${userId}`
         },
-        () => fetchConversations()
+        handleNewMessage
+      )
+      .subscribe();
+
+    // Realtime subscription for sent messages
+    const outgoingChannel = supabase
+      .channel('outgoing_messages')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'direct_messages',
+          filter: `sender_id=eq.${userId}`
+        },
+        handleNewMessage
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(incomingChannel);
+      supabase.removeChannel(outgoingChannel);
     };
   }, [userId]);
 

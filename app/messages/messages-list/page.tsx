@@ -55,6 +55,30 @@ export function MessageList({ messages, currentUserId, otherUserId, setMessages 
     };
   }, [currentUserId, otherUserId]);
 
+  useEffect(() => {
+    // Mark messages as read when the conversation is opened
+    const markMessagesAsRead = async () => {
+      const unreadMessages = messages.filter((msg) => msg.sender_id === otherUserId && !msg.is_read);
+
+      if (unreadMessages.length > 0) {
+        const { error } = await supabase
+          .from('direct_messages')
+          .update({ is_read: true })
+          .in(
+            'id',
+            unreadMessages.map((msg) => msg.id)
+          );
+
+        if (!error) {
+          // Update local state
+          setMessages((prev) => prev.map((msg) => (msg.sender_id === otherUserId && !msg.is_read ? { ...msg, is_read: true } : msg)));
+        }
+      }
+    };
+
+    markMessagesAsRead();
+  }, [otherUserId, messages]);
+
   return (
     <div className="flex flex-col gap-3 p-4 overflow-y-auto h-[calc(100vh-180px)]">
       {messages.map((message) => (
