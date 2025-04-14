@@ -61,32 +61,48 @@ export default function ConversationsList({ userId }: { userId: string }) {
 
     fetchConversations();
 
-    const handleNewMessage = (payload: any) => {
+    const handleNewMessage = async (payload: any) => {
       const newMessage = payload.new;
       const partnerId = newMessage.sender_id === userId ? newMessage.receiver_id : newMessage.sender_id;
+      const isIncoming = newMessage.sender_id !== userId;
 
       setPartners((prevPartners) => {
-        const partnerIndex = prevPartners.findIndex((p) => p.id === partnerId);
-        const isIncoming = newMessage.sender_id !== userId;
+        const existingPartnerIndex = prevPartners.findIndex((p) => p.id === partnerId);
 
-        // If partner exists in the list
-        if (partnerIndex >= 0) {
+        if (existingPartnerIndex >= 0) {
           const updatedPartners = [...prevPartners];
-          updatedPartners[partnerIndex] = {
-            ...updatedPartners[partnerIndex],
+          updatedPartners[existingPartnerIndex] = {
+            ...updatedPartners[existingPartnerIndex],
             last_message: isIncoming ? newMessage.content : `You: ${newMessage.content}`,
             last_message_at: newMessage.created_at,
-            unread_count: isIncoming && !newMessage.is_read ? (updatedPartners[partnerIndex].unread_count || 0) + 1 : 0 // Reset if it's our own message
+            unread_count: isIncoming && !newMessage.is_read ? (updatedPartners[existingPartnerIndex].unread_count || 0) + 1 : 0
           };
 
-          // Move the updated conversation to the top
-          const [movedPartner] = updatedPartners.splice(partnerIndex, 1);
+          const [movedPartner] = updatedPartners.splice(existingPartnerIndex, 1);
           return [movedPartner, ...updatedPartners];
+        } else {
+          return prevPartners;
         }
-
-        // If new conversation
-        return prevPartners;
       });
+
+      const partnerExists = partners.some((p) => p.id === partnerId);
+      if (!partnerExists) {
+        const { data: user } = await supabase.from('Account').select('account_id, account_username').eq('account_id', partnerId).single();
+
+        setPartners((prevPartners) => {
+          const alreadyExists = prevPartners.some((p) => p.id === partnerId);
+          if (alreadyExists) return prevPartners;
+
+          const newPartner = {
+            id: partnerId,
+            username: user?.account_username || 'Unknown User',
+            last_message: isIncoming ? newMessage.content : `You: ${newMessage.content}`,
+            unread_count: isIncoming && !newMessage.is_read ? 1 : 0,
+            last_message_at: newMessage.created_at
+          };
+          return [newPartner, ...prevPartners];
+        });
+      }
     };
 
     // Realtime subscription for incoming messages
