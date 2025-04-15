@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/react";
+import { Editor } from '@tiptap/react';
 
 export interface ImageUploadResult {
   success: boolean;
@@ -6,65 +6,70 @@ export interface ImageUploadResult {
   error?: string;
 }
 
-export const handleImageUpload = async (
-  file: File
-): Promise<ImageUploadResult> => {
+export const handleImageUpload = async (file: File): Promise<ImageUploadResult> => {
   try {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
+    // First get a presigned URL for the upload
+    const presignedResponse = await fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        type: file.type,
+        size: file.size
+      })
     });
 
-    if (!response.ok) {
-      throw new Error("Upload failed");
+    if (!presignedResponse.ok) {
+      const error = await presignedResponse.json();
+      throw new Error(error.error || 'Failed to get upload URL');
     }
 
-    const data = await response.json();
-    return { success: true, url: data.url };
+    const { uploadUrl, publicUrl } = await presignedResponse.json();
+
+    // Upload the file directly to storage using the presigned URL
+    const uploadResponse = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type
+      },
+      body: file
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Upload failed');
+    }
+
+    return { success: true, url: publicUrl };
   } catch (error) {
-    console.error("Error uploading image:", error);
+    console.error('Error uploading image:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
     };
   }
 };
 
-export const insertImage = async (
-  editor: Editor | null,
-  file: File,
-  onError?: (error: string) => void
-) => {
+export const insertImage = async (editor: Editor | null, file: File, onError?: (error: string) => void) => {
   if (!editor || !file) return;
 
-  if (!file.type.startsWith("image/")) {
-    onError?.("Please select an image file");
+  if (!file.type.startsWith('image/')) {
+    onError?.('Please select an image file');
     return;
   }
 
-  // Create a temporary local URL for immediate preview
-  const localUrl = URL.createObjectURL(file);
-  editor.chain().focus().setImage({ src: localUrl }).run();
+  try {
+    // Upload the image first
+    const { success, url, error } = await handleImageUpload(file);
 
-  // Upload the image and update the URL once complete
-  const { success, url, error } = await handleImageUpload(file);
+    if (!success || !url) {
+      throw new Error(error || 'Failed to upload image');
+    }
 
-  if (success && url) {
-    // Find and replace the temporary image with the uploaded one
-    const content = editor.getHTML();
-    const updatedContent = content.replace(localUrl, url);
-    editor.commands.setContent(updatedContent);
-  } else {
-    onError?.(error || "Failed to upload image");
-    // Remove the temporary image if upload failed
-    const content = editor.getHTML();
-    const updatedContent = content.replace(`<img src="${localUrl}"`, "");
-    editor.commands.setContent(updatedContent);
+    // Only insert the image after successful upload
+    editor.chain().focus().setImage({ src: url }).run();
+  } catch (error) {
+    onError?.(error instanceof Error ? error.message : 'Failed to upload image');
+    console.error('Error inserting image:', error);
   }
-
-  // Clean up the temporary URL
-  URL.revokeObjectURL(localUrl);
 };

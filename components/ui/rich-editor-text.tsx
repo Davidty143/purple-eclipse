@@ -8,16 +8,16 @@ import Placeholder from '@tiptap/extension-placeholder';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { EditorToolbar } from '../editor/toolbar';
-import { insertImage } from '../editor/image-handler';
 
 interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  onImagesSelected?: (files: File[]) => void;
 }
 
-const RichTextEditor = ({ value, onChange, placeholder = 'Write your content here...', className }: RichTextEditorProps) => {
+const RichTextEditor = ({ value, onChange, placeholder = 'Write your content here...', className, onImagesSelected }: RichTextEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,19 +59,32 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Write your content her
   });
 
   const handleImageClick = () => {
+    // Reset any previous errors
+    setError(null);
     fileInputRef.current?.click();
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    try {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
 
-    setError(null);
-    await insertImage(editor, file, (error) => setError(error));
+      setError(null);
 
-    // Reset the file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      // If onImagesSelected is provided, pass files to parent component
+      if (onImagesSelected) {
+        onImagesSelected(files);
+      }
+
+      // Don't insert the image into the editor, just let the parent component handle it
+    } catch (error) {
+      console.error('Error handling file upload:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred while selecting the image');
+    } finally {
+      // Reset the file input to allow selecting the same files again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -119,7 +132,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Write your content her
 
   return (
     <div className={cn('relative border rounded-lg overflow-hidden flex flex-col w-full', className)}>
-      <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+      <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" multiple className="hidden" />
 
       <EditorToolbar editor={editor} onImageClick={handleImageClick} onLinkClick={setLink} />
 

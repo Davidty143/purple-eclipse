@@ -1,8 +1,7 @@
 // app/forums/page.tsx
-import { LandingHeader } from '@/app/(landingPage)/components/LandingHeader';
 import { NewTopics } from '@/app/(landingPage)/components/NewTopics';
 import { ForumComponentWrapper } from './components/ForumComponentWrapper';
-import { ForumHeader } from './components/ForumHeader';
+import BodyHeader from '@/components/BodyHeader';
 
 const ForumsPage = () => {
   return (
@@ -11,7 +10,7 @@ const ForumsPage = () => {
         <div className="w-full flex flex-col lg:flex-row justify-between gap-8">
           {/* Main Content */}
           <div className="w-full flex flex-col gap-6">
-            <LandingHeader />
+            <BodyHeader />
             <ForumComponentWrapper /> {/* No props needed now */}
           </div>
 
