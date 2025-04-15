@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { createBrowserClient } from '@supabase/ssr';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface Comment {
   comment_id: number;
@@ -20,6 +21,13 @@ interface Comment {
     account_username: string;
     account_email: string;
   };
+}
+
+interface ThreadImage {
+  thread_image_id: number;
+  image_url: string;
+  storage_path: string;
+  created_at: string;
 }
 
 interface Thread {
@@ -35,6 +43,7 @@ interface Thread {
     };
   };
   comments: Comment[];
+  images: ThreadImage[];
 }
 
 interface ThreadViewProps {
@@ -47,6 +56,31 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { user, loading } = useAuth();
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+
+  const openLightbox = (imageUrl: string) => {
+    setLightboxImage(imageUrl);
+  };
+
+  const closeLightbox = () => {
+    setLightboxImage(null);
+  };
+
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeLightbox();
+      }
+    };
+
+    if (lightboxImage) {
+      window.addEventListener('keydown', handleEscKey);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleEscKey);
+    };
+  }, [lightboxImage]);
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,6 +191,55 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
     }
   };
 
+  // Add this function to sanitize and optimize image HTML
+  const optimizeImages = (content: string) => {
+    // Skip processing during SSR since DOMParser is only available in the browser
+    if (typeof window === 'undefined') {
+      return content;
+    }
+
+    // For rich text content with embedded HTML, we can't directly use Next.js Image component
+    // so we'll optimize the img tags to improve user experience but keep the HTML structure
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    const images = doc.getElementsByTagName('img');
+
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i];
+      const src = img.getAttribute('src');
+      if (src) {
+        // Handle both storage URLs and any other valid image URLs
+        const optimizedImg = document.createElement('div');
+        optimizedImg.className = 'relative w-full max-w-xl mx-auto my-4';
+        optimizedImg.innerHTML = `
+          <div class="image-container flex justify-center">
+            <img 
+              src="${src}" 
+              alt="" 
+              class="rounded-lg shadow-md object-contain max-w-full cursor-pointer"
+              style="max-height: 350px; width: auto;"
+              loading="lazy" 
+              onError="this.onerror=null; this.style.display='none';"
+              onclick="this.classList.toggle('expanded'); 
+                      if(this.classList.contains('expanded')) {
+                        this.style.maxHeight = '90vh'; 
+                        this.style.width = 'auto';
+                        this.parentElement.classList.add('fixed', 'inset-0', 'z-50', 'bg-black/80', 'flex', 'items-center', 'justify-center', 'p-4');
+                      } else {
+                        this.style.maxHeight = '350px';
+                        this.style.width = 'auto';
+                        this.parentElement.classList.remove('fixed', 'inset-0', 'z-50', 'bg-black/80', 'flex', 'items-center', 'justify-center', 'p-4');
+                      }"
+            />
+          </div>
+        `;
+        img.parentNode?.replaceChild(optimizedImg, img);
+      }
+    }
+
+    return doc.body.innerHTML;
+  };
+
   if (!thread || thread.thread_deleted) {
     return <div className="flex items-center justify-center min-h-screen">Thread not found or has been deleted</div>;
   }
@@ -178,9 +261,31 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
             <div className="text-sm text-gray-500">Posted {format(new Date(thread.thread_created), 'MMM d, yyyy')}</div>
           </CardHeader>
           <CardContent>
-            <div className="prose max-w-none">{thread.thread_content}</div>
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: optimizeImages(thread.thread_content) }} />
+
+            {/* Thread Images Gallery */}
+            {thread.images && thread.images.length > 0 && (
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {thread.images.map((image) => (
+                    <div key={image.thread_image_id} className="relative overflow-hidden rounded-lg shadow-md">
+                      <div className="image-container relative aspect-[4/3] group">
+                        <Image src={image.image_url} alt="Thread image" fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover cursor-pointer transition-transform hover:scale-105" onClick={() => openLightbox(image.image_url)} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
+
+        {/* Lightbox */}
+        {lightboxImage && (
+          <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={closeLightbox}>
+            <img src={lightboxImage} alt="Enlarged thread image" className="max-w-full max-h-[90vh] object-contain" onClick={(e) => e.stopPropagation()} />
+          </div>
+        )}
 
         {/* Comments Section */}
         <div className="space-y-6">
