@@ -1,9 +1,9 @@
 // context/AuthProvider.tsx
-"use client";
+'use client';
 
-import { createContext, useContext, useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
-import { User } from "@supabase/supabase-js"; // Import the User type from Supabase
+import { createContext, useContext, useState, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { User } from '@supabase/supabase-js'; // Import the User type from Supabase
 
 interface AuthContextValue {
   user: User | null;
@@ -17,13 +17,10 @@ interface AuthProviderProps {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({
-  children,
-  serverUser = null,
-}: AuthProviderProps) {
+export function AuthProvider({ children, serverUser = null }: AuthProviderProps) {
   const [state, setState] = useState<AuthContextValue>({
     user: serverUser, // Initialize with serverUser if provided
-    isLoading: !serverUser, // If we have serverUser, no initial loading
+    isLoading: !serverUser // If we have serverUser, no initial loading
   });
 
   const supabase = createClient();
@@ -36,33 +33,33 @@ export function AuthProvider({
       try {
         const {
           data: { user },
-          error,
+          error
         } = await supabase.auth.getUser();
         setState({
           user: error ? null : user,
-          isLoading: false,
+          isLoading: false
         });
       } catch (error) {
         setState({
           user: null,
-          isLoading: false,
+          isLoading: false
         });
       }
     };
 
     const {
-      data: { subscription },
+      data: { subscription }
     } = supabase.auth.onAuthStateChange((event, session) => {
       setState({
         user: session?.user ?? null,
-        isLoading: false,
+        isLoading: false
       });
     });
 
     checkAuth();
 
     return () => subscription?.unsubscribe();
-  }, [serverUser]); // Add serverUser to dependencies
+  }, [serverUser, supabase.auth]); // Add supabase.auth to dependencies
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 }
@@ -70,7 +67,7 @@ export function AuthProvider({
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === null) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

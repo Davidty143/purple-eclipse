@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+import Image from 'next/image';
 
 const ThreadNameRow = () => {
   return (
@@ -8,11 +9,12 @@ const ThreadNameRow = () => {
       <div className="flex items-center space-x-4 justify-start w-full">
         {/* Profile Picture (circular) */}
         <div className="flex flex-row gap-4">
-          <div className="w-8 h-8 rounded-full bg-gray-300">
-            <img
+          <div className="w-8 h-8 rounded-full bg-gray-300 relative">
+            <Image
               src="https://via.placeholder.com/150" // Placeholder image
               alt="Profile"
-              className="w-full h-full object-cover rounded-full"
+              fill
+              className="object-cover rounded-full"
             />
           </div>
         </div>

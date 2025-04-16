@@ -8,9 +8,10 @@ import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
 import '@radix-ui/themes/styles.css';
 import Logo from './layout/components/Logo';
-import { createClientForServer } from '@/utils/supabase/server';
 import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
+import { createClientForServer } from '@/utils/supabase/server'; // Import your server client creator
+import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -69,6 +70,7 @@ export default async function RootLayout({
             </div>
 
             {children}
+            <Toaster />
           </div>
         </AuthProvider>
       </body>
