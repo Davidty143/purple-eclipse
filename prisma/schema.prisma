@@ -8,38 +8,114 @@ datasource db {
 }
 
 model Account {
-  account_id       String    @id @default(uuid()) @db.Uuid
-  account_username String?   @unique
-  account_email    String?   @unique
-  account_status   AccountStatus? // Make nullable
-  account_is_deleted Boolean? // Make nullable
-  account_role_id  String?   @db.Uuid  // Foreign Key to Role
-  account_role     Role?     @relation(fields: [account_role_id], references: [role_id]) // Make nullable
+  account_id         String         @id @default(uuid()) @db.Uuid
+  account_username   String?        @unique
+  account_email      String?        @unique
+  account_status     AccountStatus?
+  account_is_deleted Boolean?
+  account_role_id    String?        @db.Uuid
+  account_role       Role?          @relation(fields: [account_role_id], references: [role_id])
+
+  comments Comment[]
 }
 
 model Role {
-  role_id   String         @id @default(uuid()) @db.Uuid
-  role_type RoleType?      @unique // Make nullable
-  accounts  Account[]     // Make nullable
-  previleges Previlage[]  // Make nullable
+  role_id    String      @id @default(uuid()) @db.Uuid
+  role_type  RoleType?   @unique
+  accounts   Account[]
+  previleges Previlage[]
 }
 
 model Previlage {
-  previlege_id          String   @id @default(uuid()) @db.Uuid
-  previlege_name        String?  // Make nullable
-  previlege_description String?  // Make nullable
-  roles                 Role[]  // Make nullable
+  previlege_id          String  @id @default(uuid()) @db.Uuid
+  previlege_name        String?
+  previlege_description String?
+  roles                 Role[]
 }
 
 enum AccountStatus {
   ACTIVE
   BANNED
   RESTRICTED
-  PENDING_VERIFICATION 
+  PENDING_VERIFICATION
 }
 
 enum RoleType {
   ADMIN
   USER
   GUEST
+}
+
+model Forum {
+  forum_id          Int      @id @default(autoincrement())
+  forum_name        String?  @unique
+  forum_description String?
+  forum_is_deleted  Boolean  @default(false) @map("forum_deleted")
+  forum_created     DateTime @default(now()) @map("forum_created") @db.Timestamptz
+  forum_modified    DateTime @updatedAt @map("forum_modified") @db.Timestamptz
+
+  subforums Subforum[]
+
+  @@map("Forum")
+}
+
+model Subforum {
+  subforum_id          Int      @id @default(autoincrement())
+  subforum_name        String?  @unique
+  subforum_description String?
+  subforum_is_deleted  Boolean  @default(false) @map("subforum_deleted")
+  subforum_created     DateTime @default(now()) @map("subforum_created") @db.Timestamptz
+  subforum_modified    DateTime @updatedAt @map("subforum_modified") @db.Timestamptz
+
+  forum    Forum @relation(fields: [forum_id], references: [forum_id])
+  forum_id Int   @map("forum_id")
+
+  threads Thread[]
+}
+
+model Thread {
+  thread_id        Int      @id @default(autoincrement())
+  thread_title     String
+  thread_content   String
+  thread_isDeleted Boolean  @default(false) @map("thread_deleted")
+  thread_created   DateTime @default(now()) @map("thread_created") @db.Timestamptz
+  thread_modified  DateTime @updatedAt @map("thread_modified") @db.Timestamptz
+
+  subforum    Subforum @relation(fields: [subforum_id], references: [subforum_id])
+  subforum_id Int      @map("subforum_id")
+
+  comments Comment[]
+  images   ThreadImage[]
+
+  @@map("Thread")
+}
+
+model Comment {
+  comment_id        Int      @id @default(autoincrement())
+  comment_content   String   @db.Text
+  comment_isDeleted Boolean  @default(false) @map("comment_deleted")
+  comment_created   DateTime @default(now()) @map("comment_created") @db.Timestamptz
+  comment_modified  DateTime @updatedAt @map("comment_modified") @db.Timestamptz
+
+  thread    Thread @relation(fields: [thread_id], references: [thread_id])
+  thread_id Int    @map("thread_id")
+
+  author    Account @relation(fields: [author_id], references: [account_id])
+  author_id String  @map("author_id") @db.Uuid
+
+  @@index([thread_id])
+  @@index([author_id])
+}
+
+model ThreadImage {
+  thread_image_id      Int      @id @default(autoincrement())
+  thread_image_url     String   @map("image_url")
+  thread_image_path    String   @map("storage_path")
+  thread_image_created DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  thread    Thread @relation(fields: [thread_id], references: [thread_id])
+  thread_id Int    @map("thread_id")
+
+  @@index([thread_id])
+  @@map("thread_image")
 }

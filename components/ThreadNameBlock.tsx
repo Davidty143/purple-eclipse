@@ -21,6 +21,7 @@ const ThreadNameBlock = () => {
         <ThreadNameRow />
         <ThreadNameRow />
         <ThreadNameRow />
+        <button className="hover:text-black underline text-sm text-start px-6 py-3.5"> See More...</button>
       </div>
     </div>
   );

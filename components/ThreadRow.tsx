@@ -1,66 +1,60 @@
-import React from "react";
+'use client';
 
-const ThreadRow = () => {
+import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { format } from 'date-fns';
+import Link from 'next/link';
+
+interface ThreadRowProps {
+  thread: {
+    thread_id: number;
+    thread_title: string;
+    thread_created: string;
+    author: {
+      account_username: string | null;
+      account_email: string | null;
+    };
+    comments: { count: number }[];
+  };
+}
+
+const ThreadRow = ({ thread }: ThreadRowProps) => {
   return (
-    <div className="thread-row py-3.5 px-6 flex flex-col">
-      {/* Poster's Profile */}
+    <Link href={`/thread/${thread.thread_id}`}>
+      <div className="thread-row py-3.5 px-6 flex flex-col hover:bg-gray-50 cursor-pointer">
+        <div className="flex items-center space-x-4 justify-between">
+          {/* Author Profile */}
+          <div className="flex flex-row gap-4">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={`https://avatar.vercel.sh/${thread.author.account_username || 'anon'}`} />
+              <AvatarFallback>{(thread.author.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
 
-      <div className="flex items-center space-x-4 justify-between">
-        {/* Profile Picture (circular) */}
-        <div className="flex flex-row gap-4">
-          <div className="w-10 h-10 rounded-full bg-gray-300">
-            <img
-              src="https://via.placeholder.com/150" // Placeholder image
-              alt="Profile"
-              className="w-full h-full object-cover rounded-full"
-            />
-          </div>
-
-          {/* Thread Details */}
-          <div className="flex  items-center">
-            <div className=" ">
-              <div className="flex justify-start items-center gap-2">
-                {/* Tag and Thread Name */}
-                <span className=" text-xs font-semibold  bg-gray-200 px-4 py-0.5 rounded-sm">
-                  Help
-                </span>
-                <h3 className="text-md font-semibold">Thread Title</h3>
-              </div>
-              <div className="text-xs text-semibold text-gray-500">
-                {/* Poster Name and Date Posted */}
-                <span>Posted by John Doe</span> - <span>March 11, 2025</span>
+            {/* Thread Details */}
+            <div className="flex items-center">
+              <div>
+                <div className="flex justify-start items-center gap-2">
+                  <span className="text-xs font-semibold bg-gray-200 px-4 py-0.5 rounded-sm">Discussion</span>
+                  <h3 className="text-md font-semibold">{thread.thread_title}</h3>
+                </div>
+                <div className="text-xs text-semibold text-gray-500">
+                  <span>Posted by {thread.author.account_username || 'Anonymous'}</span>
+                  {' - '}
+                  <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Replies and Views */}
-        <div className="flex justify-between text-sm text-gray-500">
-          <div className="flex flex-col items-start">
-            <span className=" px-2 text-xs">Replies: 10</span>
-            <span className=" px-2 text-xs ">Views: 120</span>
-          </div>
-        </div>
-
-        {/* Last Comment Section */}
-        <div className="flex justify-between items-center text-sm text-gray-500 ">
-          {/* Last Commenter's Profile */}
-          <div className="flex items-center space-x-6">
-            <div className="flex flex-col text-xs">
-              <span>2:11 AM</span>
-              <span>Benjie Saqin</span>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-gray-300">
-              <img
-                src="https://via.placeholder.com/150" // Placeholder image
-                alt="Profile"
-                className="w-full h-full object-cover rounded-full"
-              />
+          {/* Replies Count */}
+          <div className="flex justify-between text-sm text-gray-500">
+            <div className="flex flex-col items-start">
+              <span className="px-2 text-xs">Replies: {thread.comments[0]?.count || 0}</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
