@@ -58,18 +58,15 @@ export async function login(formData: FormData) {
   }
 }
 
-// lib/auth-actions.ts
 export async function signup(formData: FormData): Promise<{ error?: string }> {
   const supabase = await createClientForServer();
 
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
-    password_confirm: formData.get('password_confirm') as string,
     options: {
       data: {
-        username: formData.get('username') as string,
-        email: formData.get('email') as string
+        username: formData.get('username') as string
       }
     }
   };
@@ -84,8 +81,6 @@ export async function signup(formData: FormData): Promise<{ error?: string }> {
     return { error: error.message };
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/');
   return {};
 }
 
