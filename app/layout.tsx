@@ -8,15 +8,12 @@ import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
 import '@radix-ui/themes/styles.css';
 import Logo from './layout/components/Logo';
+import { MessageCircle } from 'lucide-react';
+import Link from 'next/link';
 import { createClientForServer } from '@/utils/supabase/server'; // Import your server client creator
 import { Toaster } from 'sonner';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'Visconn',
-  description: 'Visconn Discussion Platform'
-};
 
 export default async function RootLayout({
   children
@@ -43,7 +40,17 @@ export default async function RootLayout({
                   </div>
 
                   {/* Login Section */}
-                  <div className={cn('menu-header h-full flex items-center justify-end flex-shrink-0')}>
+                  <div className={cn('menu-header h-full flex items-center justify-end flex-shrink-0 gap-4')}>
+                    {/* Add Messages Icon */}
+                    <Link href="/messages" className="p-2 rounded-full hover:bg-gray-100 transition-colors relative" aria-label="Messages">
+                      <MessageCircle className="h-5 w-5 text-gray-700" />
+                      {/* Unread count badge - optional */}
+                      {/* {unreadCount > 0 && (
+                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          {unreadCount}
+                        </span>
+                      )} */}
+                    </Link>
                     <AuthHeader />
                   </div>
                 </div>

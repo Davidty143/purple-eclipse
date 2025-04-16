@@ -10,6 +10,11 @@ interface EditorToolbarProps {
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor, onImageClick, onLinkClick }) => {
+  // Handler for blockquote
+  const handleBlockquote = () => {
+    editor.chain().focus().toggleBlockquote().run();
+  };
+
   return (
     <div className="border-b bg-gray-50 p-2 flex flex-wrap gap-1 items-center">
       <div className="flex items-center gap-1">
@@ -33,7 +38,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor, onImageCli
         <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={editor.isActive('orderedList')} title="Numbered List">
           <OrderedListIcon />
         </ToolbarButton>
-        <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={editor.isActive('blockquote')} title="Quote">
+        <ToolbarButton onClick={handleBlockquote} isActive={editor.isActive('blockquote')} title="Quote">
           <QuoteIcon />
         </ToolbarButton>
       </div>
