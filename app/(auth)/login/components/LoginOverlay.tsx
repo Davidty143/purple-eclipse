@@ -1,7 +1,6 @@
 // app/(auth)/login/components/LoginOverlay.tsx
 'use client';
 import { useState } from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,10 +12,11 @@ interface LoginOverlayProps {
   onClose: () => void;
   onSuccess?: () => void;
   showSignUpLink?: boolean;
-  onOpenSignUp?: () => void; // New prop for opening signup overlay
+  onOpenSignUp?: () => void;
+  onOpenResetPassword?: () => void;
 }
 
-export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpenSignUp }: LoginOverlayProps) {
+export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpenSignUp, onOpenResetPassword }: LoginOverlayProps) {
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -67,9 +67,15 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
               </div>
               <div className="grid">
                 <Input id="password" name="password" type="password" className="text-sm" placeholder="Enter password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
-                <Link href="/reset-password" className="ml-auto inline-block text-xs underline p-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenResetPassword?.();
+                  }}
+                  className="ml-auto inline-block text-xs underline p-2 hover:text-primary">
                   Forgot your password?
-                </Link>
+                </button>
               </div>
 
               {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
@@ -83,6 +89,7 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
             <div className="mt-4 text-center text-sm">
               Don't have an account?{' '}
               <button
+                type="button"
                 onClick={() => {
                   onClose();
                   onOpenSignUp?.();

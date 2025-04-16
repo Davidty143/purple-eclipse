@@ -5,10 +5,12 @@ import LoginButton from '@/components/LoginLogoutButton';
 import Signup from '@/components/SignupButton';
 import { LoginOverlay } from '@/app/(auth)/login/components/LoginOverlay';
 import { SignUpOverlay } from '@/app/(auth)/signup/components/SignUpOverlay';
+import { ResetPasswordOverlay } from '@/app/(auth)/reset-password/components/ResetPasswordForm';
 
 export default function LoggedOutHeaderRight() {
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
   const [showSignUpOverlay, setShowSignUpOverlay] = useState(false);
+  const [showResetPasswordOverlay, setShowResetPasswordOverlay] = useState(false);
 
   return (
     <div className="flex items-center gap-4">
@@ -27,6 +29,10 @@ export default function LoggedOutHeaderRight() {
             setShowLoginOverlay(false);
             setShowSignUpOverlay(true);
           }}
+          onOpenResetPassword={() => {
+            setShowLoginOverlay(false);
+            setShowResetPasswordOverlay(true);
+          }}
         />
       )}
 
@@ -37,6 +43,17 @@ export default function LoggedOutHeaderRight() {
           onSuccess={() => setShowSignUpOverlay(false)}
           onOpenLogin={() => {
             setShowSignUpOverlay(false);
+            setShowLoginOverlay(true);
+          }}
+        />
+      )}
+
+      {/* Reset Password Overlay */}
+      {showResetPasswordOverlay && (
+        <ResetPasswordOverlay
+          onClose={() => setShowResetPasswordOverlay(false)}
+          onOpenLogin={() => {
+            setShowResetPasswordOverlay(false);
             setShowLoginOverlay(true);
           }}
         />
