@@ -1,43 +1,43 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
-import { MdOutlineLogin } from "react-icons/md";
+// components/SignupButton.tsx
+'use client';
+import React, { useEffect, useState } from 'react';
+import { Button } from './ui/button';
+import { createClient } from '@/utils/supabase/client';
+import { MdOutlineLogin } from 'react-icons/md';
 
 interface SignupProps {
   className?: string;
+  onOpenSignUp?: () => void;
 }
 
-const Signup: React.FC<SignupProps> = ({ className }) => {
+const Signup: React.FC<SignupProps> = ({ className, onOpenSignUp }) => {
   const [user, setUser] = useState<any>(null);
-  const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
     const fetchUser = async () => {
       const {
-        data: { user },
+        data: { user }
       } = await supabase.auth.getUser();
       setUser(user);
     };
     fetchUser();
-  }, [supabase.auth]); // Only run once on mount
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => authListener.subscription.unsubscribe();
+  }, [supabase.auth]);
 
   if (user) {
     return null;
   }
 
   return (
-    <Button
-      variant="outline"
-      onClick={() => {
-        router.push("/signup");
-      }}
-      className={`focus:outline-none focus:ring-0 focus:border-none border-none ${className}`}
-    >
-      <MdOutlineLogin className="text-lg mr-2 border-none" /> {/* Icon */}
-      <span>Register</span> {/* Text */}
+    <Button variant="outline" onClick={() => onOpenSignUp?.()} className={`focus:outline-none focus:ring-0 focus:border-none border-none ${className}`}>
+      <MdOutlineLogin className="text-lg mr-2 border-none" />
+      <span>Register</span>
     </Button>
   );
 };

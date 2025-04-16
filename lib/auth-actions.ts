@@ -58,7 +58,8 @@ export async function login(formData: FormData) {
   }
 }
 
-export async function signup(formData: FormData) {
+// lib/auth-actions.ts
+export async function signup(formData: FormData): Promise<{ error?: string }> {
   const supabase = await createClientForServer();
 
   const data = {
@@ -74,17 +75,18 @@ export async function signup(formData: FormData) {
   };
 
   if (formData.get('password') !== formData.get('password_confirm')) {
-    throw new Error('Passwords do not match');
+    return { error: 'Passwords do not match' };
   }
 
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect('/signup');
+    return { error: error.message };
   }
 
   revalidatePath('/', 'layout');
   redirect('/');
+  return {};
 }
 
 export async function signout() {

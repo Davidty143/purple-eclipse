@@ -1,4 +1,4 @@
-// components/LoginOverlay.tsx
+// app/(auth)/login/components/LoginOverlay.tsx
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -6,19 +6,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { login } from '@/lib/auth-actions';
-import SignInWithGoogleButton from '@/app/(auth)/login/components/SignInWithGoogleButton';
+import { createClient } from '@/utils/supabase/client';
+import SignInWithGoogleButton from './SignInWithGoogleButton';
 
 interface LoginOverlayProps {
   onClose: () => void;
   onSuccess?: () => void;
   showSignUpLink?: boolean;
+  onOpenSignUp?: () => void; // New prop for opening signup overlay
 }
 
-export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true }: LoginOverlayProps) {
+export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpenSignUp }: LoginOverlayProps) {
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +38,7 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true }: Logi
       if (result?.error) {
         setError(result.error);
       } else {
-        onSuccess ? onSuccess() : (window.location.href = '/');
+        onSuccess ? onSuccess() : onClose();
       }
     } catch (error) {
       setError('An error occurred. Please try again.');
@@ -78,10 +81,15 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true }: Logi
           </form>
           {showSignUpLink && (
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="underline">
+              Don't have an account?{' '}
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenSignUp?.();
+                }}
+                className="underline hover:text-primary">
                 Sign up
-              </Link>
+              </button>
             </div>
           )}
         </CardContent>
