@@ -11,7 +11,7 @@ const ForumsPage = () => {
           {/* Main Content */}
           <div className="w-full flex flex-col gap-6">
             <BodyHeader />
-            <ForumComponentWrapper /> {/* No props needed now */}
+            <ForumComponentWrapper />
           </div>
 
           {/* Sidebar */}

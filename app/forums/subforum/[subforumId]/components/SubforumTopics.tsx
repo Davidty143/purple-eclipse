@@ -14,67 +14,70 @@ interface DatabaseThread {
   thread_title: string;
   thread_created: string;
   thread_content: string;
-  comments: [{ count: number }] | [];
+  comments: { count: number }[];
   author: {
     account_username: string | null;
     account_email: string | null;
-    avatar_url: string | null;
   };
 }
 
 export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchThreads = async () => {
       const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
-      const { data, error } = await supabase
-        .from('Thread')
-        .select(
+      try {
+        const { data, error } = await supabase
+          .from('Thread')
+          .select(
+            `
+            thread_id,
+            thread_title,
+            thread_created,
+            thread_content,
+            author:author_id(account_username, account_email),
+            comments:Comment(count)
           `
-          thread_id,
-          thread_title,
-          thread_created,
-          thread_content,
-          comments:Comment (count),
-          author:author_id (
-            account_username,
-            account_email,
-            avatar_url
           )
-        `
-        )
-        .eq('subforum_id', subforumId)
-        .eq('thread_deleted', false)
-        .order('thread_created', { ascending: false })
-        .returns<DatabaseThread[]>();
+          .eq('subforum_id', subforumId)
+          .eq('thread_deleted', false)
+          .order('thread_created', { ascending: false })
+          .returns<DatabaseThread[]>();
 
-      if (!error && data) {
-        const formattedThreads: Thread[] = data.map((thread) => ({
-          id: thread.thread_id.toString(),
-          title: thread.thread_title,
-          author: {
-            name: thread.author?.account_username || 'Anonymous',
-            avatar: thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`
-          },
-          tag: 'Discussion',
-          createdAt: new Date(thread.thread_created),
-          replies: thread.comments[0]?.count || 0,
-          views: 0
-        }));
-        setThreads(formattedThreads);
+        if (error) throw error;
+
+        if (data) {
+          const formattedThreads = data.map((thread) => ({
+            id: thread.thread_id.toString(),
+            title: thread.thread_title,
+            author: {
+              name: thread.author?.account_username || 'Anonymous',
+              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(thread.author?.account_username || 'A')}&background=random`
+            },
+            tag: 'Discussion',
+            createdAt: new Date(thread.thread_created),
+            replies: thread.comments[0]?.count || 0,
+            views: 0
+          }));
+          setThreads(formattedThreads);
+        }
+      } catch (err) {
+        console.error('Error fetching threads:', err);
+        setError('Failed to load threads');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchThreads();
   }, [subforumId]);
 
-  if (loading) {
-    return <div>Loading threads...</div>;
-  }
+  if (loading) return <div>Loading threads...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="space-y-4">
