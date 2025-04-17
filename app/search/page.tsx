@@ -43,6 +43,7 @@ type Thread = {
   author: {
     account_username: string | null;
     account_email: string | null;
+    avatar_url: string | null;
   };
   subforum: {
     subforum_name: string;
@@ -58,8 +59,8 @@ async function SearchResults({ query }: { query: string }) {
   // Get client
   const supabase = await createClientForServer();
 
-  // Search threads that match the query in title only
-  const { data: threads, error } = await supabase
+  // Search threads that match the query in title or content
+  const { data: contentThreads, error: contentError } = await supabase
     .from('Thread')
     .select(
       `
@@ -85,14 +86,57 @@ async function SearchResults({ query }: { query: string }) {
       )
     `
     )
-    .ilike('thread_title', `%${query}%`) // Only search in the title
+    .or(`thread_title.ilike.%${query}%,thread_content.ilike.%${query}%`) // Search in title and content
     .eq('thread_deleted', false)
     .order('thread_created', { ascending: false })
     .limit(20);
 
-  if (error) {
-    return <div className="text-red-500">Error loading search results: {error.message}</div>;
+  // Search threads by username
+  const { data: usernameThreads, error: usernameError } = await supabase
+    .from('Thread')
+    .select(
+      `
+      thread_id,
+      thread_title,
+      thread_content,
+      thread_created,
+      thread_modified,
+      subforum_id,
+      author_id,
+      author:Account!author_id(
+        account_username,
+        account_email
+      ),
+      comments:Comment(count),
+      subforum:Subforum(
+        subforum_name,
+        subforum_id,
+        forum_id,
+        forum:Forum(
+          forum_name
+        )
+      )
+    `
+    )
+    .eq('thread_deleted', false)
+    .filter('author.account_username', 'ilike', `%${query}%`) // Search by username
+    .order('thread_created', { ascending: false })
+    .limit(20);
+
+  if (contentError && usernameError) {
+    return <div className="text-red-500">Error loading search results: {contentError.message || usernameError.message}</div>;
   }
+
+  // Combine results and remove duplicates
+  const allThreads = [...(contentThreads || []), ...(usernameThreads || [])];
+  const uniqueThreadIds = new Set();
+  const threads = allThreads.filter((thread) => {
+    if (uniqueThreadIds.has(thread.thread_id)) {
+      return false;
+    }
+    uniqueThreadIds.add(thread.thread_id);
+    return true;
+  });
 
   if (!threads || threads.length === 0) {
     return (
@@ -104,46 +148,44 @@ async function SearchResults({ query }: { query: string }) {
   }
 
   return (
-    <div className="space-y-0 border rounded-lg overflow-hidden">
-      {threads.map((thread: any) => (
-        <Link key={thread.thread_id} href={`/thread/${thread.thread_id}`}>
-          <div className="thread-row py-3.5 px-6 flex flex-col hover:bg-gray-50 cursor-pointer border-b last:border-b-0">
-            <div className="flex items-center space-x-4 justify-between">
-              {/* Author Profile */}
-              <div className="flex flex-row gap-4">
-                <Avatar className="h-10 w-10">
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500">Found {threads.length} results</p>
+      <div className="space-y-4">
+        {threads.map((thread: any) => (
+          <div key={thread.thread_id} className="border rounded-lg overflow-hidden bg-white hover:bg-gray-50 transition-colors">
+            <Link href={`/thread/${thread.thread_id}`} className="block p-5">
+              <div className="flex items-start gap-4">
+                {/* Author Avatar */}
+                <Avatar className="h-10 w-10 flex-shrink-0">
                   <AvatarImage src={`https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
                   <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
 
-                {/* Thread Details */}
-                <div className="flex items-center">
-                  <div>
-                    <div className="flex justify-start items-center gap-2">
-                      <span className="text-xs font-semibold bg-gray-200 px-4 py-0.5 rounded-sm">{thread.subforum?.forum?.forum_name || 'Discussion'}</span>
-                      <h3 className="text-md font-semibold">{thread.thread_title}</h3>
-                    </div>
-                    <div className="text-xs text-semibold text-gray-500">
-                      <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
-                      {' - '}
-                      <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
-                      {' - '}
-                      <span>{thread.subforum?.subforum_name}</span>
-                    </div>
+                {/* Thread Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="text-xs font-semibold bg-gray-200 px-3 py-0.5 rounded-full">{thread.subforum?.forum?.forum_name || 'Discussion'}</span>
+                    <span className="text-xs text-gray-500">in {thread.subforum?.subforum_name}</span>
+                  </div>
+
+                  <h3 className="text-lg font-semibold mb-1">{thread.thread_title}</h3>
+
+                  {/* Content Preview */}
+                  <p className="text-sm text-gray-700 line-clamp-2 mb-2" dangerouslySetInnerHTML={{ __html: thread.thread_content }}></p>
+
+                  <div className="flex items-center text-xs text-gray-500 mt-2">
+                    <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
+                    <span className="mx-2">•</span>
+                    <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
+                    <span className="mx-2">•</span>
+                    <span>{thread.comments[0]?.count || 0} replies</span>
                   </div>
                 </div>
               </div>
-
-              {/* Replies Count */}
-              <div className="flex justify-between text-sm text-gray-500">
-                <div className="flex flex-col items-start">
-                  <span className="px-2 text-xs">Replies: {thread.comments[0]?.count || 0}</span>
-                </div>
-              </div>
-            </div>
+            </Link>
           </div>
-        </Link>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
