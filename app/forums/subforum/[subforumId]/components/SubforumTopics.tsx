@@ -18,6 +18,7 @@ interface DatabaseThread {
   author: {
     account_username: string | null;
     account_email: string | null;
+    avatar_url: string | null;
   };
 }
 
@@ -38,9 +39,10 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
           thread_created,
           thread_content,
           comments:Comment (count),
-          author:author_id!inner (
+          author:author_id (
             account_username,
-            account_email
+            account_email,
+            avatar_url
           )
         `
         )
@@ -54,8 +56,8 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
           id: thread.thread_id.toString(),
           title: thread.thread_title,
           author: {
-            name: thread.author.account_username || 'Anonymous',
-            avatar: `https://avatar.vercel.sh/${thread.author.account_username || 'anon'}`
+            name: thread.author?.account_username || 'Anonymous',
+            avatar: thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`
           },
           tag: 'Discussion',
           createdAt: new Date(thread.thread_created),

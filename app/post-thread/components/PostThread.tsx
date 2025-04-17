@@ -142,11 +142,15 @@ const PostThread = () => {
       // If the account doesn't exist, create one
       if (accountError || !accountData) {
         console.log('Account not found, creating new account');
+        // Get avatar URL from Google profile
+        const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+
         const { error: createAccountError } = await supabase.from('Account').insert({
           account_id: user.id,
           account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
           account_email: user.email,
-          account_is_deleted: false
+          account_is_deleted: false,
+          avatar_url: avatarUrl
         });
 
         if (createAccountError) {
@@ -174,7 +178,8 @@ const PostThread = () => {
             subforum_id: selectedSubforumId,
             thread_deleted: false,
             thread_created: new Date().toISOString(),
-            thread_modified: new Date().toISOString()
+            thread_modified: new Date().toISOString(),
+            author_id: user.id
           }
         ])
         .select()
