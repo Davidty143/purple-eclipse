@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ThreadRow } from './SubforumThreadRow';
 import { createBrowserClient } from '@supabase/ssr';
 import { Thread } from './SubforumThreadRow';
+import { useRouter } from 'next/navigation';
 
 interface SubforumTopicsProps {
   subforumId: number;
@@ -22,9 +23,14 @@ interface DatabaseThread {
 }
 
 export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
+  const router = useRouter();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleThreadClick = (threadId: string) => {
+    router.push(`/thread/${threadId}`);
+  };
 
   useEffect(() => {
     const fetchThreads = async () => {
@@ -82,7 +88,9 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
   return (
     <div className="space-y-4">
       {threads.map((thread) => (
-        <ThreadRow key={thread.id} thread={thread} />
+        <div key={thread.id} onClick={() => handleThreadClick(thread.id)} className="cursor-pointer hover:bg-gray-50 transition-colors rounded-lg">
+          <ThreadRow thread={thread} />
+        </div>
       ))}
       {threads.length === 0 && <div className="text-center py-8 text-gray-500">No threads found in this subforum</div>}
     </div>
