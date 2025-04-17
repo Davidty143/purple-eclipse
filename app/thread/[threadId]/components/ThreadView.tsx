@@ -277,7 +277,6 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
                   {thread.subforum.subforum_name}
                 </Link>
               </div>
-              <h1 className="text-2xl font-semibold mt-2">{thread.thread_title}</h1>
             </div>
           </div>
 
