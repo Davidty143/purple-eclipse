@@ -1,52 +1,116 @@
-  generator client {
-    provider = "prisma-client-js"
-  }
+generator client {
+  provider = "prisma-client-js"
+}
 
-  datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
-  }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  model Account {
-    account_id                  String   @id @unique @db.Uuid
-    account_username            String?  @unique
-    account_email               String?  @unique
-    account_photo_url           String?
-    account_status              AccountStatus
-    account_is_deleted          Boolean
-    account_iscreated_timestamp DateTime? @default(now()) @db.Timestamptz(6)
-    account_modified_timestamp  DateTime? @default(now()) @db.Timestamptz(6)
+model Account {
+  account_id         String         @id @default(uuid()) @db.Uuid
+  account_username   String?        @unique
+  account_email      String?        @unique
+  account_status     AccountStatus?
+  account_is_deleted Boolean?
+  account_role_id    String?        @db.Uuid
+  account_role       Role?          @relation(fields: [account_role_id], references: [role_id])
+  comments           Comment[]
+  threads            Thread[]
+}
 
-    account_role_id             String   @db.Uuid // Foreign Key to Role (UUID type)
-    account_role                Role     @relation(fields: [account_role_id], references: [role_id]) // Relation to Role
-  }
+model Role {
+  role_id    String      @id @default(uuid()) @db.Uuid
+  role_type  RoleType?   @unique
+  accounts   Account[]
+  previleges Previlage[] @relation("PrevilageToRole")
+}
 
-  model Role {
-    role_id       String      @id @unique @db.Uuid // UUID type for role_id
-    role_type     RoleType
-    previlege_id  String?      @db.Uuid // Foreign Key to Previlage (UUID type)
-    previlege     Previlage?   @relation(fields: [previlege_id], references: [previlege_id]) // Relation to Previlage
+model Previlage {
+  previlege_id          String  @id @default(uuid()) @db.Uuid
+  previlege_name        String?
+  previlege_description String?
+  roles                 Role[]  @relation("PrevilageToRole")
+}
 
-    accounts      Account[]   // One-to-many relation with Account (A Role can have many Accounts)
-  }
+model Forum {
+  forum_name        String?    @unique
+  forum_description String?
+  forum_created     DateTime   @default(now()) @map("forum_created") @db.Timestamptz(6)
+  forum_modified    DateTime   @updatedAt @map("forum_modified") @db.Timestamptz(6)
+  forum_id          Int        @id @default(autoincrement())
+  forum_is_deleted  Boolean    @default(false) @map("forum_deleted")
+  subforums         Subforum[]
 
-  model Previlage {
-    previlege_id          String  @id @unique @db.Uuid // UUID type for previlege_id
-    previlege_name        String?
-    previlege_description String?
+  @@map("Forum")
+}
 
-    roles                 Role[]  // One-to-many relation with Role (A Previlage can be assigned to many Roles)
-  }
+model Subforum {
+  subforum_id          Int      @id @default(autoincrement())
+  subforum_name        String?  @unique
+  subforum_description String?
+  subforum_created     DateTime @default(now()) @map("subforum_created") @db.Timestamptz(6)
+  subforum_modified    DateTime @updatedAt @map("subforum_modified") @db.Timestamptz(6)
+  forum_id             Int      @map("forum_id")
+  subforum_is_deleted  Boolean  @default(false) @map("subforum_deleted")
+  forum                Forum    @relation(fields: [forum_id], references: [forum_id])
+  threads              Thread[]
+}
 
-  enum AccountStatus {
-    ACTIVE
-    BANNED
-    RESTRICTED
-  }
+model Thread {
+  thread_id        Int           @id @default(autoincrement())
+  thread_title     String
+  thread_content   String
+  thread_isDeleted Boolean       @default(false) @map("thread_deleted")
+  thread_created   DateTime      @default(now()) @map("thread_created") @db.Timestamptz(6)
+  thread_modified  DateTime      @updatedAt @map("thread_modified") @db.Timestamptz(6)
+  subforum_id      Int           @map("subforum_id")
+  author_id        String        @map("author_id") @db.Uuid
+  comments         Comment[]
+  author           Account       @relation(fields: [author_id], references: [account_id])
+  subforum         Subforum      @relation(fields: [subforum_id], references: [subforum_id])
+  images           ThreadImage[]
 
-  enum RoleType {
-    ADMIN 
-    USER
-    GUEST
-  }
+  @@index([author_id])
+  @@map("Thread")
+}
 
+model Comment {
+  comment_id        Int      @id @default(autoincrement())
+  comment_content   String
+  comment_isDeleted Boolean  @default(false) @map("comment_deleted")
+  comment_created   DateTime @default(now()) @map("comment_created") @db.Timestamptz(6)
+  comment_modified  DateTime @updatedAt @map("comment_modified") @db.Timestamptz(6)
+  thread_id         Int      @map("thread_id")
+  author_id         String   @map("author_id") @db.Uuid
+  author            Account  @relation(fields: [author_id], references: [account_id])
+  thread            Thread   @relation(fields: [thread_id], references: [thread_id])
+
+  @@index([thread_id])
+  @@index([author_id])
+}
+
+model ThreadImage {
+  thread_image_id      Int      @id @default(autoincrement())
+  thread_image_url     String   @map("image_url")
+  thread_image_path    String   @map("storage_path")
+  thread_image_created DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  thread_id            Int      @map("thread_id")
+  thread               Thread   @relation(fields: [thread_id], references: [thread_id])
+
+  @@index([thread_id])
+  @@map("thread_image")
+}
+
+enum AccountStatus {
+  ACTIVE
+  BANNED
+  RESTRICTED
+  PENDING_VERIFICATION
+}
+
+enum RoleType {
+  ADMIN
+  USER
+  GUEST
+}

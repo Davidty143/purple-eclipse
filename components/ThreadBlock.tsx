@@ -1,5 +1,5 @@
-import React from "react";
-import ThreadRow from "@/components/ThreadRow";
+import React from 'react';
+import ThreadRow from '@/components/ThreadRow';
 
 const ThreadBlock = () => {
   return (
@@ -18,6 +18,7 @@ const ThreadBlock = () => {
         <ThreadRow />
         <ThreadRow />
         <ThreadRow />
+        <button className="hover:text-black underline text-sm text-start px-6 py-3.5"> See More...</button>
       </div>
     </div>
   );

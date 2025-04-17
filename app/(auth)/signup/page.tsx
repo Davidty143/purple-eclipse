@@ -1,5 +1,7 @@
-import React from "react";
-import { SignUpForm } from "./components/SignUpForm";
+//(auth)/signup/page.tsx
+
+import React from 'react';
+import { SignUpForm } from './components/SignUpForm';
 
 const SignUpPage = () => {
   return (

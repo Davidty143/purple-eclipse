@@ -1,38 +1,25 @@
-import { createClientForServer } from "@/utils/supabase/server";
-import Image from "next/image";
+import { createClientForServer } from '@/utils/supabase/server';
+import LandingPage from './(landingPage)/page';
 
 export default async function Home() {
   const supabase = await createClientForServer();
 
   const session = await supabase.auth.getUser();
 
-  if (!session.data.user)
-    return (
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h1 className="text-4xl font-bold">Not Authenticated</h1>
-      </div>
-    );
+  if (!session.data?.user) return <LandingPage />;
 
-  const {
-    data: {
-      user: { user_metadata, app_metadata },
-    },
-  } = session;
+  const user = session?.data?.user;
+  const user_metadata = user?.user_metadata || {};
+  const app_metadata = user?.app_metadata || {};
 
-  const { name, email, user_name, avatar_url } = user_metadata;
-
-  const userName = user_name ? `@${user_name}` : "User Name Not Set";
-
-  // console.log(session)
+  const { name, email, username, avatar_url } = user_metadata;
+  const userName = username ? `@${username}` : 'User Name Not Set';
 
   return (
     <div className="">
-      {/* continer at the center of the page  */}
-      <div className="flex flex-col items-center justify-center h-screen gap-4">
-        <h1 className="text-4xl font-bold">{name}</h1>
-        <p className="text-xl">User Name: {userName}</p>
-        <p className="text-xl">Email: {email}</p>
-        <p className="text-xl">Created with: {app_metadata.provider}</p>
+      {/* Container at the center of the page */}
+      <div className="flex flex-col items-center justify-center max-w-3xl mx-auto">
+        <LandingPage />
       </div>
     </div>
   );
