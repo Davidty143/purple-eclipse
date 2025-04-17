@@ -44,6 +44,9 @@ export default function SubforumPage() {
     }
   }, [params.subforumId]);
 
+  console.log('Params:', params);
+  console.log('Subforum ID being passed:', Number(params.subforumId));
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -67,7 +70,7 @@ export default function SubforumPage() {
           {/* Main Content */}
           <div className="w-full flex flex-col gap-6">
             <SubforumHeader title={subforum.name} description={subforum.description} />
-            <SubforumTopics />
+            <SubforumTopics subforumId={Number(params.subforumId)} />
           </div>
 
           {/* Sidebar */}
