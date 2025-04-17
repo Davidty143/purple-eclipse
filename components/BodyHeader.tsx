@@ -9,7 +9,7 @@ const BodyHeader = () => {
         <h1 className="p-title-value ">WELCOME TO VISCONN!</h1>
         <div className="ml-auto">
           <Link href="/post-thread">
-            <Button className="px-4 text-sm border bg-white text-black hover:bg-gray-100">Post Thread</Button>
+            <Button className="px-4 text-sm border border-gray-300 bg-white text-black hover:bg-gray-100">Post Thread</Button>
           </Link>
         </div>
         <div className="v-quick-action"></div>
