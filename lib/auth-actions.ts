@@ -58,33 +58,30 @@ export async function login(formData: FormData) {
   }
 }
 
-export async function signup(formData: FormData) {
+export async function signup(formData: FormData): Promise<{ error?: string }> {
   const supabase = await createClientForServer();
 
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
-    password_confirm: formData.get('password_confirm') as string,
     options: {
       data: {
-        username: formData.get('username') as string,
-        email: formData.get('email') as string
+        username: formData.get('username') as string
       }
     }
   };
 
   if (formData.get('password') !== formData.get('password_confirm')) {
-    throw new Error('Passwords do not match');
+    return { error: 'Passwords do not match' };
   }
 
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect('/signup');
+    return { error: error.message };
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/');
+  return {};
 }
 
 export async function signout() {
