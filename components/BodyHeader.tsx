@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const BodyHeader = () => {
   return (
-    <div className="p-body-header border-2 border-gray-300 px-5 py-3 rounded-md my-10">
+    <div className="p-body-header border border-gray-300 px-5 py-3 rounded-md my-10">
       <div className="p-title text-lg font-semibold flex flex-row justify-between">
         <h1 className="p-title-value ">WELCOME TO VISCONN!</h1>
         <div className="ml-auto">
