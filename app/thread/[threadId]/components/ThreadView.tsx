@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Comment {
   comment_id: number;
@@ -20,6 +21,7 @@ interface Comment {
   author: {
     account_username: string;
     account_email: string;
+    avatar_url?: string | null;
   };
 }
 
@@ -36,8 +38,14 @@ interface Thread {
   thread_content: string;
   thread_created: string;
   thread_deleted: boolean;
+  author: {
+    account_username: string;
+    account_email: string;
+    avatar_url?: string | null;
+  };
   subforum: {
     subforum_name: string;
+    subforum_id: number;
     forum: {
       forum_name: string;
     };
@@ -97,7 +105,8 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
       comment_deleted: false,
       author: {
         account_username: user.user_metadata?.username || 'Anonymous',
-        account_email: user.email || ''
+        account_email: user.email || '',
+        avatar_url: user.user_metadata?.avatar_url
       }
     };
 
@@ -122,11 +131,15 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
       // If the account doesn't exist, create one
       if (accountError || !accountData) {
         console.log('Account not found, creating new account');
+        // Get avatar URL from Google profile
+        const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+
         const { error: createAccountError } = await supabase.from('Account').insert({
           account_id: user.id,
           account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
           account_email: user.email,
-          account_is_deleted: false
+          account_is_deleted: false,
+          avatar_url: avatarUrl // Add the avatar URL
         });
 
         if (createAccountError) {
@@ -248,17 +261,43 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Breadcrumb */}
-        <div className="text-sm text-gray-500 mb-4">
-          <span>{thread.subforum.forum.forum_name}</span>
-          <span className="mx-2">/</span>
-          <span>{thread.subforum.subforum_name}</span>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center space-x-1 text-sm text-gray-500">
+                <Link href="/" className="hover:underline">
+                  Forums
+                </Link>
+                <span>&gt;</span>
+                <Link href="/forums" className="hover:underline">
+                  {thread.subforum.forum.forum_name}
+                </Link>
+                <span>&gt;</span>
+                <Link href={`/forums/subforum/${thread.subforum.subforum_id}`} className="hover:underline">
+                  {thread.subforum.subforum_name}
+                </Link>
+              </div>
+              <h1 className="text-2xl font-semibold mt-2">{thread.thread_title}</h1>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4 text-sm text-gray-500 border-b pb-4">
+            <div className="flex items-center space-x-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
+                <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
+            </div>
+            <span>•</span>
+            <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
+          </div>
         </div>
 
         {/* Main Thread Card */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>{thread.thread_title}</CardTitle>
-            <div className="text-sm text-gray-500">Posted {format(new Date(thread.thread_created), 'MMM d, yyyy')}</div>
           </CardHeader>
           <CardContent>
             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: optimizeImages(thread.thread_content) }} />
@@ -303,7 +342,7 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
                   <CardContent className="p-4">
                     <div className="flex items-start gap-4">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={`https://avatar.vercel.sh/${comment.author.account_username}`} />
+                        <AvatarImage src={comment.author.avatar_url || `https://avatar.vercel.sh/${comment.author.account_username || 'anon'}`} />
                         <AvatarFallback>{comment.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">

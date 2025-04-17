@@ -15,6 +15,7 @@ interface ThreadData {
   author: {
     account_username: string | null;
     account_email: string | null;
+    avatar_url?: string | null;
   };
   comments: { count: number }[];
 }
@@ -32,16 +33,25 @@ interface DatabaseThread {
   thread_title: string;
   thread_created: string;
   comments: { count: number }[];
+  author: {
+    account_username: string | null;
+    account_email: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 export function ThreadRow({ thread }: { thread: ThreadData }) {
+  // Use the avatar_url if available, otherwise fallback to the vercel.sh avatar
+  // Adding null check to ensure we don't access properties of undefined
+  const avatarUrl = thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'user'}`;
+
   return (
     <Link href={`/thread/${thread.thread_id}`}>
       <div className="flex items-start gap-3 p-3 hover:bg-accent rounded-md transition-colors cursor-pointer">
         {/* Avatar on the leftmost */}
         <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarImage src={`https://avatar.vercel.sh/${thread.author.account_username || 'user'}`} />
-          <AvatarFallback className="text-xs">{thread.author.account_username ? thread.author.account_username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
+          <AvatarImage src={avatarUrl} />
+          <AvatarFallback className="text-xs">{thread.author?.account_username ? thread.author.account_username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0">
@@ -53,7 +63,7 @@ export function ThreadRow({ thread }: { thread: ThreadData }) {
           </div>
 
           <div className="text-xs text-muted-foreground mt-1">
-            Posted by {thread.author.account_username || 'Anonymous'} • {format(new Date(thread.thread_created), 'MMM d, yyyy')}
+            Posted by {thread.author?.account_username || 'Anonymous'} • {format(new Date(thread.thread_created), 'MMM d, yyyy')}
           </div>
         </div>
       </div>
@@ -132,11 +142,11 @@ export function PopularSubforumsGrid() {
           return;
         }
 
-        // For each subforum, fetch threads with author data and comment counts
+        // For each subforum, fetch threads with author data directly
         const subforumsWithThreads = await Promise.all(
           subforumData.map(async (subforum) => {
             try {
-              // 1. Get threads for this subforum - threads don't have author relationship directly
+              // 1. Get threads for this subforum with author data directly
               const { data: threadsData, error: threadsError } = await supabase
                 .from('Thread')
                 .select(
@@ -144,7 +154,11 @@ export function PopularSubforumsGrid() {
                   thread_id,
                   thread_title,
                   thread_created,
-                  comments:Comment(count)
+                  comments:Comment(count),
+                  author:author_id(
+                    account_username,
+                    account_email
+                  )
                 `
                 )
                 .eq('subforum_id', subforum.subforum_id)
@@ -153,7 +167,7 @@ export function PopularSubforumsGrid() {
                 .limit(5);
 
               if (threadsError) {
-                console.error(`Error fetching threads for subforum ${subforum.subforum_id}:`, threadsError);
+                console.error(`Error fetching threads for subforum ${subforum.subforum_id}:`, threadsError.message, threadsError.details, threadsError.hint);
                 // If there's an error, return the subforum with empty threads
                 return {
                   subforum_id: subforum.subforum_id,
@@ -173,47 +187,15 @@ export function PopularSubforumsGrid() {
                 };
               }
 
-              // 2. Get the first comment for each thread to find out who created it
-              // In the Comments table, the first comment typically belongs to the thread creator
-              const threadIds = threadsData.map((thread) => thread.thread_id);
-              const { data: commentsData, error: commentsError } = await supabase
-                .from('Comment')
-                .select(
-                  `
-                  comment_id,
-                  thread_id,
-                  author:author_id(
-                    account_username,
-                    account_email
-                  )
-                `
-                )
-                .in('thread_id', threadIds)
-                .eq('comment_deleted', false)
-                .order('comment_created', { ascending: true });
-
-              if (commentsError) {
-                console.error(`Error fetching comments for subforum ${subforum.subforum_id}:`, commentsError);
-              }
-
-              // Group comments by thread_id and take the first one for each thread
-              const threadToAuthorMap = new Map();
-              if (commentsData) {
-                commentsData.forEach((comment) => {
-                  if (!threadToAuthorMap.has(comment.thread_id)) {
-                    threadToAuthorMap.set(comment.thread_id, comment.author);
-                  }
-                });
-              }
-
               // Transform data to match our interface
-              const threads: ThreadData[] = threadsData.map((thread: DatabaseThread) => ({
+              const threads: ThreadData[] = threadsData.map((thread: any) => ({
                 thread_id: thread.thread_id,
                 thread_title: thread.thread_title,
                 thread_created: thread.thread_created,
-                author: threadToAuthorMap.get(thread.thread_id) || {
-                  account_username: null,
-                  account_email: null
+                author: {
+                  account_username: thread.author?.account_username || null,
+                  account_email: thread.author?.account_email || null,
+                  avatar_url: thread.author?.avatar_url || null
                 },
                 comments: thread.comments || []
               }));
