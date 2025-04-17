@@ -6,11 +6,12 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 
 type SearchPageProps = {
-  searchParams: { q?: string };
+  searchParams: { q?: string; type?: string };
 };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = searchParams.q;
+  const searchType = searchParams.type || 'content'; // Default to content search
 
   // If no query, redirect to home
   if (!query) {
@@ -20,10 +21,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <main className="flex flex-col items-center justify-between p-4 min-h-screen">
       <div className="w-full max-w-[1250px] xl:w-[80%]">
-        <h1 className="text-2xl font-bold mb-6">Search Results for: {query}</h1>
+        <h1 className="text-2xl font-bold mb-2">Search Results for: {query}</h1>
+
+        {/* Search Type Selector */}
+        <div className="flex mb-6 gap-2">
+          <Link href={`/search?q=${encodeURIComponent(query)}&type=content`} className={`px-4 py-1 rounded-md text-sm ${searchType === 'content' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+            Content
+          </Link>
+          <Link href={`/search?q=${encodeURIComponent(query)}&type=username`} className={`px-4 py-1 rounded-md text-sm ${searchType === 'username' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+            By Username
+          </Link>
+          <Link href={`/search?q=${encodeURIComponent(query)}&type=all`} className={`px-4 py-1 rounded-md text-sm ${searchType === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}>
+            All
+          </Link>
+        </div>
 
         <Suspense fallback={<div className="text-center py-10">Loading results...</div>}>
-          <SearchResults query={query} />
+          <SearchResults query={query} searchType={searchType} />
         </Suspense>
       </div>
     </main>
@@ -55,89 +69,132 @@ type Thread = {
   };
 };
 
-async function SearchResults({ query }: { query: string }) {
+async function SearchResults({ query, searchType }: { query: string; searchType: string }) {
   // Get client
   const supabase = await createClientForServer();
 
-  // Search threads that match the query in title or content
-  const { data: contentThreads, error: contentError } = await supabase
-    .from('Thread')
-    .select(
-      `
-      thread_id,
-      thread_title,
-      thread_content,
-      thread_created,
-      thread_modified,
-      subforum_id,
-      author_id,
-      author:Account!author_id(
-        account_username,
-        account_email
-      ),
-      comments:Comment(count),
-      subforum:Subforum(
-        subforum_name,
-        subforum_id,
-        forum_id,
-        forum:Forum(
-          forum_name
-        )
-      )
-    `
-    )
-    .or(`thread_title.ilike.%${query}%,thread_content.ilike.%${query}%`) // Search in title and content
-    .eq('thread_deleted', false)
-    .order('thread_created', { ascending: false })
-    .limit(20);
-
-  // Search threads by username
-  const { data: usernameThreads, error: usernameError } = await supabase
-    .from('Thread')
-    .select(
-      `
-      thread_id,
-      thread_title,
-      thread_content,
-      thread_created,
-      thread_modified,
-      subforum_id,
-      author_id,
-      author:Account!author_id(
-        account_username,
-        account_email
-      ),
-      comments:Comment(count),
-      subforum:Subforum(
-        subforum_name,
-        subforum_id,
-        forum_id,
-        forum:Forum(
-          forum_name
-        )
-      )
-    `
-    )
-    .eq('thread_deleted', false)
-    .filter('author.account_username', 'ilike', `%${query}%`) // Search by username
-    .order('thread_created', { ascending: false })
-    .limit(20);
-
-  if (contentError && usernameError) {
-    return <div className="text-red-500">Error loading search results: {contentError.message || usernameError.message}</div>;
+  // Ensure the search term is valid
+  if (!query || query.trim().length === 0) {
+    return (
+      <div className="py-10 text-center">
+        <p className="text-gray-600">Please enter a search term.</p>
+      </div>
+    );
   }
 
-  // Combine results and remove duplicates
-  const allThreads = [...(contentThreads || []), ...(usernameThreads || [])];
-  const uniqueThreadIds = new Set();
-  const threads = allThreads.filter((thread) => {
-    if (uniqueThreadIds.has(thread.thread_id)) {
-      return false;
-    }
-    uniqueThreadIds.add(thread.thread_id);
-    return true;
-  });
+  const searchTerm = query.trim();
+  let threads: any[] = [];
+  let error = null;
 
+  // Perform search based on the selected type
+  if (searchType === 'content' || searchType === 'all') {
+    // Search threads by content
+    const { data: contentThreads, error: contentError } = await supabase
+      .from('Thread')
+      .select(
+        `
+        thread_id,
+        thread_title,
+        thread_content,
+        thread_created,
+        thread_modified,
+        subforum_id,
+        author_id,
+        author:Account!author_id(
+          account_username,
+          account_email
+        ),
+        comments:Comment(count),
+        subforum:Subforum(
+          subforum_name,
+          subforum_id,
+          forum_id,
+          forum:Forum(
+            forum_name
+          )
+        )
+      `
+      )
+      .eq('thread_deleted', false)
+      .or(`thread_title.ilike.%${searchTerm}%,thread_content.ilike.%${searchTerm}%`)
+      .order('thread_created', { ascending: false })
+      .limit(20);
+
+    if (contentError) {
+      error = contentError;
+    } else if (contentThreads) {
+      threads = [...contentThreads];
+    }
+  }
+
+  if (searchType === 'username' || searchType === 'all') {
+    // First get account IDs matching the username
+    const { data: matchingAccounts, error: accountError } = await supabase.from('Account').select('account_id').ilike('account_username', `%${searchTerm}%`);
+
+    if (accountError) {
+      if (!error) error = accountError;
+    } else if (matchingAccounts && matchingAccounts.length > 0) {
+      // Get all author IDs that match the username search
+      const authorIds = matchingAccounts.map((account) => account.account_id);
+
+      // Now get threads by these authors
+      const { data: usernameThreads, error: usernameError } = await supabase
+        .from('Thread')
+        .select(
+          `
+          thread_id,
+          thread_title,
+          thread_content,
+          thread_created,
+          thread_modified,
+          subforum_id,
+          author_id,
+          author:Account!author_id(
+            account_username,
+            account_email
+          ),
+          comments:Comment(count),
+          subforum:Subforum(
+            subforum_name,
+            subforum_id,
+            forum_id,
+            forum:Forum(
+              forum_name
+            )
+          )
+        `
+        )
+        .eq('thread_deleted', false)
+        .in('author_id', authorIds)
+        .order('thread_created', { ascending: false })
+        .limit(20);
+
+      if (usernameError) {
+        if (!error) error = usernameError;
+      } else if (usernameThreads) {
+        threads = [...threads, ...usernameThreads];
+      }
+    }
+  }
+
+  // Handle errors
+  if (error) {
+    return <div className="text-red-500">Error loading search results: {error.message}</div>;
+  }
+
+  // Remove duplicates if searching for both
+  if (searchType === 'all') {
+    const uniqueThreadIds = new Set();
+    threads = threads.filter((thread) => {
+      if (uniqueThreadIds.has(thread.thread_id)) {
+        return false;
+      }
+      uniqueThreadIds.add(thread.thread_id);
+      return true;
+    });
+  }
+
+  // No results case
   if (!threads || threads.length === 0) {
     return (
       <div className="py-10 text-center">
@@ -147,6 +204,7 @@ async function SearchResults({ query }: { query: string }) {
     );
   }
 
+  // Display results
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">Found {threads.length} results</p>
