@@ -35,7 +35,7 @@ export function ForumComponentWrapper() {
         data.map((forum: ForumData) => ({
           id: forum.id,
           name: forum.name,
-          description: forum.description || '',
+          description: forum.description || ' ',
           subforums: forum.subforums.map((subforum: Subforum) => ({
             id: subforum.id,
             name: subforum.name
