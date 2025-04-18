@@ -42,7 +42,7 @@ export default function UserProfile({ user }: UserProfileProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [usernameError, setUsernameError] = useState<string | null>(null); // Added state for username error
+  const [usernameError, setUsernameError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,7 +117,6 @@ export default function UserProfile({ user }: UserProfileProps) {
       setIsSaving(true);
       const supabase = createClient();
 
-      // Check for username availability
       if (newUsername && newUsername !== accountData?.account_username) {
         const { data: existingUsername, error: checkError } = await supabase.from('Account').select('account_id').eq('account_username', newUsername).neq('account_id', user.id).maybeSingle();
 
@@ -126,7 +125,7 @@ export default function UserProfile({ user }: UserProfileProps) {
           setUsernameError('Username is already taken. Please choose another.');
           return;
         } else {
-          setUsernameError(null); // Clear any previous error
+          setUsernameError(null);
         }
       }
 
@@ -183,7 +182,7 @@ export default function UserProfile({ user }: UserProfileProps) {
   return (
     <div className="grid gap-8">
       <Card className="overflow-hidden border border-gray-300">
-        <CardHeader className=" py-4 border-b border-gray-300 bg-slate-50">
+        <CardHeader className="py-4 border-b border-gray-300 bg-slate-50">
           <div className="flex justify-between items-center">
             <CardTitle className="text-xl">User Information</CardTitle>
             {!editMode ? (
@@ -206,7 +205,7 @@ export default function UserProfile({ user }: UserProfileProps) {
         </CardHeader>
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row items-start gap-8">
-            <div className="relative">
+            <div className="relative self-center md:self-start">
               <Avatar className="w-32 h-32 rounded-xl">
                 <AvatarImage src={avatarUrl} />
                 <AvatarFallback className="text-4xl">{name?.charAt(0).toUpperCase()}</AvatarFallback>
@@ -252,7 +251,7 @@ export default function UserProfile({ user }: UserProfileProps) {
       <CardTitle className="text-2xl font-bold">Your Threads</CardTitle>
 
       <Card className="overflow-hidden border border-gray-300">
-        <CardHeader className=" bg-slate-50 border-b border-gray-300 rounded-t-md">
+        <CardHeader className="bg-slate-50 border-b border-gray-300 rounded-t-md">
           <CardDescription className="text-lg text-gray-800 font-semibold">Manage threads you've created</CardDescription>
         </CardHeader>
         <CardContent className="p-6">
