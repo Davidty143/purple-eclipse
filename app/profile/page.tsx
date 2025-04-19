@@ -8,15 +8,21 @@ export default async function ProfilePage() {
     data: { user }
   } = await supabase.auth.getUser();
 
-  // If not logged in, redirect to login page
   if (!user) {
     redirect('/login');
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold mb-8">Your Profile</h1>
-      <UserProfile user={user} />
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl font-bold mb-8">Your Profile</h1>
+        <div className="w-full flex flex-col gap-8">
+          <div className="w-full flex flex-col gap-6">
+            <UserProfile user={user} />
+          </div>
+        </div>
+        <footer className="w-full mt-auto py-4" />
+      </div>
     </div>
   );
 }

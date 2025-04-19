@@ -10,8 +10,9 @@ datasource db {
 model Account {
   account_id         String         @id @default(uuid()) @db.Uuid
   account_username   String?        @unique
-  account_email      String?        @unique
+  account_email      String?        @unique   
   account_status     AccountStatus?
+  account_avatar_url String?
   account_is_deleted Boolean?
   account_role_id    String?        @db.Uuid
   account_role       Role?          @relation(fields: [account_role_id], references: [role_id])
@@ -36,7 +37,7 @@ model Previlage {
 model Forum {
   forum_name        String?    @unique
   forum_description String?
-  forum_created     DateTime   @default(now()) @map("forum_created") @db.Timestamptz(6)
+  forum_created     DateTime   @default(now())   @map("forum_created") @db.Timestamptz(6)
   forum_modified    DateTime   @updatedAt @map("forum_modified") @db.Timestamptz(6)
   forum_id          Int        @id @default(autoincrement())
   forum_is_deleted  Boolean    @default(false) @map("forum_deleted")

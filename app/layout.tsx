@@ -1,3 +1,4 @@
+//layout.tsx
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -41,16 +42,6 @@ export default async function RootLayout({
 
                   {/* Login Section */}
                   <div className={cn('menu-header h-full flex items-center justify-end flex-shrink-0 gap-4')}>
-                    {/* Add Messages Icon */}
-                    <Link href="/messages" className="p-2 rounded-full hover:bg-gray-100 transition-colors relative" aria-label="Messages">
-                      <MessageCircle className="h-5 w-5 text-gray-700" />
-                      {/* Unread count badge - optional */}
-                      {/* {unreadCount > 0 && (
-                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                          {unreadCount}
-                        </span>
-                      )} */}
-                    </Link>
                     <AuthHeader />
                   </div>
                 </div>

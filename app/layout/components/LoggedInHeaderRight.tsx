@@ -1,11 +1,11 @@
-// components/LoggedInHeaderRight.tsx
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
@@ -13,6 +13,23 @@ import Link from 'next/link';
 export default function LoggedInHeaderRight() {
   const router = useRouter();
   const { user } = useAuth();
+  const [accountData, setAccountData] = useState<{ account_username: string | null; account_avatar_url: string | null } | null>(null);
+
+  useEffect(() => {
+    const fetchAccountData = async () => {
+      if (!user) return;
+      const supabase = createClient();
+      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id).single();
+
+      if (!error) {
+        setAccountData(data);
+      } else {
+        console.error('Failed to fetch account data:', error);
+      }
+    };
+
+    fetchAccountData();
+  }, [user]);
 
   const handleSignOut = async () => {
     try {
@@ -27,18 +44,25 @@ export default function LoggedInHeaderRight() {
 
   if (!user) return null;
 
+  const username = accountData?.account_username || '';
+  const avatarUrl = accountData?.account_avatar_url || '';
+  const fallbackInitial = username ? username.charAt(0).toUpperCase() : '?';
+
   return (
     <div className="flex items-center gap-4">
+      {/* Messages Icon */}
+      <Link href="/messages" className="p-2 rounded-full hover:bg-gray-100 transition-colors relative" aria-label="Messages">
+        <MessageCircle className="h-5 w-5" />
+      </Link>
+
+      {/* User Profile Dropdown */}
       <div className="flex items-center gap-2">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={user.user_metadata?.avatar_url} />
-          <AvatarFallback>{user.user_metadata?.username?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
-        </Avatar>
+        <Avatar className="h-8 w-8">{avatarUrl ? <AvatarImage src={avatarUrl} alt="User avatar" /> : <AvatarFallback>{fallbackInitial}</AvatarFallback>}</Avatar>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-1 p-1 h-auto hover:bg-transparent focus:bg-transparent hover:cursor-pointer">
-              <span className="text-sm font-medium">{user.user_metadata?.username || user.email?.split('@')[0]}</span>
+              <span className="text-sm font-medium">{username}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
