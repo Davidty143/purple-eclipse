@@ -1,10 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import LandingPage from '@/app/(landingPage)/page';
 
 export default function Logo() {
   return (
-    <Link href="<LandingPage/>" className="hover:opacity-80 transition-opacity">
+    <Link href="/" className="hover:opacity-80 transition-opacity">
       <div className="h-[60px] w-auto flex items-center justify-start py-5">
         <Image
           src="/images/VISCONN.png"
