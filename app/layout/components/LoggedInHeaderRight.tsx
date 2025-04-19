@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
@@ -50,6 +50,12 @@ export default function LoggedInHeaderRight() {
 
   return (
     <div className="flex items-center gap-4">
+      {/* Messages Icon */}
+      <Link href="/messages" className="p-2 rounded-full hover:bg-gray-100 transition-colors relative" aria-label="Messages">
+        <MessageCircle className="h-5 w-5" />
+      </Link>
+
+      {/* User Profile Dropdown */}
       <div className="flex items-center gap-2">
         <Avatar className="h-8 w-8">{avatarUrl ? <AvatarImage src={avatarUrl} alt="User avatar" /> : <AvatarFallback>{fallbackInitial}</AvatarFallback>}</Avatar>
 
