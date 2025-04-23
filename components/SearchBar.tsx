@@ -31,7 +31,7 @@ export default function SearchBar() {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-[300px] mx-auto">
+    <div ref={containerRef} className="relative w-full sm:w-[300px] mx-auto sm:px-0">
       <form onSubmit={handleSearch}>
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
