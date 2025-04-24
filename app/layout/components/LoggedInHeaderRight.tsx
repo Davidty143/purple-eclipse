@@ -13,7 +13,10 @@ import Link from 'next/link';
 export default function LoggedInHeaderRight() {
   const router = useRouter();
   const { user } = useAuth();
-  const [accountData, setAccountData] = useState<{ account_username: string | null; account_avatar_url: string | null } | null>(null);
+  const [accountData, setAccountData] = useState<{
+    account_username: string | null;
+    account_avatar_url: string | null;
+  } | null>(null);
 
   useEffect(() => {
     const fetchAccountData = async () => {
@@ -50,9 +53,10 @@ export default function LoggedInHeaderRight() {
 
   return (
     <div className="flex items-center gap-4">
-      {/* Messages Icon */}
-      <Link href="/messages" className="p-2 rounded-full hover:bg-gray-100 transition-colors relative" aria-label="Messages">
-        <MessageCircle className="h-5 w-5" />
+      {/* Messages Icon with Notification Badge */}
+      <Link href="/messages" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Messages">
+        <MessageCircle className="h-5 w-5 text-gray-700" />
+        <span className="absolute top-0.5 right-0.5 h-3.5 w-3.5 rounded-full bg-red-500 ring-2 ring-white" />
       </Link>
 
       {/* User Profile Dropdown */}
