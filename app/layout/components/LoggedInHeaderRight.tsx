@@ -13,13 +13,13 @@ import Link from 'next/link';
 export default function LoggedInHeaderRight() {
   const router = useRouter();
   const { user } = useAuth();
-  const [accountData, setAccountData] = useState<{ account_username: string | null; account_avatar_url: string | null } | null>(null);
+  const [accountData, setAccountData] = useState<{ account_username: string | null; avatar_url: string | null } | null>(null);
 
   useEffect(() => {
     const fetchAccountData = async () => {
       if (!user) return;
       const supabase = createClient();
-      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id).single();
+      const { data, error } = await supabase.from('Account').select('account_username, avatar_url').eq('account_id', user.id).single();
 
       if (!error) {
         setAccountData(data);
@@ -45,7 +45,7 @@ export default function LoggedInHeaderRight() {
   if (!user) return null;
 
   const username = accountData?.account_username || '';
-  const avatarUrl = accountData?.account_avatar_url || '';
+  const avatarUrl = accountData?.avatar_url || '';
   const fallbackInitial = username ? username.charAt(0).toUpperCase() : '?';
 
   return (

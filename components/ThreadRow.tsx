@@ -16,6 +16,10 @@ interface ThreadRowProps {
       avatar_url?: string | null;
     };
     comments: { count: number }[];
+    subforum?: {
+      subforum_id: number;
+      subforum_name: string;
+    };
   };
 }
 
@@ -23,8 +27,11 @@ const ThreadRow = ({ thread }: ThreadRowProps) => {
   // Determine avatar URL - use author's avatar_url if it exists, otherwise use default
   const avatarUrl = thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`;
 
+  // Create URL with category if available
+  const threadUrl = thread.subforum ? `/category/${thread.subforum.subforum_name.toLowerCase()}/thread/${thread.thread_id}` : `/thread/${thread.thread_id}`;
+
   return (
-    <Link href={`/thread/${thread.thread_id}`}>
+    <Link href={threadUrl}>
       <div className="thread-row py-3.5 px-6 flex flex-col hover:bg-gray-50 cursor-pointer">
         <div className="flex items-center space-x-4 justify-between">
           {/* Author Profile */}

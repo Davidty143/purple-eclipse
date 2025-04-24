@@ -1,0 +1,272 @@
+'use client';
+
+import { useState, useMemo, useCallback } from 'react';
+import { format, formatDistanceToNow } from 'date-fns';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Comment, Thread } from './interfaces';
+
+interface CommentsListProps {
+  thread: Thread;
+  user: any | null;
+  isSubmitting: boolean;
+  replyingTo: number | null;
+  setReplyingTo: (id: number | null) => void;
+  replyContent: string;
+  setReplyContent: (content: string) => void;
+  handleReplySubmit: (parentCommentId: number, content?: string) => Promise<void>;
+  handleNestedReplySubmit?: (replyId: number, content: string) => Promise<boolean | void>;
+}
+
+// Helper function to format date in a dynamic way
+const formatRelativeTime = (date: Date): string => {
+  const now = new Date();
+  const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+  if (diffInHours < 1) {
+    return formatDistanceToNow(date, { addSuffix: true });
+  } else if (diffInHours < 24) {
+    return `${Math.floor(diffInHours)}h ago`;
+  } else if (diffInHours < 48) {
+    return 'yesterday';
+  } else if (diffInHours < 168) {
+    // 7 days
+    return `${Math.floor(diffInHours / 24)}d ago`;
+  } else {
+    return format(date, 'MMM d, yyyy');
+  }
+};
+
+// Utility function to deduplicate replies based on comment_id
+function deduplicateReplies(replies: Comment[] | undefined): Comment[] {
+  if (!replies || replies.length === 0) return [];
+
+  // Use a Map to track unique replies by ID
+  const uniqueReplies = new Map<number, Comment>();
+
+  // Add each non-deleted reply to the map (will overwrite duplicates)
+  replies.filter((reply) => !reply.comment_deleted).forEach((reply) => uniqueReplies.set(reply.comment_id, reply));
+
+  // Convert back to array and sort by creation date
+  return Array.from(uniqueReplies.values()).sort((a, b) => new Date(a.comment_created).getTime() - new Date(b.comment_created).getTime());
+}
+
+export default function CommentsList({ thread, user, isSubmitting, replyingTo, setReplyingTo, replyContent, setReplyContent, handleReplySubmit, handleNestedReplySubmit }: CommentsListProps) {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Comments</h2>
+        <div className="text-sm text-gray-500">{thread.comments.filter((c) => !c.comment_deleted).length} comments</div>
+      </div>
+
+      {/* Comments List */}
+      <div className="space-y-4">
+        {thread.comments
+          .filter((comment) => !comment.comment_deleted && !comment.parent_comment_id)
+          .map((comment) => (
+            <CommentCard key={`comment-${comment.comment_id}`} comment={comment} user={user} isSubmitting={isSubmitting} replyingTo={replyingTo} setReplyingTo={setReplyingTo} replyContent={replyContent} setReplyContent={setReplyContent} handleReplySubmit={handleReplySubmit} handleNestedReplySubmit={handleNestedReplySubmit} />
+          ))}
+      </div>
+    </div>
+  );
+}
+
+interface CommentCardProps {
+  comment: Comment;
+  user: any | null;
+  isSubmitting: boolean;
+  replyingTo: number | null;
+  setReplyingTo: (id: number | null) => void;
+  replyContent: string;
+  setReplyContent: (content: string) => void;
+  handleReplySubmit: (parentCommentId: number, content?: string) => Promise<void>;
+  handleNestedReplySubmit?: (replyId: number, content: string) => Promise<boolean | void>;
+}
+
+function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, replyContent, setReplyContent, handleReplySubmit, handleNestedReplySubmit }: CommentCardProps) {
+  const [showReplies, setShowReplies] = useState(false);
+  const [replyingToNestedId, setReplyingToNestedId] = useState<number | null>(null);
+  const [nestedReplyContent, setNestedReplyContent] = useState('');
+
+  // Get deduplicated replies
+  const uniqueReplies = deduplicateReplies(comment.replies);
+  const replyCount = uniqueReplies.length;
+
+  const onNestedReplySubmit = async (replyId: number) => {
+    if (!nestedReplyContent.trim()) return;
+
+    try {
+      // If external handler is provided, use it
+      if (handleNestedReplySubmit) {
+        const success = await handleNestedReplySubmit(replyId, nestedReplyContent);
+        if (success !== false) {
+          // Reset form after submission
+          setNestedReplyContent('');
+          setReplyingToNestedId(null);
+          // Make sure replies are visible after submitting
+          setShowReplies(true);
+        }
+      } else {
+        // Otherwise use the default behavior
+        await handleReplySubmit(replyId, nestedReplyContent);
+        // Reset form after submission
+        setNestedReplyContent('');
+        setReplyingToNestedId(null);
+        // Make sure replies are visible after submitting
+        setShowReplies(true);
+      }
+    } catch (error) {
+      console.error('Error submitting nested reply:', error);
+    }
+  };
+
+  return (
+    <Card className="comment-card">
+      <CardContent className="p-4">
+        <div className="flex items-start gap-4">
+          <Avatar className="h-10 w-10 shrink-0">
+            <AvatarImage src={comment.author.avatar_url || `https://avatar.vercel.sh/${comment.author.account_username || 'anon'}`} alt={comment.author.account_username || 'User'} />
+            <AvatarFallback>{comment.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="font-medium">{comment.author.account_username}</div>
+              <div className="text-sm text-gray-500">{formatRelativeTime(new Date(comment.comment_created))}</div>
+            </div>
+            <div className="text-gray-700">{comment.comment_content}</div>
+
+            {/* Reply Button */}
+            {user && (
+              <div>
+                <Button variant="ghost" size="sm" onClick={() => setReplyingTo(replyingTo === comment.comment_id ? null : comment.comment_id)} className="text-gray-500 hover:text-gray-700" disabled={isSubmitting}>
+                  {replyingTo === comment.comment_id ? 'Cancel' : 'Reply'}
+                </Button>
+              </div>
+            )}
+
+            {/* View Replies Button */}
+            {replyCount > 0 && (
+              <div>
+                <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700 flex items-center gap-1 pl-0" onClick={() => setShowReplies(!showReplies)}>
+                  {showReplies ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      Hide replies
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      View {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+
+            {/* Reply Form - placed before the replies for better context */}
+            {replyingTo === comment.comment_id && (
+              <div className="pl-4 border-l-2 border-blue-200 py-2">
+                <textarea value={replyContent} onChange={(e) => setReplyContent(e.target.value)} placeholder={`Reply to ${comment.author.account_username}...`} className="w-full min-h-[80px] p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" disabled={isSubmitting} />
+                <div className="mt-2 flex justify-end">
+                  <Button size="sm" disabled={isSubmitting || !replyContent.trim()} onClick={() => handleReplySubmit(comment.comment_id)} className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                        Posting...
+                      </>
+                    ) : (
+                      'Post Reply'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Replies section */}
+            {showReplies && replyCount > 0 && (
+              <div className="pt-2 space-y-4">
+                <div className="border-l-2 border-gray-200">
+                  {uniqueReplies.map((reply, index) => (
+                    <div key={`${comment.comment_id}-reply-${reply.comment_id}-${index}`} className="pl-4 py-3">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-8 w-8 shrink-0">
+                          <AvatarImage src={reply.author.avatar_url || `https://avatar.vercel.sh/${reply.author.account_username || 'anon'}`} alt={reply.author.account_username || 'User'} />
+                          <AvatarFallback>{reply.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 space-y-1.5">
+                          <div className="flex flex-col">
+                            <div className="font-medium text-sm">{reply.author.account_username}</div>
+                            <div className="text-gray-700 text-sm mt-1">{reply.comment_content}</div>
+                            <div className="flex items-center gap-4 mt-1.5">
+                              <div className="text-xs text-gray-500">{formatRelativeTime(new Date(reply.comment_created))}</div>
+                              {user && (
+                                <Button variant="ghost" size="sm" className="text-xs text-gray-500 h-auto p-0" onClick={() => setReplyingToNestedId(replyingToNestedId === reply.comment_id ? null : reply.comment_id)} disabled={isSubmitting}>
+                                  {replyingToNestedId === reply.comment_id ? 'Cancel' : 'Reply'}
+                                </Button>
+                              )}
+                            </div>
+
+                            {/* Nested Reply Form */}
+                            {replyingToNestedId === reply.comment_id && (
+                              <div className="mt-2 pl-3 border-l border-blue-100 py-2">
+                                <textarea value={nestedReplyContent} onChange={(e) => setNestedReplyContent(e.target.value)} placeholder={`Reply to ${reply.author.account_username}...`} className="w-full min-h-[60px] p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" disabled={isSubmitting} />
+                                <div className="mt-1 flex justify-end">
+                                  <Button size="sm" disabled={isSubmitting || !nestedReplyContent.trim()} onClick={() => onNestedReplySubmit(reply.comment_id)} className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    {isSubmitting ? (
+                                      <>
+                                        <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                        Posting...
+                                      </>
+                                    ) : (
+                                      'Reply'
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Display nested replies (replies to replies) */}
+                            {reply.replies && reply.replies.length > 0 && (
+                              <div className="mt-3 pl-3 pt-2 space-y-3 border-l border-gray-100">
+                                <div className="text-xs text-gray-500 mb-2">
+                                  {deduplicateReplies(reply.replies).length} nested {deduplicateReplies(reply.replies).length === 1 ? 'reply' : 'replies'}
+                                </div>
+
+                                {deduplicateReplies(reply.replies).map((nestedReply, nestedIndex) => (
+                                  <div key={`nested-${reply.comment_id}-${nestedReply.comment_id}-${nestedIndex}`} className="pl-2 pt-2">
+                                    <div className="flex items-start gap-2">
+                                      <div className="w-1 h-full bg-gray-100 rounded-full"></div>
+                                      <Avatar className="h-7 w-7 shrink-0">
+                                        <AvatarImage src={nestedReply.author.avatar_url || `https://avatar.vercel.sh/${nestedReply.author.account_username || 'anon'}`} alt={nestedReply.author.account_username || 'User'} />
+                                        <AvatarFallback>{nestedReply.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                                      </Avatar>
+                                      <div className="flex-1">
+                                        <div className="flex flex-col">
+                                          <div className="font-medium text-sm">{nestedReply.author.account_username}</div>
+                                          <div className="text-gray-700 text-sm mt-1">{nestedReply.comment_content}</div>
+                                          <div className="flex items-center gap-4 mt-1">
+                                            <div className="text-xs text-gray-500">{formatRelativeTime(new Date(nestedReply.comment_created))}</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

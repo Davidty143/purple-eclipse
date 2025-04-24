@@ -12,7 +12,7 @@ model Account {
   account_username   String?        @unique
   account_email      String?        @unique   
   account_status     AccountStatus?
-  account_avatar_url String?
+  avatar_url         String?
   account_is_deleted Boolean?
   account_role_id    String?        @db.Uuid
   account_role       Role?          @relation(fields: [account_role_id], references: [role_id])
@@ -84,11 +84,15 @@ model Comment {
   comment_modified  DateTime @updatedAt @map("comment_modified") @db.Timestamptz(6)
   thread_id         Int      @map("thread_id")
   author_id         String   @map("author_id") @db.Uuid
+  parent_comment_id Int?     @map("parent_comment_id")
   author            Account  @relation(fields: [author_id], references: [account_id])
   thread            Thread   @relation(fields: [thread_id], references: [thread_id])
+  parent            Comment? @relation("CommentToReply", fields: [parent_comment_id], references: [comment_id])
+  replies           Comment[] @relation("CommentToReply")
 
   @@index([thread_id])
   @@index([author_id])
+  @@index([parent_comment_id])
 }
 
 model ThreadImage {
