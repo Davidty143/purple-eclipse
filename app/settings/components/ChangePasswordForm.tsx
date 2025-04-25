@@ -86,8 +86,8 @@ export default function ChangePasswordForm() {
 
   return (
     <Card className="overflow-hidden border border-gray-300">
-      <CardHeader className="py-4 border-b border-gray-300 bg-slate-50">
-        <CardTitle className="text-xl">Change Your Password</CardTitle>
+      <CardHeader className="py-2 border-b border-gray-300 bg-gray-50">
+        <CardTitle className="text-md font-medium">Change Your Password</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
         <form onSubmit={handleChangePassword} className="space-y-6 max-w-2xl">
@@ -117,7 +117,7 @@ export default function ChangePasswordForm() {
 
           {message && <p className={`text-sm ${isSuccess ? 'text-green-600' : 'text-red-500'}`}>{message}</p>}
 
-          <Button type="submit" disabled={loading} className="w-full md:w-fit">
+          <Button type="submit" disabled={loading} className="w-full text-sm font-medium py-4">
             {loading ? 'Updating...' : 'Change Password'}
           </Button>
         </form>

@@ -4,17 +4,19 @@ import Link from 'next/link';
 
 const BodyHeader = () => {
   return (
-    <div className="p-body-header border border-gray-300 p-5 rounded-md mb-10 ">
-      <div className="p-title text-lg font-semibold flex flex-row justify-between">
-        <h1 className="p-title-value ">WELCOME TO VISCONN!</h1>
-        <div className="ml-auto">
-          <Link href="/post-thread">
-            <Button className="px-4 text-sm border border-gray-300 bg-white text-black hover:bg-gray-100">Post Thread</Button>
-          </Link>
-        </div>
-        <div className="v-quick-action"></div>
+    <div className="border border-gray-300 p-5 rounded-md mb-10">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Title */}
+        <h1 className="text-lg font-semibold">WELCOME TO VISCONN!</h1>
+
+        {/* Button */}
+        <Link href="/post-thread" className="sm:ml-auto">
+          <Button className="px-4 text-sm border border-gray-300 bg-white text-black hover:bg-gray-100 w-full sm:w-auto">Post Thread</Button>
+        </Link>
       </div>
-      <div className="p-description text-sm text-gray-500 w-3/5">Visconn is a place to connect, share ideas, and join discussions. Engage with others through threads, comments, and more.</div>
+
+      {/* Description */}
+      <div className="mt-3 text-sm text-gray-500 w-full sm:w-3/5">Visconn is a place to connect, share ideas, and join discussions. Engage with others through threads, comments, and more.</div>
     </div>
   );
 };

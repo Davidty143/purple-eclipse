@@ -19,7 +19,7 @@ export default async function SettingsPage() {
           {/* Sidebar Navigation */}
           <aside className="w-full lg:w-1/2">
             <nav className="space-y-3 ">
-              <button className="block w-full text-left px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-100 transition">Change Password</button>
+              <button className="block w-full text-left px-6 py-3 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-100 transition border-gray-300">Change Password</button>
             </nav>
           </aside>
 
