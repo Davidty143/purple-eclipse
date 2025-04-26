@@ -18,7 +18,8 @@ export async function GET(request: Request) {
           subforum_id,
           subforum_name,
           subforum_description,
-          subforum_deleted
+          subforum_deleted,
+          subforum_icon 
         )
       `
       )
@@ -36,7 +37,8 @@ export async function GET(request: Request) {
         id: subforum.subforum_id,
         name: subforum.subforum_name,
         description: subforum.subforum_description,
-        isDeleted: subforum.subforum_deleted
+        isDeleted: subforum.subforum_deleted,
+        icon: subforum.subforum_icon
       }))
     }));
 

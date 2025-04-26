@@ -1,65 +1,161 @@
-import HeaderDropdownMenu from "./HeaderDropDownMenu";
+'use client';
+
+import { useState } from 'react';
+import { FiMenu, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import Link from 'next/link';
 
 const Header = () => {
-  // Define different menu items for each dropdown with their corresponding links
-  const menu1 = [
-    { text: "What's New", href: "/newposts" },
-    { text: "Trending Now", href: "/trendingposts" },
-    { text: "Popular", href: "/popularposts" },
-  ];
-  const menu2 = [
-    { text: "Forum1", href: "/forum1" },
-    { text: "Forum2", href: "/forum2" },
-    { text: "Forum3", href: "/forum3" },
-  ];
-  const menu3 = [
-    { text: "This Day", href: "/dailtrending" },
-    { text: "This Week", href: "/weeklytrending" },
-    { text: "This Month", href: "/monthlytrending" },
-  ];
-  const menu4 = [
-    { text: "New Topics", href: "/newtopics" },
-    { text: "New Questions", href: "/newquestions" },
-    { text: "New Solutions", href: "/newsolutions" },
-  ];
+  const menus = {
+    home: {
+      title: 'Home',
+      link: '/',
+      items: [
+        { text: "What's New", href: '/newposts' },
+        { text: 'Trending Now', href: '/trendingposts' },
+        { text: 'Popular', href: '/popularposts' }
+      ]
+    },
+    forums: {
+      title: 'Forums',
+      link: '/forums',
+      items: [
+        { text: 'Forum 1', href: '/forum1' },
+        { text: 'Forum 2', href: '/forum2' },
+        { text: 'Forum 3', href: '/forum3' }
+      ]
+    },
+    trending: {
+      title: 'Trending',
+      link: '/trending',
+      items: [
+        { text: 'Today', href: '/daily-trending' },
+        { text: 'This Week', href: '/weekly-trending' },
+        { text: 'This Month', href: '/monthly-trending' }
+      ]
+    },
+    latest: {
+      title: 'Latest',
+      link: '/latest',
+      items: [
+        { text: 'New Topics', href: '/newtopics' },
+        { text: 'New Questions', href: '/newquestions' },
+        { text: 'New Solutions', href: '/newsolutions' }
+      ]
+    }
+  };
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="flex text-sm justify-between items-center py-4 min-w-full max-h-full space-x-4">
-      {/* Container for horizontal scroll on mobile, with max-width set to 300px */}
-      <div className="flex overflow-x-auto md:overflow-x-visible md:flex-nowrap space-x-4 max-w-[200px] md:max-w-full">
-        {/* First Dropdown Menu with custom trigger text and main link */}
-        <HeaderDropdownMenu
-          menuItems={menu1}
-          triggerText="Home"
-          dropdownPosition="left-[-73px]"
-          triggerLink="/"
-        />
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="w-full py-3 px-4 md:px-0">
+        <div className="flex items-center justify-between w-full">
+          {/* Hamburger Menu - Left */}
+          <div className="md:hidden">
+            <button className="-ml-4 p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+              {mobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
+            </button>
+          </div>
 
-        {/* Second Dropdown Menu with custom trigger text and main link */}
-        <HeaderDropdownMenu
-          menuItems={menu2}
-          triggerText="Forums"
-          triggerLink="/forums"
-          dropdownPosition="left-[-84px]" // Custom position class
-        />
+          {/* Desktop Menu */}
+          <nav className="hidden md:flex space-x-1">
+            {Object.values(menus).map((menu, index) => (
+              <DesktopDropdown key={index} title={menu.title} link={menu.link} items={menu.items} />
+            ))}
+          </nav>
+        </div>
 
-        {/* Third Dropdown Menu with custom trigger text and main link */}
-        <HeaderDropdownMenu
-          menuItems={menu3}
-          triggerText="Trending"
-          triggerLink="/trending"
-          dropdownPosition="left-[-95px]" // Custom position class
-        />
+        {/* Mobile overlay */}
+        <div className={`md:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setMobileMenuOpen(false)} />
 
-        {/* Fourth Dropdown Menu with custom trigger text and main link */}
-        <HeaderDropdownMenu
-          menuItems={menu4}
-          triggerText="Latest"
-          triggerLink="/latest"
-          dropdownPosition="left-[-74.014px]" // Custom position class
-        />
+        {/* Mobile slide menu */}
+        <div className={`md:hidden fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="p-4 h-full flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <Link href="/" className="text-xl font-bold text-[#2b7a58]" onClick={() => setMobileMenuOpen(false)}>
+                VISCONN
+              </Link>
+              <button className="p-2 rounded-lg text-gray-700 hover:bg-gray-100" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
+                <FiX className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Mobile nav */}
+            <nav className="flex-1 overflow-y-auto">
+              <div className="space-y-1">
+                {Object.values(menus).map((menu, index) => (
+                  <MobileDropdown key={index} title={menu.title} link={menu.link} items={menu.items} onItemClick={() => setMobileMenuOpen(false)} />
+                ))}
+              </div>
+            </nav>
+
+            {/* Footer */}
+            <div className="pt-4 mt-auto border-t border-gray-200 text-xs text-gray-500">
+              <div className="flex flex-col space-y-1">
+                <Link href="/privacy" onClick={() => setMobileMenuOpen(false)}>
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" onClick={() => setMobileMenuOpen(false)}>
+                  Terms of Service
+                </Link>
+                <span>© {new Date().getFullYear()} Tenza</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
+  );
+};
+
+// Desktop Dropdown
+const DesktopDropdown = ({ title, link, items }: { title: string; link: string; items: { text: string; href: string }[] }) => {
+  return (
+    <div className="relative group">
+      <Link href={link} className="flex items-center px-4 py-2 text-gray-700 rounded-lg transition-colors font-medium group-hover:text-[color:#2b7a58]">
+        {title}
+        <FiChevronDown className="ml-1 transition-transform group-hover:rotate-180 group-hover:text-[color:#2b7a58]" />
+      </Link>
+
+      <div className="absolute left-0 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+        <div className="py-1">
+          {items.map((item, index) => (
+            <Link key={index} href={item.href} className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
+              {item.text}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Mobile Dropdown
+const MobileDropdown = ({ title, link, items, onItemClick }: { title: string; link: string; items: { text: string; href: string }[]; onItemClick: () => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className={`rounded-md transition-colors mb-1 ${isOpen ? 'bg-gray-50' : 'bg-white'}`}>
+      <div className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-100" onClick={() => setIsOpen(!isOpen)}>
+        <Link href={link} className={`text-base font-medium flex-1 transition-colors ${isOpen ? 'text-[#2b7a58]' : 'text-gray-800'}`} onClick={onItemClick}>
+          {title}
+        </Link>
+        {isOpen ? <FiChevronUp className="w-5 h-5 text-[#2b7a58]" /> : <FiChevronDown className="w-5 h-5 text-gray-400" />}
+      </div>
+
+      <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-96' : 'max-h-0'}`}>
+        <ul className="space-y-1 px-4 py-1">
+          {items.map((item, index) => (
+            <li key={index}>
+              <Link href={item.href} className="block text-sm text-gray-600 px-2 py-2 rounded-md hover:bg-gray-100 hover:text-[#2b7a58] transition-colors" onClick={onItemClick}>
+                {item.text}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 };
 

@@ -52,6 +52,7 @@ model Subforum {
   subforum_description String?
   subforum_created     DateTime @default(now()) @map("subforum_created") @db.Timestamptz(6)
   subforum_modified    DateTime @updatedAt @map("subforum_modified") @db.Timestamptz(6)
+  subforum_icon        String?  @map("subforum_icon")
   forum_id             Int      @map("forum_id")
   subforum_is_deleted  Boolean  @default(false) @map("subforum_deleted")
   forum                Forum    @relation(fields: [forum_id], references: [forum_id])
