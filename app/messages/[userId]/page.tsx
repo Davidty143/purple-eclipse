@@ -1,7 +1,6 @@
-//app/messages/[userid]/page.tsx
+// app/messages/[userId]/page.tsx
 'use client';
 
-import { use } from 'react';
 import { useEffect, useState } from 'react';
 import { useSearchParams, redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -11,6 +10,8 @@ import { MessageList } from '../messages-list/page';
 import { MessageInput } from '../message-input/page';
 import { cn } from '@/lib/utils';
 import { MessageCircle } from 'lucide-react';
+import MessageHeader from '../message-header/page'; // Import the MessageHeader component
+import { use } from 'react';
 
 interface Message {
   id: string;
@@ -22,15 +23,20 @@ interface Message {
 }
 
 export default function MessagePage({ params }: { params: Promise<{ userId: string }> }) {
-  const { userId } = use(params);
+  // Unwrap the Promise to access userId
+  const { userId } = use(params); // Use React.use() to unwrap the params
+
   const supabase = createClient();
 
   const searchParams = useSearchParams();
-  const username = searchParams.get('username') || 'Messages';
+  const username = searchParams.get('username') || 'Messages'; // Default to "Messages" if no username param
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch the username for the userId (other user in the conversation)
+  const [otherUser, setOtherUser] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +49,11 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
       }
 
       setCurrentUser(user);
+
+      // Fetch the other user's data
+      const { data: otherUserData } = await supabase.from('Account').select('account_username').eq('account_id', userId).single(); // Fetch the username for the other user
+
+      setOtherUser(otherUserData); // Set the other user's data
 
       // Fetch messages between current user and the userId
       const { data: messages } = await supabase.from('direct_messages').select('*').or(`and(sender_id.eq.${user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user.id})`).order('created_at', { ascending: true });
@@ -69,7 +80,8 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
         </div>
         <div className="w-3/4 flex flex-col bg-background">
           <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold">{username}</h2>
+            {/* Pass the username of the other user */}
+            <MessageHeader username={otherUser?.account_username || 'Messages'} />
           </div>
           {messages.length > 0 ? (
             <>
