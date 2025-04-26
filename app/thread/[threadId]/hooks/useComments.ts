@@ -37,7 +37,7 @@ export function useComments(initialThread: Thread, user: any | null) {
       author: {
         account_username: user.user_metadata?.username || 'Anonymous',
         account_email: user.email || '',
-        avatar_url: user.user_metadata?.avatar_url
+        account_avatar_url: user.user_metadata?.avatar_url
       }
     };
 
@@ -70,7 +70,7 @@ export function useComments(initialThread: Thread, user: any | null) {
           account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
           account_email: user.email,
           account_is_deleted: false,
-          avatar_url: avatarUrl // Use avatar_url to match the database column name
+          account_avatar_url: avatarUrl // Use account_avatar_url instead of avatar_url to match the database column
         });
 
         if (createAccountError) {
@@ -96,7 +96,7 @@ export function useComments(initialThread: Thread, user: any | null) {
           author:author_id (
             account_username,
             account_email,
-            avatar_url
+            account_avatar_url
           )
         `
         )
@@ -159,7 +159,7 @@ export function useComments(initialThread: Thread, user: any | null) {
       author: {
         account_username: user.user_metadata?.username || 'Anonymous',
         account_email: user.email || '',
-        avatar_url: user.user_metadata?.avatar_url
+        account_avatar_url: user.user_metadata?.avatar_url
       }
     };
 
@@ -232,7 +232,7 @@ export function useComments(initialThread: Thread, user: any | null) {
           account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
           account_email: user.email,
           account_is_deleted: false,
-          avatar_url: avatarUrl // Use avatar_url to match the database column name
+          account_avatar_url: avatarUrl // Use account_avatar_url instead of avatar_url
         });
 
         if (createAccountError) {
@@ -259,7 +259,7 @@ export function useComments(initialThread: Thread, user: any | null) {
           author:author_id (
             account_username,
             account_email,
-            avatar_url
+            account_avatar_url
           )
         `
         )

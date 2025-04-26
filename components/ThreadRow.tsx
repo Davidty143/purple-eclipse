@@ -13,7 +13,7 @@ interface ThreadRowProps {
     author: {
       account_username: string | null;
       account_email: string | null;
-      avatar_url?: string | null;
+      account_avatar_url?: string | null;
     };
     comments: { count: number }[];
     subforum?: {
@@ -25,7 +25,7 @@ interface ThreadRowProps {
 
 const ThreadRow = ({ thread }: ThreadRowProps) => {
   // Determine avatar URL - use author's avatar_url if it exists, otherwise use default
-  const avatarUrl = thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`;
+  const avatarUrl = thread.author?.account_avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`;
 
   // Create URL with category if available
   const threadUrl = thread.subforum ? `/category/${thread.subforum.subforum_name.toLowerCase()}/thread/${thread.thread_id}` : `/thread/${thread.thread_id}`;

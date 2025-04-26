@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -89,10 +89,37 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
   const [showReplies, setShowReplies] = useState(false);
   const [replyingToNestedId, setReplyingToNestedId] = useState<number | null>(null);
   const [nestedReplyContent, setNestedReplyContent] = useState('');
+  const [showNestedReplies, setShowNestedReplies] = useState<Record<number, boolean>>({});
 
-  // Get deduplicated replies
-  const uniqueReplies = deduplicateReplies(comment.replies);
+  // Get deduplicated replies - memoize this to prevent infinite re-renders
+  const uniqueReplies = useMemo(() => deduplicateReplies(comment.replies), [comment.replies]);
   const replyCount = uniqueReplies.length;
+
+  // Function to get filtered nested replies
+  const getFilteredNestedReplies = useCallback((replyObj: Comment) => {
+    if (!replyObj.replies) return [];
+    return replyObj.replies.filter((r) => !r.comment_deleted);
+  }, []);
+
+  // Initialize nested replies to be hidden - only run once when the component mounts
+  useEffect(() => {
+    if (uniqueReplies.length > 0) {
+      const initialState: Record<number, boolean> = {};
+      uniqueReplies.forEach((reply) => {
+        if (reply.replies && reply.replies.length > 0) {
+          initialState[reply.comment_id] = false;
+        }
+      });
+      setShowNestedReplies(initialState);
+    }
+  }, [comment.comment_id]); // Only run when the comment id changes, not on every render
+
+  const toggleNestedReplies = (replyId: number) => {
+    setShowNestedReplies((prev) => ({
+      ...prev,
+      [replyId]: !prev[replyId]
+    }));
+  };
 
   const onNestedReplySubmit = async (replyId: number) => {
     if (!nestedReplyContent.trim()) return;
@@ -107,6 +134,11 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
           setReplyingToNestedId(null);
           // Make sure replies are visible after submitting
           setShowReplies(true);
+          // Show nested replies for this reply
+          setShowNestedReplies((prev) => ({
+            ...prev,
+            [replyId]: true
+          }));
         }
       } else {
         // Otherwise use the default behavior
@@ -116,6 +148,11 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
         setReplyingToNestedId(null);
         // Make sure replies are visible after submitting
         setShowReplies(true);
+        // Show nested replies for this reply
+        setShowNestedReplies((prev) => ({
+          ...prev,
+          [replyId]: true
+        }));
       }
     } catch (error) {
       console.error('Error submitting nested reply:', error);
@@ -127,7 +164,7 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
           <Avatar className="h-10 w-10 shrink-0">
-            <AvatarImage src={comment.author.avatar_url || `https://avatar.vercel.sh/${comment.author.account_username || 'anon'}`} alt={comment.author.account_username || 'User'} />
+            <AvatarImage src={comment.author.account_avatar_url || `https://avatar.vercel.sh/${comment.author.account_username || 'anon'}`} alt={comment.author.account_username || 'User'} />
             <AvatarFallback>{comment.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-2.5">
@@ -192,7 +229,7 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
                     <div key={`${comment.comment_id}-reply-${reply.comment_id}-${index}`} className="pl-4 py-3">
                       <div className="flex items-start gap-3">
                         <Avatar className="h-8 w-8 shrink-0">
-                          <AvatarImage src={reply.author.avatar_url || `https://avatar.vercel.sh/${reply.author.account_username || 'anon'}`} alt={reply.author.account_username || 'User'} />
+                          <AvatarImage src={reply.author.account_avatar_url || `https://avatar.vercel.sh/${reply.author.account_username || 'anon'}`} alt={reply.author.account_username || 'User'} />
                           <AvatarFallback>{reply.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 space-y-1.5">
@@ -228,34 +265,58 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
                             )}
 
                             {/* Display nested replies (replies to replies) */}
-                            {reply.replies && reply.replies.length > 0 && (
-                              <div className="mt-3 pl-3 pt-2 space-y-3 border-l border-gray-100">
-                                <div className="text-xs text-gray-500 mb-2">
-                                  {deduplicateReplies(reply.replies).length} nested {deduplicateReplies(reply.replies).length === 1 ? 'reply' : 'replies'}
-                                </div>
+                            {reply.replies &&
+                              reply.replies.length > 0 &&
+                              (() => {
+                                // Calculate this once per render
+                                const filteredNestedReplies = getFilteredNestedReplies(reply);
+                                const nestedReplyCount = filteredNestedReplies.length;
 
-                                {deduplicateReplies(reply.replies).map((nestedReply, nestedIndex) => (
-                                  <div key={`nested-${reply.comment_id}-${nestedReply.comment_id}-${nestedIndex}`} className="pl-2 pt-2">
-                                    <div className="flex items-start gap-2">
-                                      <div className="w-1 h-full bg-gray-100 rounded-full"></div>
-                                      <Avatar className="h-7 w-7 shrink-0">
-                                        <AvatarImage src={nestedReply.author.avatar_url || `https://avatar.vercel.sh/${nestedReply.author.account_username || 'anon'}`} alt={nestedReply.author.account_username || 'User'} />
-                                        <AvatarFallback>{nestedReply.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-                                      </Avatar>
-                                      <div className="flex-1">
-                                        <div className="flex flex-col">
-                                          <div className="font-medium text-sm">{nestedReply.author.account_username}</div>
-                                          <div className="text-gray-700 text-sm mt-1">{nestedReply.comment_content}</div>
-                                          <div className="flex items-center gap-4 mt-1">
-                                            <div className="text-xs text-gray-500">{formatRelativeTime(new Date(nestedReply.comment_created))}</div>
+                                return nestedReplyCount > 0 ? (
+                                  <div className="mt-3 pl-3 pt-2 space-y-3 border-l border-gray-100">
+                                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                                      <Button variant="ghost" size="sm" className="text-xs text-gray-500 h-auto p-0 flex items-center gap-1" onClick={() => toggleNestedReplies(reply.comment_id)}>
+                                        {showNestedReplies[reply.comment_id] ? (
+                                          <>
+                                            <ChevronUp className="h-3 w-3" />
+                                            Hide
+                                          </>
+                                        ) : (
+                                          <>
+                                            <ChevronDown className="h-3 w-3" />
+                                            Show
+                                          </>
+                                        )}
+                                      </Button>
+                                      <span>
+                                        {nestedReplyCount} nested {nestedReplyCount === 1 ? 'reply' : 'replies'}
+                                      </span>
+                                    </div>
+
+                                    {showNestedReplies[reply.comment_id] &&
+                                      filteredNestedReplies.map((nestedReply, nestedIndex) => (
+                                        <div key={`nested-${reply.comment_id}-${nestedReply.comment_id}-${nestedIndex}`} className="pl-2 pt-2">
+                                          <div className="flex items-start gap-2">
+                                            <div className="w-1 h-full bg-gray-100 rounded-full"></div>
+                                            <Avatar className="h-7 w-7 shrink-0">
+                                              <AvatarImage src={nestedReply.author.account_avatar_url || `https://avatar.vercel.sh/${nestedReply.author.account_username || 'anon'}`} alt={nestedReply.author.account_username || 'User'} />
+                                              <AvatarFallback>{nestedReply.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                              <div className="flex flex-col">
+                                                <div className="font-medium text-sm">{nestedReply.author.account_username}</div>
+                                                <div className="text-gray-700 text-sm mt-1">{nestedReply.comment_content}</div>
+                                                <div className="flex items-center gap-4 mt-1">
+                                                  <div className="text-xs text-gray-500">{formatRelativeTime(new Date(nestedReply.comment_created))}</div>
+                                                </div>
+                                              </div>
+                                            </div>
                                           </div>
                                         </div>
-                                      </div>
-                                    </div>
+                                      ))}
                                   </div>
-                                ))}
-                              </div>
-                            )}
+                                ) : null;
+                              })()}
                           </div>
                         </div>
                       </div>

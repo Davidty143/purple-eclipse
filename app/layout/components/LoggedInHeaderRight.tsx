@@ -13,18 +13,42 @@ import Link from 'next/link';
 export default function LoggedInHeaderRight() {
   const router = useRouter();
   const { user } = useAuth();
-  const [accountData, setAccountData] = useState<{ account_username: string | null; avatar_url: string | null } | null>(null);
+  const [accountData, setAccountData] = useState<{ account_username: string | null; account_avatar_url: string | null } | null>(null);
 
   useEffect(() => {
     const fetchAccountData = async () => {
       if (!user) return;
       const supabase = createClient();
-      const { data, error } = await supabase.from('Account').select('account_username, avatar_url').eq('account_id', user.id).single();
 
-      if (!error) {
-        setAccountData(data);
+      // First check if account exists
+      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id);
+
+      if (!error && data && data.length > 0) {
+        setAccountData(data[0]);
       } else {
-        console.error('Failed to fetch account data:', error);
+        // If account doesn't exist or there was an error, create a new account
+        console.log('Account not found or error occurred, creating new account');
+
+        // Get avatar URL from user metadata if available
+        const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+
+        const { error: createAccountError, data: newAccount } = await supabase
+          .from('Account')
+          .insert({
+            account_id: user.id,
+            account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
+            account_email: user.email,
+            account_is_deleted: false,
+            account_avatar_url: avatarUrl
+          })
+          .select('account_username, account_avatar_url')
+          .single();
+
+        if (!createAccountError && newAccount) {
+          setAccountData(newAccount);
+        } else {
+          console.error('Failed to create account:', createAccountError);
+        }
       }
     };
 
@@ -45,7 +69,7 @@ export default function LoggedInHeaderRight() {
   if (!user) return null;
 
   const username = accountData?.account_username || '';
-  const avatarUrl = accountData?.avatar_url || '';
+  const avatarUrl = accountData?.account_avatar_url || '';
   const fallbackInitial = username ? username.charAt(0).toUpperCase() : '?';
 
   return (

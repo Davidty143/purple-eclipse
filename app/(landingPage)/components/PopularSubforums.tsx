@@ -1,12 +1,13 @@
 'use client';
+import React, { use } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { createCachedFetch } from '@/lib/use-cached-fetch';
 
 interface ThreadData {
   thread_id: number;
@@ -15,7 +16,7 @@ interface ThreadData {
   author: {
     account_username: string | null;
     account_email: string | null;
-    avatar_url?: string | null;
+    account_avatar_url?: string | null;
   };
   comments: { count: number }[];
 }
@@ -27,23 +28,10 @@ interface SubforumData {
   threads: ThreadData[];
 }
 
-// Define a more specific type for the Supabase response
-interface DatabaseThread {
-  thread_id: number;
-  thread_title: string;
-  thread_created: string;
-  comments: { count: number }[];
-  author: {
-    account_username: string | null;
-    account_email: string | null;
-    avatar_url: string | null;
-  } | null;
-}
-
 export function ThreadRow({ thread }: { thread: ThreadData }) {
   // Use the avatar_url if available, otherwise fallback to the vercel.sh avatar
   // Adding null check to ensure we don't access properties of undefined
-  const avatarUrl = thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'user'}`;
+  const avatarUrl = thread.author?.account_avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'user'}`;
 
   return (
     <Link href={`/thread/${thread.thread_id}`}>
@@ -108,162 +96,134 @@ export function SubforumBlock({ subforum }: { subforum: SubforumData }) {
   );
 }
 
-export function PopularSubforumsGrid() {
-  const [subforums, setSubforums] = useState<SubforumData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Create a suspense-ready data fetcher
+const fetchSubforums = async () => {
+  const supabase = createClient();
 
-  useEffect(() => {
-    async function fetchSubforums() {
+  // First get active subforums
+  const { data: subforumData, error: subforumError } = await supabase
+    .from('Subforum')
+    .select(
+      `
+      subforum_id,
+      subforum_name,
+      subforum_description
+    `
+    )
+    .eq('subforum_deleted', false)
+    .limit(5);
+
+  if (subforumError) {
+    console.error('Error fetching subforums:', subforumError);
+    throw new Error(`Subforum fetch error: ${subforumError.message}`);
+  }
+
+  if (!subforumData || subforumData.length === 0) {
+    return [];
+  }
+
+  // For each subforum, fetch threads with author data directly
+  const subforumsWithThreads = await Promise.all(
+    subforumData.map(async (subforum) => {
       try {
-        const supabase = createClient();
-
-        // First get active subforums
-        const { data: subforumData, error: subforumError } = await supabase
-          .from('Subforum')
+        // Get threads for this subforum with author data directly
+        const { data: threadsData, error: threadsError } = await supabase
+          .from('Thread')
           .select(
             `
-            subforum_id,
-            subforum_name,
-            subforum_description
+            thread_id,
+            thread_title,
+            thread_created,
+            comments:Comment(count),
+            author:author_id(
+              account_username,
+              account_email
+            )
           `
           )
-          .eq('subforum_deleted', false)
+          .eq('subforum_id', subforum.subforum_id)
+          .eq('thread_deleted', false)
+          .order('thread_created', { ascending: false })
           .limit(5);
 
-        if (subforumError) {
-          console.error('Error fetching subforums:', subforumError);
-          throw new Error(`Subforum fetch error: ${subforumError.message}`);
+        if (threadsError) {
+          console.error(`Error fetching threads for subforum ${subforum.subforum_id}:`, threadsError.message, threadsError.details, threadsError.hint);
+          return {
+            subforum_id: subforum.subforum_id,
+            subforum_name: subforum.subforum_name,
+            subforum_description: subforum.subforum_description,
+            threads: []
+          };
         }
 
-        if (!subforumData || subforumData.length === 0) {
-          setSubforums([]);
-          setLoading(false);
-          return;
+        // If no threads for this subforum, return early
+        if (!threadsData || threadsData.length === 0) {
+          return {
+            subforum_id: subforum.subforum_id,
+            subforum_name: subforum.subforum_name,
+            subforum_description: subforum.subforum_description,
+            threads: []
+          };
         }
 
-        // For each subforum, fetch threads with author data directly
-        const subforumsWithThreads = await Promise.all(
-          subforumData.map(async (subforum) => {
-            try {
-              // 1. Get threads for this subforum with author data directly
-              const { data: threadsData, error: threadsError } = await supabase
-                .from('Thread')
-                .select(
-                  `
-                  thread_id,
-                  thread_title,
-                  thread_created,
-                  comments:Comment(count),
-                  author:author_id(
-                    account_username,
-                    account_email
-                  )
-                `
-                )
-                .eq('subforum_id', subforum.subforum_id)
-                .eq('thread_deleted', false)
-                .order('thread_created', { ascending: false })
-                .limit(5);
+        // Transform data to match our interface
+        const threads: ThreadData[] = threadsData.map((thread: any) => ({
+          thread_id: thread.thread_id,
+          thread_title: thread.thread_title,
+          thread_created: thread.thread_created,
+          author: {
+            account_username: thread.author?.account_username || null,
+            account_email: thread.author?.account_email || null,
+            account_avatar_url: thread.author?.account_avatar_url || null
+          },
+          comments: thread.comments || []
+        }));
 
-              if (threadsError) {
-                console.error(`Error fetching threads for subforum ${subforum.subforum_id}:`, threadsError.message, threadsError.details, threadsError.hint);
-                // If there's an error, return the subforum with empty threads
-                return {
-                  subforum_id: subforum.subforum_id,
-                  subforum_name: subforum.subforum_name,
-                  subforum_description: subforum.subforum_description,
-                  threads: []
-                };
-              }
-
-              // If no threads for this subforum, return early
-              if (!threadsData || threadsData.length === 0) {
-                return {
-                  subforum_id: subforum.subforum_id,
-                  subforum_name: subforum.subforum_name,
-                  subforum_description: subforum.subforum_description,
-                  threads: []
-                };
-              }
-
-              // Transform data to match our interface
-              const threads: ThreadData[] = threadsData.map((thread: any) => ({
-                thread_id: thread.thread_id,
-                thread_title: thread.thread_title,
-                thread_created: thread.thread_created,
-                author: {
-                  account_username: thread.author?.account_username || null,
-                  account_email: thread.author?.account_email || null,
-                  avatar_url: thread.author?.avatar_url || null
-                },
-                comments: thread.comments || []
-              }));
-
-              return {
-                subforum_id: subforum.subforum_id,
-                subforum_name: subforum.subforum_name,
-                subforum_description: subforum.subforum_description,
-                threads
-              };
-            } catch (err) {
-              console.error(`Error processing subforum ${subforum.subforum_id}:`, err);
-              // Return subforum with empty threads rather than failing completely
-              return {
-                subforum_id: subforum.subforum_id,
-                subforum_name: subforum.subforum_name,
-                subforum_description: subforum.subforum_description,
-                threads: []
-              };
-            }
-          })
-        );
-
-        setSubforums(subforumsWithThreads);
-      } catch (err: any) {
-        console.error('Error fetching subforums:', err);
-        setError(err?.message || 'Failed to load subforums. Please try again later.');
-      } finally {
-        setLoading(false);
+        return {
+          subforum_id: subforum.subforum_id,
+          subforum_name: subforum.subforum_name,
+          subforum_description: subforum.subforum_description,
+          threads
+        };
+      } catch (err) {
+        console.error(`Error processing subforum ${subforum.subforum_id}:`, err);
+        // Return subforum with empty threads rather than failing completely
+        return {
+          subforum_id: subforum.subforum_id,
+          subforum_name: subforum.subforum_name,
+          subforum_description: subforum.subforum_description,
+          threads: []
+        };
       }
-    }
+    })
+  );
 
-    fetchSubforums();
-  }, []);
+  return subforumsWithThreads;
+};
 
-  if (error) {
+// Create a cached fetcher with a 2-minute TTL
+const getSubforumsData = createCachedFetch<SubforumData[]>(
+  'popular-subforums',
+  fetchSubforums,
+  { ttl: 2 * 60 * 1000 } // 2 minutes cache
+);
+
+export function PopularSubforumsGrid() {
+  // Use the React 'use' hook to unwrap the promise in a way that works with Suspense
+  const subforums = use(getSubforumsData());
+
+  // If there was an error, it would be thrown and caught by the nearest error boundary
+  if (!subforums || subforums.length === 0) {
     return (
-      <div className="space-y-6">
-        <div className="p-4 bg-red-50 text-red-800 rounded-md">Error: {error}</div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        {Array(3)
-          .fill(0)
-          .map((_, i) => (
-            <SubforumSkeleton key={i} />
-          ))}
-      </div>
-    );
-  }
-
-  if (subforums.length === 0) {
-    return (
-      <div className="space-y-6">
-        <Card className="w-full p-8 text-center">
-          <p className="text-muted-foreground">No active subforums found</p>
-        </Card>
+      <div className="p-6 text-center bg-gray-50 rounded-lg border border-gray-200">
+        <p className="text-gray-600">No active subforums found.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {subforums.map((subforum) => (
+      {subforums.map((subforum: SubforumData) => (
         <SubforumBlock key={subforum.subforum_id} subforum={subforum} />
       ))}
     </div>

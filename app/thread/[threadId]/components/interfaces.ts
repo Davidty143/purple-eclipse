@@ -7,7 +7,7 @@ export interface Comment {
   author: {
     account_username: string;
     account_email: string;
-    avatar_url?: string | null;
+    account_avatar_url?: string | null;
   };
   replies?: Comment[];
 }
@@ -28,7 +28,7 @@ export interface Thread {
   author: {
     account_username: string;
     account_email: string;
-    avatar_url?: string | null;
+    account_avatar_url?: string | null;
   };
   subforum: {
     subforum_name: string;

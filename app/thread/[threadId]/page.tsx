@@ -29,7 +29,7 @@ export default async function Page({ params }: PageProps) {
         author:author_id (
           account_username,
           account_email,
-          avatar_url
+          account_avatar_url
         ),
         subforum:subforum_id (
           subforum_name,
@@ -42,7 +42,7 @@ export default async function Page({ params }: PageProps) {
           author:author_id (
             account_username,
             account_email,
-            avatar_url
+            account_avatar_url
           )
         ),
         images:thread_image (

@@ -12,7 +12,7 @@ model Account {
   account_username   String?        @unique
   account_email      String?        @unique   
   account_status     AccountStatus?
-  avatar_url         String?
+  account_avatar_url         String?
   account_is_deleted Boolean?
   account_role_id    String?        @db.Uuid
   account_role       Role?          @relation(fields: [account_role_id], references: [role_id])

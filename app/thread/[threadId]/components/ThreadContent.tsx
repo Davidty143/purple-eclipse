@@ -39,7 +39,7 @@ export default function ThreadContent({ thread, optimizeImages, openLightbox }: 
         <div className="flex items-center space-x-4 text-sm text-gray-500 border-b pb-4">
           <div className="flex items-center space-x-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
+              <AvatarImage src={thread.author?.account_avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
               <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
