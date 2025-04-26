@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 interface Subforum {
   id: number;
   name: string;
-  icon: string; // Add the icon to the Subforum interface
+  icon: string;
 }
 
 interface ForumData {
@@ -40,7 +40,7 @@ export function ForumComponentWrapper() {
           subforums: forum.subforums.map((subforum: Subforum) => ({
             id: subforum.id,
             name: subforum.name,
-            icon: subforum.icon // Make sure to include the icon here
+            icon: subforum.icon
           }))
         }))
       );
