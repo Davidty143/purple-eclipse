@@ -10,7 +10,7 @@ import { MessageList } from '../messages-list/page';
 import { MessageInput } from '../message-input/page';
 import { cn } from '@/lib/utils';
 import { MessageCircle } from 'lucide-react';
-import MessageHeader from '../message-header/page'; // Import the MessageHeader component
+import MessageHeader from '../message-header/page';
 import { use } from 'react';
 
 interface Message {
@@ -24,12 +24,12 @@ interface Message {
 
 export default function MessagePage({ params }: { params: Promise<{ userId: string }> }) {
   // Unwrap the Promise to access userId
-  const { userId } = use(params); // Use React.use() to unwrap the params
+  const { userId } = use(params);
 
   const supabase = createClient();
 
   const searchParams = useSearchParams();
-  const username = searchParams.get('username') || 'Messages'; // Default to "Messages" if no username param
+  const username = searchParams.get('username') || 'Messages';
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -50,12 +50,10 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
 
       setCurrentUser(user);
 
-      // Fetch the other user's data
       const { data: otherUserData } = await supabase.from('Account').select('account_username').eq('account_id', userId).single(); // Fetch the username for the other user
 
-      setOtherUser(otherUserData); // Set the other user's data
+      setOtherUser(otherUserData);
 
-      // Fetch messages between current user and the userId
       const { data: messages } = await supabase.from('direct_messages').select('*').or(`and(sender_id.eq.${user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user.id})`).order('created_at', { ascending: true });
 
       setMessages(messages || []);
@@ -75,7 +73,7 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
         <div className="w-1/4 border-r bg-background flex flex-col">
           <UserSearch currentUserId={currentUser.id} />
           <div className="flex-1 overflow-y-auto">
-            <ConversationsList userId={currentUser.id} />
+            <ConversationsList userId={currentUser.id} selectedReceiverId={userId} />
           </div>
         </div>
         <div className="w-3/4 flex flex-col bg-background">

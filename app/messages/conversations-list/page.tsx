@@ -16,7 +16,7 @@ interface ConversationPartner {
   last_message_at?: string;
 }
 
-export default function ConversationsList({ userId }: { userId: string }) {
+export default function ConversationsList({ userId, selectedReceiverId }: { userId: string; selectedReceiverId: string }) {
   const supabase = createClient();
   const [partners, setPartners] = useState<ConversationPartner[]>([]);
   const [loading, setLoading] = useState(true);
@@ -171,28 +171,38 @@ export default function ConversationsList({ userId }: { userId: string }) {
             <p className="text-xs text-muted-foreground mt-1">Start a new conversation from your connections</p>
           </div>
         ) : (
-          partners.map((partner) => (
-            <Link key={partner.id} href={`/messages/${partner.id}`} className={cn('flex items-center p-3 rounded-lg transition-colors', 'hover:bg-muted/50', 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring')}>
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>
-                {partner.unread_count ? <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">{partner.unread_count}</span> : null}
-              </div>
-              <div className="ml-3 flex-1 min-w-0">
-                <div className="flex justify-between items-baseline">
-                  <p className="text-sm font-medium truncate">{partner.username}</p>
-                  {partner.last_message_at && (
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(partner.last_message_at).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                  )}
+          partners.map((partner) => {
+            // Highlight the selected conversation based on selectedReceiverId
+            const isSelected = partner.id === selectedReceiverId;
+
+            return (
+              <Link
+                key={partner.id}
+                href={`/messages/${partner.id}`}
+                className={cn('flex items-center p-3 rounded-lg transition-colors', 'hover:bg-muted/50', 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', {
+                  'bg-muted': isSelected // Highlight the selected conversation
+                })}>
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>
+                  {partner.unread_count ? <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">{partner.unread_count}</span> : null}
                 </div>
-                <p className="text-xs text-muted-foreground truncate">{partner.last_message || 'No messages yet'}</p>
-              </div>
-            </Link>
-          ))
+                <div className="ml-3 flex-1 min-w-0">
+                  <div className="flex justify-between items-baseline">
+                    <p className="text-sm font-medium truncate">{partner.username}</p>
+                    {partner.last_message_at && (
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(partner.last_message_at).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground truncate">{partner.last_message || 'No messages yet'}</p>
+                </div>
+              </Link>
+            );
+          })
         )}
       </div>
     </div>
