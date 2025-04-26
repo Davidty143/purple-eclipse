@@ -64,24 +64,29 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
       <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto py-4">
         <div className="flex h-[calc(100vh-160px)] border rounded-lg overflow-hidden">
           {/* Sidebar skeleton */}
-          <div className="w-1/4 border-r p-4 space-y-4 bg-background">
-            <Skeleton className="h-10 w-full" />
-            <div className="w-full">
-              <div className="h-px w-full" /> {/* Divider skeleton */}
+          <div className="w-1/4 border-r bg-background flex flex-col">
+            <div className="p-4 space-y-4">
+              <Skeleton className="h-10 w-full" />
             </div>
-            {[...Array(9)].map((_, i) => (
-              <div key={i} className="flex items-center space-x-3">
-                <Skeleton className="h-10 w-10 rounded-full " />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-full" />
+
+            {/* Full-width divider outside the padded box */}
+            <div className="h-px w-full bg-gray-200" />
+
+            <div className="p-4 space-y-4 flex-1 overflow-y-auto">
+              {[...Array(9)].map((_, i) => (
+                <div key={i} className="flex items-center space-x-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Message panel skeleton */}
-          <div className="w-3/4 flex flex-col bg-background">
+          <div className="w-3/4 flex flex-col">
             <div className="p-4 border-b">
               <Skeleton className="h-6 w-1/3" />
             </div>
