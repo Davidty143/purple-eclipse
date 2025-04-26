@@ -77,7 +77,7 @@ export function MessageInput({ receiverId, currentUserId, setMessages }: Message
         `}>
         <Send className="h-4 w-4" />
       </Button>
-      {state?.['error'] && <p className="text-sm text-red-500">{state['error']}</p>} {/* Use bracket notation for 'error' */}
+      {state?.['error'] && <p className="text-sm text-red-500">{state['error']}</p>} {}
     </form>
   );
 }

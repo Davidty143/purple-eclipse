@@ -6,6 +6,7 @@ import { Search, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton'; // ✅ Add this
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -40,7 +41,6 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
     }
   };
 
-  // Debounce the search
   useEffect(() => {
     const timer = setTimeout(() => {
       handleSearch();
@@ -59,9 +59,18 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
       {searchQuery && (
         <div className="mt-2 space-y-2 max-h-60 overflow-y-auto">
           {isSearching ? (
-            <div className="flex items-center justify-center p-4">
-              <p className="text-sm text-muted-foreground">Searching...</p>
-            </div>
+            // ✅ Skeleton placeholder
+            [...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between p-2">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+                <Skeleton className="h-6 w-20 rounded-md" />
+              </div>
+            ))
           ) : searchResults.length > 0 ? (
             searchResults.map((user) => (
               <div key={user.account_id} className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-lg">
@@ -76,7 +85,6 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
                 </div>
 
                 <Button variant="ghost" size="sm" className="text-primary hover:text-primary" asChild>
-                  {/* Update the Link with the username as a query parameter */}
                   <Link href={`/messages/${user.account_id}?username=${user.account_username}`}>
                     <UserPlus className="h-4 w-4 mr-1" />
                     Message

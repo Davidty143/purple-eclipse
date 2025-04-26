@@ -36,9 +36,7 @@ export default async function MessagesPage() {
           </div>
         </div>
         <div className="w-3/4 flex flex-col bg-background">
-          <div className="p-4 border-b">
-            <MessageHeader /> {}
-          </div>
+          <div className="p-4 border-b"></div>
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center p-6">
               <MessageCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />

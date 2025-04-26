@@ -1,4 +1,3 @@
-// components/messages/conversations-list.tsx
 'use client';
 
 import { createClient } from '@/utils/supabase/client';
@@ -6,7 +5,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface ConversationPartner {
   id: string;
@@ -144,25 +142,13 @@ export default function ConversationsList({ userId, selectedReceiverId }: { user
   if (loading) {
     return (
       <div className="p-4 space-y-4">
-        <h2 className="text-lg font-semibold">Conversations</h2>
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center space-x-3">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[120px]" />
-                <Skeleton className="h-3 w-[200px]" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <p className="text-center text-muted-foreground"></p>
       </div>
     );
   }
 
   return (
     <div className="p-2">
-      <h2 className="text-lg font-semibold px-2 py-3">Conversations</h2>
       <div className="space-y-1">
         {partners.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-6 text-center">
