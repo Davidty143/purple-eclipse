@@ -14,7 +14,7 @@ interface ConversationPartner {
   last_message_at?: string;
 }
 
-export default function ConversationsList({ userId, selectedReceiverId }: { userId: string; selectedReceiverId: string }) {
+export default function ConversationsList({ userId, selectedReceiverId, onSelect }: { userId: string; selectedReceiverId: string; onSelect?: () => void }) {
   const supabase = createClient();
   const [partners, setPartners] = useState<ConversationPartner[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,8 +165,9 @@ export default function ConversationsList({ userId, selectedReceiverId }: { user
               <Link
                 key={partner.id}
                 href={`/messages/${partner.id}`}
+                onClick={onSelect}
                 className={cn('flex items-center p-3 rounded-lg transition-colors', 'hover:bg-muted/50', 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', {
-                  'bg-muted': isSelected // Highlight the selected conversation
+                  'bg-muted': isSelected
                 })}>
                 <div className="relative">
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>
