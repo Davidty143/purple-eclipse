@@ -1,4 +1,3 @@
-// components/messages/user-search.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -72,12 +71,13 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
                     <AvatarFallback>{user.account_username.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm fo  nt-medium">{user.account_username}</p>
+                    <p className="text-sm font-medium">{user.account_username}</p>
                   </div>
                 </div>
 
                 <Button variant="ghost" size="sm" className="text-primary hover:text-primary" asChild>
-                  <Link href={`/messages/${user.account_id}`}>
+                  {/* Update the Link with the username as a query parameter */}
+                  <Link href={`/messages/${user.account_id}?username=${user.account_username}`}>
                     <UserPlus className="h-4 w-4 mr-1" />
                     Message
                   </Link>

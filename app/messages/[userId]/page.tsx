@@ -1,16 +1,16 @@
-// app/messages/[userId]/page.tsx
+//app/messages/[userid]/page.tsx
 'use client';
 
+import { use } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams, redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { redirect } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import ConversationsList from '../conversations-list/page';
+import { UserSearch } from '../user-search/page';
 import { MessageList } from '../messages-list/page';
 import { MessageInput } from '../message-input/page';
-import ConversationsList from '../conversations-list/page';
-import { use } from 'react';
-import { UserSearch } from '../user-search/page';
 import { cn } from '@/lib/utils';
-import { MessageCircle, User } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -23,22 +23,28 @@ interface Message {
 
 export default function MessagePage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
+  const supabase = createClient();
+
+  const searchParams = useSearchParams();
+  const username = searchParams.get('username') || 'Messages';
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchData = async () => {
       const {
         data: { user }
       } = await supabase.auth.getUser();
+
       if (!user) {
         redirect('/login');
       }
+
       setCurrentUser(user);
 
-      // Always fetch messages, even if conversation doesn't exist yet
+      // Fetch messages between current user and the userId
       const { data: messages } = await supabase.from('direct_messages').select('*').or(`and(sender_id.eq.${user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user.id})`).order('created_at', { ascending: true });
 
       setMessages(messages || []);
@@ -63,7 +69,7 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
         </div>
         <div className="w-3/4 flex flex-col bg-background">
           <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold">Messages</h2>
+            <h2 className="text-lg font-semibold">{username}</h2>
           </div>
           {messages.length > 0 ? (
             <>
