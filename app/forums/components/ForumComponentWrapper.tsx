@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 interface Subforum {
   id: number;
   name: string;
+  icon: string;
 }
 
 interface ForumData {
@@ -35,10 +36,11 @@ export function ForumComponentWrapper() {
         data.map((forum: ForumData) => ({
           id: forum.id,
           name: forum.name,
-          description: forum.description || '',
+          description: forum.description || ' ',
           subforums: forum.subforums.map((subforum: Subforum) => ({
             id: subforum.id,
-            name: subforum.name
+            name: subforum.name,
+            icon: subforum.icon
           }))
         }))
       );
@@ -87,7 +89,7 @@ export function ForumComponentWrapper() {
           <ForumTitle title={forum.name} forumId={forum.id} description={forum.description} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} onEditSuccess={handleEditSuccess} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {forum.subforums.map((subforum) => (
-              <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} />
+              <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} icon={subforum.icon} />
             ))}
           </div>
         </div>

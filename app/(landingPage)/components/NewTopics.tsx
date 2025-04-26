@@ -1,5 +1,5 @@
-// components/NewTopics.tsx
 'use client';
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -12,14 +12,11 @@ export function NewTopics() {
   const hasMore = sidebarMockThreads.length > 10;
 
   return (
-    <Card className="w-[300px] p-0">
-      {' '}
-      <CardHeader className="pb-3 px-4 pt-3 border-b bg-gray-50">
-        {' '}
-        <CardTitle className="text-md text-start font-semibold ">New Topics</CardTitle>
+    <Card className="w-full lg:w-[300px] rounded-lg border border-gray-300">
+      <CardHeader className="pb-3 px-4 pt-3 border-b rounded-t-lg bg-gray-50">
+        <CardTitle className="text-md text-start font-medium">New Topics</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 px-2 pt-3 pb-4">
-        {' '}
+      <CardContent className="space-y-3 px-4 pt-3 pb-4">
         {displayedThreads.map((thread) => (
           <SidebarThreadRow key={thread.id} thread={thread} />
         ))}

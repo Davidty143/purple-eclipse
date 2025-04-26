@@ -28,7 +28,7 @@ export function ForumTitle({ title, forumId, showActions = true, onAddSuccess, o
 
   const handleEditSuccess = () => {
     onEditSuccess?.();
-    refreshData?.(); // Refresh data if provided
+    refreshData?.();
   };
 
   return (

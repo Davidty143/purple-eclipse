@@ -26,6 +26,10 @@ export default async function Page({ params }: PageProps) {
       .select(
         `
         *,
+        author:author_id (
+          account_username,
+          account_email
+        ),
         subforum:subforum_id (
           subforum_name,
           forum:forum_id (

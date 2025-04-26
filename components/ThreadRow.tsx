@@ -13,12 +13,16 @@ interface ThreadRowProps {
     author: {
       account_username: string | null;
       account_email: string | null;
+      avatar_url?: string | null;
     };
     comments: { count: number }[];
   };
 }
 
 const ThreadRow = ({ thread }: ThreadRowProps) => {
+  // Determine avatar URL - use author's avatar_url if it exists, otherwise use default
+  const avatarUrl = thread.author?.avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`;
+
   return (
     <Link href={`/thread/${thread.thread_id}`}>
       <div className="thread-row py-3.5 px-6 flex flex-col hover:bg-gray-50 cursor-pointer">
@@ -26,8 +30,8 @@ const ThreadRow = ({ thread }: ThreadRowProps) => {
           {/* Author Profile */}
           <div className="flex flex-row gap-4">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={`https://avatar.vercel.sh/${thread.author.account_username || 'anon'}`} />
-              <AvatarFallback>{(thread.author.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarImage src={avatarUrl} />
+              <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
 
             {/* Thread Details */}
@@ -38,7 +42,7 @@ const ThreadRow = ({ thread }: ThreadRowProps) => {
                   <h3 className="text-md font-semibold">{thread.thread_title}</h3>
                 </div>
                 <div className="text-xs text-semibold text-gray-500">
-                  <span>Posted by {thread.author.account_username || 'Anonymous'}</span>
+                  <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
                   {' - '}
                   <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
                 </div>
