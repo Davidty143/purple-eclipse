@@ -1,4 +1,3 @@
-// components/messages/message-list.tsx
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -23,7 +22,7 @@ interface MessageListProps {
 
 export function MessageList({ messages, currentUserId, otherUserId, setMessages }: MessageListProps) {
   const supabase = createClient();
-  const channelRef = useRef<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const channel = supabase
@@ -56,6 +55,9 @@ export function MessageList({ messages, currentUserId, otherUserId, setMessages 
   }, [currentUserId, otherUserId]);
 
   useEffect(() => {
+    // Auto-scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+
     // Mark messages as read when the conversation is opened
     const markMessagesAsRead = async () => {
       const unreadMessages = messages.filter((msg) => msg.sender_id === otherUserId && !msg.is_read);
@@ -70,7 +72,6 @@ export function MessageList({ messages, currentUserId, otherUserId, setMessages 
           );
 
         if (!error) {
-          // Update local state
           setMessages((prev) => prev.map((msg) => (msg.sender_id === otherUserId && !msg.is_read ? { ...msg, is_read: true } : msg)));
         }
       }
@@ -80,10 +81,11 @@ export function MessageList({ messages, currentUserId, otherUserId, setMessages 
   }, [otherUserId, messages]);
 
   return (
-    <div className="flex flex-col gap-3 p-4 overflow-y-auto h-[calc(100vh-180px)]">
+    <div className="flex flex-col gap-3 p-4">
       {messages.map((message) => (
         <MessageBubble key={message.id} message={message} isCurrentUser={message.sender_id === currentUserId} />
       ))}
+      <div ref={messagesEndRef} />
     </div>
   );
 }

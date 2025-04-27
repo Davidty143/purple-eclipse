@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useRef } from 'react';
 import { useSearchParams, redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import ConversationsList from '../conversations-list/page';
@@ -8,7 +8,7 @@ import { UserSearch } from '../user-search/page';
 import { MessageList } from '../messages-list/page';
 import { MessageInput } from '../message-input/page';
 import { cn } from '@/lib/utils';
-import { MessageCircle, ListPlus } from 'lucide-react';
+import { MessageCircle, ListPlus, X } from 'lucide-react';
 import MessageHeader from '../message-header/page';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -26,6 +26,7 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
   const supabase = createClient();
   const searchParams = useSearchParams();
   const username = searchParams.get('username') || 'Messages';
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -55,41 +56,59 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
     fetchData();
   }, [userId]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   if (isLoading || !currentUser) {
     return (
-      <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto py-4">
-        <div className="flex md:flex-row flex-col h-[calc(100vh-160px)] border rounded-lg overflow-hidden">
-          <div className="w-full md:w-1/4 border-r bg-background flex flex-col">
-            <div className="p-4 space-y-4">
-              <Skeleton className="h-10 w-full" />
+      <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto py-4 md:px-4 xl:px-2">
+        <div className="flex md:flex-row flex-col h-[calc(100vh-160px)] border rounded-lg bg-background">
+          {/* Sidebar Skeleton */}
+          <div className="hidden md:flex flex-col w-full md:w-1/4 border-r">
+            <div className="p-4">
+              <Skeleton className="h-10 w-full rounded-lg" />
             </div>
-            <div className="h-px w-full bg-gray-200" />
-            <div className="p-4 space-y-4 flex-1 overflow-y-auto">
-              {[...Array(9)].map((_, i) => (
+            <div className="border-b" />
+            <div className="flex-1 min-h-0 p-4 space-y-4">
+              {[...Array(8)].map((_, i) => (
                 <div key={i} className="flex items-center space-x-3">
                   <Skeleton className="h-10 w-10 rounded-full" />
                   <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-4 w-3/4 rounded" />
+                    <Skeleton className="h-3 w-full rounded" />
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="w-full md:w-3/4 flex flex-col">
-            <div className="p-4 border-b">
-              <Skeleton className="h-6 w-1/3" />
+          {/* Main Content Skeleton */}
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Header Skeleton */}
+            <div className="p-4 border-b flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Skeleton className="h-7 w-32 rounded" />
+              </div>
+              <Skeleton className="h-7 w-7 rounded md:hidden" />
             </div>
-            <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+
+            {/* Message List Skeleton */}
+            <div className="flex-1 min-h-0 p-4 space-y-4">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="flex space-x-3">
-                  <Skeleton className="h-10 w-full" />
+                <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] ${i % 2 === 0 ? 'bg-primary/10' : 'bg-muted'} rounded-lg ${i % 2 === 0 ? 'rounded-br-none' : 'rounded-bl-none'}`}>
+                    <Skeleton className="h-16 w-full" />
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="p-4 border-t">
-              <Skeleton className="h-10 w-full rounded-md" />
+            {/* Message Input Skeleton*/}
+            <div className="shrink-0 p-4 border-t">
+              <div className="flex items-center gap-2">
+                <Skeleton className="flex-1 h-10 rounded" /> {/* Input field */}
+                <Skeleton className="h-10 w-10 rounded" /> {/* Send button */}
+              </div>
             </div>
           </div>
         </div>
@@ -98,75 +117,70 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
   }
 
   return (
-    <div className={cn('w-full max-w-[1250px] xl:w-[80%] mx-auto py-4')}>
-      <div className="flex md:flex-row flex-col h-[calc(100vh-160px)] border rounded-lg overflow-hidden relative">
-        {/* --- Desktop Sidebar --- */}
-        <div className="hidden md:flex w-1/4 border-r bg-background flex-col">
-          <UserSearch currentUserId={currentUser.id} />
-          <div className="flex-1 overflow-y-auto">
+    <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto md:px-4 xl:px-2 py-4">
+      <div className="flex md:flex-row flex-col h-[calc(100vh-160px)] border md:rounded-md bg-background">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:flex flex-col w-full md:w-1/4 border-r">
+          <div className=" ">
+            <UserSearch currentUserId={currentUser.id} />
+          </div>
+          <div className="border-b" />
+          <div className="flex-1 min-h-0">
             <ConversationsList userId={currentUser.id} selectedReceiverId={userId} onSelect={() => setShowSidebar(false)} />
           </div>
         </div>
 
-        {/* --- Mobile Drawer --- */}
+        {/* Mobile Sidebar Overlay - Right side */}
         {showSidebar && (
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden" onClick={() => setShowSidebar(false)}>
-            <div className="absolute right-0 top-0 h-full w-3/4 max-w-xs bg-background border-l shadow-lg flex flex-col" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden">
+            <div className="absolute inset-y-0 right-0 w-4/5 max-w-sm bg-background border-l shadow-lg flex flex-col" onClick={(e) => e.stopPropagation()}>
               <div className="p-4 border-b flex justify-between items-center">
-                <p className="font-semibold">Conversations</p>
-                <button onClick={() => setShowSidebar(false)}>✕</button>
+                <h2 className="font-semibold text-lg">Conversations</h2>
+                <button onClick={() => setShowSidebar(false)} className="p-1 rounded-full hover:bg-accent">
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <UserSearch currentUserId={currentUser.id} />
-              <div className="flex-1 overflow-y-auto">
+              <div className="px-4 pb-2 ">
+                <UserSearch currentUserId={currentUser.id} />
+              </div>
+              <div className="flex-1 min-h-0">
                 <ConversationsList userId={currentUser.id} selectedReceiverId={userId} onSelect={() => setShowSidebar(false)} />
               </div>
             </div>
           </div>
         )}
 
-        {/* --- Message Panel --- */}
-        <div className="w-full md:w-3/4 flex flex-col bg-background">
-          {/* Mobile header with menu button on the right */}
-          <div className="md:hidden p-4 border-b flex items-center justify-between">
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-h-0">
+          {/* Header - Username left, menu button right */}
+          <div className="p-3 md:p-4 border-b flex items-center justify-between">
             <MessageHeader username={otherUser?.account_username || 'Messages'} />
-            <button onClick={() => setShowSidebar(true)} className="text-muted-foreground">
-              <ListPlus className="h-6 w-6" />
+            <button onClick={() => setShowSidebar(true)} className="md:hidden text-muted-foreground p-1 rounded-md hover:bg-accent">
+              <ListPlus className="h-5 w-5" />
             </button>
           </div>
 
-          {/* Desktop header with labels on the left */}
-          <div className="hidden md:block p-4 border-b flex justify-between">
-            <MessageHeader username={otherUser?.account_username || 'Messages'} />
-            <button onClick={() => setShowSidebar(true)} className="text-muted-foreground md:hidden">
-              <ListPlus className="h-6 w-6" />
-            </button>
-          </div>
-
-          {/* Message List */}
-          <div className="flex-1 overflow-y-auto pb-16">
-            {' '}
-            {/* Added padding-bottom */}
+          {/* Message List - Only scrollable area */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-2 md:p-4">
             {messages.length > 0 ? (
-              <MessageList messages={messages} currentUserId={currentUser.id} otherUserId={userId} setMessages={setMessages} />
+              <>
+                <MessageList messages={messages} currentUserId={currentUser.id} otherUserId={userId} setMessages={setMessages} />
+                <div ref={messagesEndRef} />
+              </>
             ) : (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center p-6">
-                  <MessageCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No messages yet</p>
-                  <p className="text-sm text-muted-foreground mt-2">Start the conversation</p>
-                </div>
+              <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                <MessageCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground">No messages yet</h3>
+                <p className="text-sm text-muted-foreground mt-1">Send your first message to start the conversation</p>
               </div>
             )}
           </div>
 
-          <div className="hidden md:block bg-background">
+          {/* Input Area */}
+          <div className="shrink-0 border-t">
             <MessageInput receiverId={userId} currentUserId={currentUser.id} setMessages={setMessages} />
           </div>
         </div>
-      </div>
-
-      <div className="md:hidden w-full bg-background border-t">
-        <MessageInput receiverId={userId} currentUserId={currentUser.id} setMessages={setMessages} />
       </div>
     </div>
   );

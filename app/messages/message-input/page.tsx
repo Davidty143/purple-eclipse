@@ -64,7 +64,7 @@ export function MessageInput({ receiverId, currentUserId, setMessages }: Message
   };
 
   return (
-    <form action={handleSubmit} className="flex gap-2 p-4 md:border-t">
+    <form action={handleSubmit} className="flex gap-2 p-4">
       <input type="hidden" name="receiverId" value={receiverId} />
       <Input name="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Type a message..." required minLength={1} disabled={isPending || isPendingTransition} />
       <Button

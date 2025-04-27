@@ -63,7 +63,7 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
   }, []);
 
   return (
-    <div className="p-4 border-b" ref={searchRef}>
+    <div className="p-4" ref={searchRef}>
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Search users..." className="pl-9" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onFocus={() => setShowDropdown(true)} />
