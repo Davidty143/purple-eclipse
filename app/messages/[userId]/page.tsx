@@ -140,9 +140,10 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <div className="px-4 pb-2 ">
+              <div className=" ">
                 <UserSearch currentUserId={currentUser.id} />
               </div>
+              <div className="border-b" />
               <div className="flex-1 min-h-0">
                 <ConversationsList userId={currentUser.id} selectedReceiverId={userId} onSelect={() => setShowSidebar(false)} />
               </div>
