@@ -59,7 +59,7 @@ export function SignUpOverlay({ onClose, onSuccess, showLoginLink = true, onOpen
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
       <Card className="mx-auto w-[350px] sm:w-[400px] h-[500px] relative">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700" aria-label="Close signup">
           ✕
