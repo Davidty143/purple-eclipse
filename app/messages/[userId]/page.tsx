@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { MessageCircle, ListPlus, X } from 'lucide-react';
 import MessageHeader from '../message-header/page';
 import { Skeleton } from '@/components/ui/skeleton';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
   id: string;
@@ -103,11 +104,12 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
                 </div>
               ))}
             </div>
-            {/* Message Input Skeleton*/}
+
+            {/* Message Input Skeleton */}
             <div className="shrink-0 p-4 border-t">
               <div className="flex items-center gap-2">
-                <Skeleton className="flex-1 h-10 rounded" /> {/* Input field */}
-                <Skeleton className="h-10 w-10 rounded" /> {/* Send button */}
+                <Skeleton className="flex-1 h-10 rounded-full" />
+                <Skeleton className="h-10 w-10 rounded-full" />
               </div>
             </div>
           </div>
@@ -121,7 +123,7 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
       <div className="flex md:flex-row flex-col h-[calc(100vh-160px)] border md:rounded-md bg-background">
         {/* Desktop Sidebar */}
         <div className="hidden md:flex flex-col w-full md:w-1/4 border-r">
-          <div className=" ">
+          <div className="">
             <UserSearch currentUserId={currentUser.id} />
           </div>
           <div className="border-b" />
@@ -130,38 +132,42 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
           </div>
         </div>
 
-        {/* Mobile Sidebar Overlay - Right side */}
-        {showSidebar && (
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden">
-            <div className="absolute inset-y-0 right-0 w-4/5 max-w-sm bg-background border-l shadow-lg flex flex-col" onClick={(e) => e.stopPropagation()}>
-              <div className="p-4 border-b flex justify-between items-center">
-                <h2 className="font-semibold text-lg">Conversations</h2>
-                <button onClick={() => setShowSidebar(false)} className="p-1 rounded-full hover:bg-accent">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <div className=" ">
-                <UserSearch currentUserId={currentUser.id} />
-              </div>
-              <div className="border-b" />
-              <div className="flex-1 min-h-0">
-                <ConversationsList userId={currentUser.id} selectedReceiverId={userId} onSelect={() => setShowSidebar(false)} />
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Mobile Sidebar Overlay with Animation */}
+        <AnimatePresence>
+          {showSidebar && (
+            <>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden" onClick={() => setShowSidebar(false)} />
+
+              <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="fixed inset-y-0 right-0 w-4/5 max-w-sm bg-background border-l shadow-lg flex flex-col z-50" onClick={(e) => e.stopPropagation()}>
+                <div className="p-4 border-b flex justify-between items-center">
+                  <h2 className="font-semibold text-lg">Conversations</h2>
+                  <motion.button onClick={() => setShowSidebar(false)} className="p-1 rounded-full hover:bg-accent" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <X className="h-5 w-5" />
+                  </motion.button>
+                </div>
+                <div className="">
+                  <UserSearch currentUserId={currentUser.id} />
+                </div>
+                <div className="border-b" />
+                <div className="flex-1 min-h-0">
+                  <ConversationsList userId={currentUser.id} selectedReceiverId={userId} onSelect={() => setShowSidebar(false)} />
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-h-0">
-          {/* Header - Username left, menu button right */}
+          {/* Header */}
           <div className="p-3 md:p-4 border-b flex items-center justify-between">
             <MessageHeader username={otherUser?.account_username || 'Messages'} />
-            <button onClick={() => setShowSidebar(true)} className="md:hidden text-muted-foreground p-1 rounded-md hover:bg-accent">
+            <motion.button onClick={() => setShowSidebar(true)} className="md:hidden text-muted-foreground p-1 rounded-md hover:bg-accent" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <ListPlus className="h-5 w-5" />
-            </button>
+            </motion.button>
           </div>
 
-          {/* Message List - Only scrollable area */}
+          {/* Message List */}
           <div className="flex-1 min-h-0 overflow-y-auto p-2 md:p-4">
             {messages.length > 0 ? (
               <>
