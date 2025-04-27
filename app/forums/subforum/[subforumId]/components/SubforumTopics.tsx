@@ -15,7 +15,7 @@ interface DatabaseThread {
   thread_title: string;
   thread_created: string;
   thread_content: string;
-  comments: { count: number }[];
+  comment_count: number;
   author: {
     account_username: string | null;
     account_email: string | null;
@@ -46,7 +46,7 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
             thread_created,
             thread_content,
             author:author_id(account_username, account_email),
-            comments:Comment(count)
+            comment_count:Comment(count)
           `
           )
           .eq('subforum_id', subforumId)
@@ -66,7 +66,7 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
             },
             tag: 'Discussion',
             createdAt: new Date(thread.thread_created),
-            replies: thread.comments[0]?.count || 0,
+            replies: thread.comment_count || 0,
             views: 0
           }));
           setThreads(formattedThreads);

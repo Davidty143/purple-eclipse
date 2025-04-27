@@ -22,12 +22,36 @@ export default function LoggedInHeaderRight() {
     const fetchAccountData = async () => {
       if (!user) return;
       const supabase = createClient();
-      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id).single();
 
-      if (!error) {
-        setAccountData(data);
+      // First check if account exists
+      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id);
+
+      if (!error && data && data.length > 0) {
+        setAccountData(data[0]);
       } else {
-        console.error('Failed to fetch account data:', error);
+        // If account doesn't exist or there was an error, create a new account
+        console.log('Account not found or error occurred, creating new account');
+
+        // Get avatar URL from user metadata if available
+        const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+
+        const { error: createAccountError, data: newAccount } = await supabase
+          .from('Account')
+          .insert({
+            account_id: user.id,
+            account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
+            account_email: user.email,
+            account_is_deleted: false,
+            account_avatar_url: avatarUrl
+          })
+          .select('account_username, account_avatar_url')
+          .single();
+
+        if (!createAccountError && newAccount) {
+          setAccountData(newAccount);
+        } else {
+          console.error('Failed to create account:', createAccountError);
+        }
       }
     };
 
