@@ -3,7 +3,7 @@
         <tr>
             <td colspan="3">
                 <h2>Purple-eclipse </h2>
-                <p> <strong>Target:<strong> `AB.0XY.00Z` </p>
+                <h4> Target: `AB.0XY.00Z` </h4>
             </td>
         </tr>
         <tr>
@@ -72,7 +72,7 @@
             </td>
         </tr>
         <tr>
-            <th>
+            <th colspan="3">
                 © Tenza
             </th>
         </tr>
