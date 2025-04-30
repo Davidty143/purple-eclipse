@@ -17,6 +17,7 @@ export default function LoggedInHeaderRight() {
     account_username: string | null;
     account_avatar_url: string | null;
   } | null>(null);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchAccountData = async () => {
@@ -58,6 +59,52 @@ export default function LoggedInHeaderRight() {
     fetchAccountData();
   }, [user]);
 
+  useEffect(() => {
+    if (!user) return;
+
+    const supabase = createClient();
+
+    // Initial fetch of unread messages count per conversation
+    const fetchUnreadCount = async () => {
+      const { data: conversations, error } = await supabase.from('direct_messages').select('sender_id, is_read').eq('receiver_id', user.id).eq('is_read', false);
+
+      if (!error) {
+        // Count unique senders with unread messages
+        const uniqueSenders = new Set(conversations.map((msg) => msg.sender_id));
+        setUnreadCount(uniqueSenders.size);
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Realtime subscription for unread messages
+    const channel = supabase
+      .channel('unread_messages')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'direct_messages',
+          filter: `receiver_id=eq.${user.id}`
+        },
+        async (payload) => {
+          // Refetch the count when messages change
+          const { data: conversations, error } = await supabase.from('direct_messages').select('sender_id, is_read').eq('receiver_id', user.id).eq('is_read', false);
+
+          if (!error) {
+            const uniqueSenders = new Set(conversations.map((msg) => msg.sender_id));
+            setUnreadCount(uniqueSenders.size);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const handleSignOut = async () => {
     try {
       const supabase = createClient();
@@ -80,7 +127,7 @@ export default function LoggedInHeaderRight() {
       {/* Messages Icon */}
       <Link href="/messages" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Messages">
         <MessageCircle className="h-5 w-5 text-gray-700" />
-        <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-red-500 ring-2 ring-white" />
+        {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-red-500 text-white text-[8px] flex items-center justify-center">{unreadCount}</span>}
       </Link>
 
       {/* Notification Icon */}

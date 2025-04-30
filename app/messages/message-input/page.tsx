@@ -55,18 +55,16 @@ export function MessageInput({ receiverId, currentUserId, setMessages }: Message
 
     setContent('');
 
-    // Submit to server within a transition
     startTransition(async () => {
-      const result = await action(formData);
-      if (result?.error) {
-        // Rollback if error
+      const result = action(formData);
+      if (result?.['error']) {
         setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
       }
     });
   };
 
   return (
-    <form action={handleSubmit} className="flex gap-2 p-4 border-t">
+    <form action={handleSubmit} className="flex gap-2 p-4">
       <input type="hidden" name="receiverId" value={receiverId} />
       <Input name="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Type a message..." required minLength={1} disabled={isPending || isPendingTransition} />
       <Button
@@ -74,12 +72,12 @@ export function MessageInput({ receiverId, currentUserId, setMessages }: Message
         size="icon"
         disabled={isPending || isPendingTransition || !content.trim()}
         className={`
-    ${!(isPending || isPendingTransition || !content.trim()) ? 'bg-[#267858] hover:bg-[#1e6046] text-white' : 'opacity-50 cursor-not-allowed'}
-    transition-colors duration-200
-  `}>
+          ${!(isPending || isPendingTransition || !content.trim()) ? 'bg-[#267858] hover:bg-[#1e6046] text-white' : 'opacity-50 cursor-not-allowed'}
+          transition-colors duration-200
+        `}>
         <Send className="h-4 w-4" />
       </Button>
-      {state?.error && <p className="text-sm text-red-500">{state.error}</p>}
+      {state?.['error'] && <p className="text-sm text-red-500">{state['error']}</p>} {/* Use bracket notation for 'error' */}
     </form>
   );
 }

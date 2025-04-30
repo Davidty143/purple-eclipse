@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "ESNext",  // Keep ESNext for ES Modules
-    "moduleResolution": "Node",  // Changed from "bundler" to "Node" for better compatibility
+    "module": "ESNext", // Keep ESNext for ES Modules
+    "moduleResolution": "Node", // Changed from "bundler" to "Node" for better compatibility
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -22,9 +18,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
     "target": "ES2017"
   },
@@ -33,9 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "prisma/**/*.ts"  // Ensure Prisma files are also included for ts-node
+    "prisma/**/*.ts", // Ensure Prisma files are also included for ts-node
+    "app/messages/message-header"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
