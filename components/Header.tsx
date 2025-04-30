@@ -19,9 +19,9 @@ const Header = () => {
       title: 'Forums',
       link: '/forums',
       items: [
-        { text: 'Forum 1', href: '/forum1' },
-        { text: 'Forum 2', href: '/forum2' },
-        { text: 'Forum 3', href: '/forum3' }
+        { text: 'Academics', href: '/forum1' },
+        { text: 'Courses', href: '/forum2' },
+        { text: 'Lifestyle', href: '/forum3' }
       ]
     },
     trending: {

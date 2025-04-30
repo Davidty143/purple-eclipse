@@ -1,132 +1,122 @@
-// components/sidebar-mock-threads.ts
-export interface SidebarThread {
-  id: string;
-  title: string;
-  author: {
-    name: string;
-    avatar?: string;
-  };
-}
-
 export const sidebarMockThreads: SidebarThread[] = [
   {
     id: 's1',
-    title: 'Next.js 15 beta features released today',
+    title: 'Top techniques for effective note-taking',
     author: {
       name: 'Tim Neutkens',
-      avatar: 'https://github.com/timneutkens.png'
+      avatar: 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=Tim'
     }
   },
   {
     id: 's2',
-    title: 'React Server Components deep dive',
+    title: 'Balancing academics and part-time work',
     author: {
       name: 'Dan Abramov',
-      avatar: 'https://github.com/gaearon.png'
+      avatar: 'https://randomuser.me/api/portraits/men/32.jpg'
     }
   },
   {
     id: 's3',
-    title: 'My AI-powered developer tools',
+    title: 'My experience with online learning platforms',
     author: {
       name: 'Swyx',
-      avatar: 'https://github.com/sw-yx.png'
+      avatar: 'https://i.pravatar.cc/150?img=12'
     }
   },
   {
     id: 's4',
-    title: 'TypeScript 5.5 beta features',
+    title: 'Should I pursue a master’s degree?',
     author: {
       name: 'Anders Hejlsberg',
-      avatar: 'https://github.com/ahejlsberg.png'
+      avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Anders'
     }
   },
   {
     id: 's5',
-    title: 'Web performance in 2025',
+    title: 'Healthy morning routines for students',
     author: {
       name: 'Addy Osmani',
-      avatar: 'https://github.com/addyosmani.png'
+      avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
     }
   },
   {
     id: 's6',
-    title: 'State of CSS 2025 survey results',
+    title: 'Top productivity apps for college life',
     author: {
       name: 'Lea Verou',
-      avatar: 'https://github.com/leaverou.png'
+      avatar: 'https://i.pravatar.cc/150?img=23'
     }
   },
   {
     id: 's7',
-    title: 'Building accessible components',
+    title: 'How to avoid burnout during finals week',
     author: {
       name: 'Marcy Sutton',
-      avatar: 'https://github.com/marcysutton.png'
+      avatar: 'https://api.dicebear.com/9.x/bottts/svg?seed=Marcy'
     }
   },
   {
     id: 's8',
-    title: 'Rust for frontend developers',
+    title: 'Budgeting tips for university students',
     author: {
       name: 'Steve Klabnik',
-      avatar: 'https://github.com/steveklabnik.png'
+      avatar: 'https://randomuser.me/api/portraits/men/77.jpg'
     }
   },
   {
     id: 's9',
-    title: 'My journey learning Three.js',
+    title: 'Dorm room organization hacks',
     author: {
       name: 'Bruno Simon',
-      avatar: 'https://github.com/brunosimon.png'
+      avatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Bruno'
     }
   },
   {
     id: 's10',
-    title: 'CSS nesting best practices',
+    title: 'Best study playlists for deep focus',
     author: {
       name: 'Adam Argyle',
-      avatar: 'https://github.com/argyleink.png'
+      avatar: 'https://i.pravatar.cc/150?img=7'
     }
   },
   {
     id: 's11',
-    title: 'The future of state management in React',
+    title: 'Study abroad: What I wish I knew',
     author: {
       name: 'Michel Weststrate',
-      avatar: 'https://github.com/mweststrate.png'
+      avatar: 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=Michel'
     }
   },
   {
     id: 's12',
-    title: 'Building microfrontends with Next.js',
+    title: 'How to prepare for college entrance exams',
     author: {
       name: 'Zack Jackson',
-      avatar: 'https://github.com/ScriptedAlchemy.png'
+      avatar: 'https://randomuser.me/api/portraits/men/58.jpg'
     }
   },
   {
     id: 's13',
-    title: 'Advanced TypeScript patterns',
+    title: 'Building better habits with habit tracking',
     author: {
       name: 'Matt Pocock',
-      avatar: 'https://github.com/mattpocock.png'
+      avatar: 'https://api.dicebear.com/9.x/notionists/svg?seed=Matt'
     }
   },
   {
     id: 's14',
-    title: 'WebAssembly for frontend developers',
+    title: 'My journey switching majors',
     author: {
       name: 'Lin Clark',
-      avatar: 'https://github.com/linclark.png'
+      avatar: 'https://i.pravatar.cc/150?img=49'
     }
   },
   {
     id: 's15',
-    title: 'Design systems in 2025',
+    title: 'Sleep strategies for busy students',
     author: {
       name: 'Brad Frost',
-      avatar: 'https://github.com/bradfrost.png'
+      avatar: 'https://randomuser.me/api/portraits/men/9.jpg'
     }
   }
 ];
