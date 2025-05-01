@@ -10,11 +10,11 @@ datasource db {
 model Account {
   account_id         String         @id @default(uuid()) @db.Uuid
   account_username   String?        @unique
-  account_email      String?        @unique   
+  account_email      String?        @unique
   account_status     AccountStatus?
-  account_avatar_url         String?
   account_is_deleted Boolean?
   account_role_id    String?        @db.Uuid
+  account_avatar_url String?
   account_role       Role?          @relation(fields: [account_role_id], references: [role_id])
   comments           Comment[]
   threads            Thread[]
@@ -37,7 +37,7 @@ model Previlage {
 model Forum {
   forum_name        String?    @unique
   forum_description String?
-  forum_created     DateTime   @default(now())   @map("forum_created") @db.Timestamptz(6)
+  forum_created     DateTime   @default(now()) @map("forum_created") @db.Timestamptz(6)
   forum_modified    DateTime   @updatedAt @map("forum_modified") @db.Timestamptz(6)
   forum_id          Int        @id @default(autoincrement())
   forum_is_deleted  Boolean    @default(false) @map("forum_deleted")
@@ -52,9 +52,9 @@ model Subforum {
   subforum_description String?
   subforum_created     DateTime @default(now()) @map("subforum_created") @db.Timestamptz(6)
   subforum_modified    DateTime @updatedAt @map("subforum_modified") @db.Timestamptz(6)
-  subforum_icon        String?  @map("subforum_icon")
   forum_id             Int      @map("forum_id")
   subforum_is_deleted  Boolean  @default(false) @map("subforum_deleted")
+  subforum_icon        String?  @map("subforum_icon")
   forum                Forum    @relation(fields: [forum_id], references: [forum_id])
   threads              Thread[]
 }
@@ -96,6 +96,7 @@ model Comment {
   @@index([parent_comment_id])
 }
 
+
 model ThreadImage {
   thread_image_id      Int      @id @default(autoincrement())
   thread_image_url     String   @map("image_url")
@@ -106,6 +107,19 @@ model ThreadImage {
 
   @@index([thread_id])
   @@map("thread_image")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model direct_messages {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content     String
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  sender_id   String    @db.Uuid
+  receiver_id String    @db.Uuid
+  is_read     Boolean?  @default(false)
+
+  @@index([receiver_id], map: "idx_direct_messages_receiver")
+  @@index([sender_id], map: "idx_direct_messages_sender")
 }
 
 enum AccountStatus {

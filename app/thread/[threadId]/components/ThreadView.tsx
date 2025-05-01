@@ -23,8 +23,8 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-6 md:py-8">
+      <div className="w-full max-w-4xl mx-auto px-3 sm:px-4">
         {/* Thread Header and Content */}
         <ThreadContent thread={currentThread} optimizeImages={optimizeImages} openLightbox={openLightbox} />
 
