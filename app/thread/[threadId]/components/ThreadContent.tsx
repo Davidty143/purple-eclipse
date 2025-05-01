@@ -17,10 +17,10 @@ export default function ThreadContent({ thread, optimizeImages, openLightbox }: 
   return (
     <>
       {/* Breadcrumb */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center space-x-1 text-sm text-gray-500">
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="w-full sm:w-auto">
+            <div className="flex flex-wrap items-center space-x-1 text-xs sm:text-sm text-gray-500">
               <Link href="/" className="hover:underline">
                 Forums
               </Link>
@@ -36,35 +36,35 @@ export default function ThreadContent({ thread, optimizeImages, openLightbox }: 
           </div>
         </div>
 
-        <div className="flex items-center space-x-4 text-sm text-gray-500 border-b pb-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 border-b pb-3 sm:pb-4">
           <div className="flex items-center space-x-2">
-            <Avatar className="h-8 w-8">
+            <Avatar className="h-6 w-6 sm:h-8 sm:w-8">
               <AvatarImage src={thread.author?.account_avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
               <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
           </div>
-          <span>•</span>
+          <span className="hidden sm:inline">•</span>
           <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
         </div>
       </div>
 
       {/* Main Thread Card */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>{thread.thread_title}</CardTitle>
+      <Card className="mb-6 sm:mb-8 mt-3 sm:mt-4">
+        <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-lg sm:text-xl md:text-2xl break-words">{thread.thread_title}</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: optimizeImages(thread.thread_content) }} />
+        <CardContent className="px-3 sm:px-6 py-3 sm:py-4">
+          <div className="prose max-w-none text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: optimizeImages(thread.thread_content) }} />
 
           {/* Thread Images Gallery */}
           {thread.images && thread.images.length > 0 && (
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {thread.images.map((image) => (
                   <div key={image.thread_image_id} className="relative overflow-hidden rounded-lg shadow-md">
                     <div className="image-container relative aspect-[4/3] group">
-                      <Image src={image.image_url} alt="Thread image" fill sizes="(max-width: 640px) 100vw, 50vw" className="object-cover cursor-pointer transition-transform hover:scale-105" onClick={() => openLightbox(image.image_url)} />
+                      <Image src={image.image_url} alt="Thread image" fill sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw" className="object-cover cursor-pointer transition-transform hover:scale-105" onClick={() => openLightbox(image.image_url)} />
                     </div>
                   </div>
                 ))}

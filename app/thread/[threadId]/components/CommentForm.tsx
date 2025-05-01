@@ -15,21 +15,21 @@ interface CommentFormProps {
 
 export default function CommentForm({ user, loading, newComment, setNewComment, isSubmitting, handleCommentSubmit }: CommentFormProps) {
   return (
-    <div className="mt-8 pt-4 border-t border-gray-200">
-      <h3 className="text-lg font-medium mb-4">Add Your Comment</h3>
+    <div className="mt-6 sm:mt-8 pt-3 sm:pt-4 border-t border-gray-200">
+      <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Add Your Comment</h3>
       {loading ? (
-        <div className="text-center py-4">
-          <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+        <div className="text-center py-3 sm:py-4">
+          <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin mx-auto" />
         </div>
       ) : user ? (
         <form onSubmit={handleCommentSubmit}>
-          <div className="border rounded-lg p-4 bg-white">
-            <textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Write your comment..." className="w-full min-h-[100px] p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" disabled={isSubmitting} />
-            <div className="mt-4 flex justify-end">
-              <Button type="submit" disabled={isSubmitting || !newComment.trim()} className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          <div className="border rounded-lg p-3 sm:p-4 bg-white">
+            <textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Write your comment..." className="w-full min-h-[80px] sm:min-h-[100px] p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base" disabled={isSubmitting} />
+            <div className="mt-3 sm:mt-4 flex justify-end">
+              <Button type="submit" disabled={isSubmitting || !newComment.trim()} className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm h-8 sm:h-9">
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 animate-spin" />
                     Posting...
                   </>
                 ) : (
@@ -40,7 +40,7 @@ export default function CommentForm({ user, loading, newComment, setNewComment, 
           </div>
         </form>
       ) : (
-        <div className="text-center py-6 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="text-center py-5 sm:py-6 bg-gray-50 rounded-lg border border-gray-200">
           Please{' '}
           <Link href="/login" className="text-blue-600 hover:underline">
             sign in
