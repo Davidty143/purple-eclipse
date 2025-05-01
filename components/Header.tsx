@@ -113,12 +113,14 @@ const Header = () => {
 const DesktopDropdown = ({ title, link, items }: { title: string; link: string; items: { text: string; href: string }[] }) => {
   return (
     <div className="relative group">
-      <Link href={link} className="flex items-center px-4 py-2 text-gray-700 rounded-lg transition-colors font-medium group-hover:text-[color:#2b7a58]">
-        {title}
-        <FiChevronDown className="ml-1 transition-transform group-hover:rotate-180 group-hover:text-[color:#2b7a58]" />
+      {/* Dropdown header */}
+      <Link href={link} className="flex justify-between items-center w-full pr-4 py-2 text-gray-700 rounded-lg transition-colors font-medium group-hover:text-[color:#2b7a58] group-hover:font-semibold">
+        <span className="text-left">{title}</span>
+        <FiChevronDown className="ml-2 transition-transform group-hover:rotate-180 group-hover:text-[color:#2b7a58]" />
       </Link>
 
-      <div className="absolute left-0 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      {/* Dropdown menu */}
+      <div className="absolute -left-3 mt-2 w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="py-1">
           {items.map((item, index) => (
             <Link key={index} href={item.href} className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
