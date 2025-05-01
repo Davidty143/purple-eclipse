@@ -1,6 +1,6 @@
 'use client';
 
-import { useState,use } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { SidebarThreadRow } from './SidebarThreadRow';
@@ -72,9 +72,47 @@ const getNewThreadsData = createCachedFetch<Thread[]>(
 );
 
 export function NewTopics() {
-  // Use the React 'use' hook to unwrap the promise in a way that works with Suspense
-  const threads = use(getNewThreadsData());
+  // Replace the React 'use' hook with useState and useEffect for client-side rendering
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    // Fetch data client-side to avoid hydration mismatch
+    getNewThreadsData()
+      .then((data) => {
+        setThreads(data || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching new threads data:', error);
+        setLoading(false);
+      });
+  }, []);
+
+  // Handle loading state
+  if (loading) {
+    return (
+      <Card className="w-[300px] p-0 rounded-lg border-gray-300">
+        <CardHeader className="pb-3 px-4 pt-3 border-b rounded-t-lg bg-gray-50">
+          <CardTitle className="text-md text-start font-medium">New Topics</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 px-2 pt-3 pb-4">
+          {Array(5)
+            .fill(0)
+            .map((_, i) => (
+              <div key={i} className="flex items-center gap-2 p-2">
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+                <div className="flex-1">
+                  <div className="h-3 bg-gray-200 rounded w-4/5 mb-1 animate-pulse"></div>
+                  <div className="h-2 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+        </CardContent>
+      </Card>
+    );
+  }
 
   const displayedThreads = showAll ? threads : threads.slice(0, 10);
   const hasMore = threads.length > 10;
