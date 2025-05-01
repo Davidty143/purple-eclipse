@@ -10,7 +10,7 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   // Get threadId from params and ensure it's a valid value
-  const { threadId } = params;
+  const threadId = params?.threadId;
 
   // Validate threadId is a number
   if (!threadId || isNaN(parseInt(threadId))) {
