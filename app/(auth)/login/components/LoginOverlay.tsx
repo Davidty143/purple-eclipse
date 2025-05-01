@@ -59,7 +59,7 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
           <CardTitle className="text-2xl text-center font-bold text-[#267858] ">VISCONN</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-start text-base font-semibold text-gray-900 pb-4">Login</div>
+          <div className="text-start text-sm font-semibold text-gray-900 pb-4">Login</div>
 
           <SignInWithGoogleButton />
 
