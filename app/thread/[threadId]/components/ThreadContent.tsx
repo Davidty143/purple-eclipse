@@ -52,6 +52,7 @@ export default function ThreadContent({ thread, optimizeImages, openLightbox }: 
       {/* Main Thread Card */}
       <Card className="mb-6 sm:mb-8 mt-3 sm:mt-4">
         <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center gap-2 mb-2">{thread.thread_category && <span className="text-xs font-semibold bg-gray-200 px-4 py-0.5 rounded-sm">{thread.thread_category}</span>}</div>
           <CardTitle className="text-lg sm:text-xl md:text-2xl break-words">{thread.thread_title}</CardTitle>
         </CardHeader>
         <CardContent className="px-3 sm:px-6 py-3 sm:py-4">

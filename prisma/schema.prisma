@@ -65,6 +65,7 @@
     thread_id        Int            @id @default(autoincrement())
     thread_title     String
     thread_content   String
+    thread_category  String?        // Added thread_category field as optional
     thread_isDeleted Boolean        @default(false) @map("thread_deleted")
     thread_created   DateTime       @default(now()) @map("thread_created") @db.Timestamptz(6)
     thread_modified  DateTime       @updatedAt @map("thread_modified") @db.Timestamptz(6)
@@ -112,7 +113,7 @@
     @@map("thread_image")
   }
 
-  model notifications {
+  model Notification {
     notification_id Int              @id @default(autoincrement())
     recipient_id    String           @db.Uuid // Who should receive the notification
     sender_id       String           @db.Uuid // Who triggered the notification
