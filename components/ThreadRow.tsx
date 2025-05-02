@@ -10,6 +10,7 @@ interface ThreadRowProps {
     thread_id: number;
     thread_title: string;
     thread_created: string;
+    thread_category?: string;
     author: {
       account_username: string | null;
       account_email: string | null;
@@ -45,7 +46,7 @@ const ThreadRow = ({ thread }: ThreadRowProps) => {
             <div className="flex items-center">
               <div>
                 <div className="flex justify-start items-center gap-2">
-                  <span className="text-xs font-semibold bg-gray-200 px-4 py-0.5 rounded-sm">Discussion</span>
+                  <span className="text-xs font-semibold bg-gray-200 px-4 py-0.5 rounded-sm">{thread.thread_category || 'Discussion'}</span>
                   <h3 className="text-md font-semibold">{thread.thread_title}</h3>
                 </div>
                 <div className="text-xs text-semibold text-gray-500">

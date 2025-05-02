@@ -15,6 +15,7 @@ interface DatabaseThread {
   thread_title: string;
   thread_created: string;
   thread_content: string;
+  thread_category?: string;
   comment_count: number;
   author: {
     account_username: string | null;
@@ -45,6 +46,7 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
             thread_title,
             thread_created,
             thread_content,
+            thread_category,
             author:author_id(account_username, account_email),
             comment_count:Comment(count)
           `
@@ -64,7 +66,7 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
               name: thread.author?.account_username || 'Anonymous',
               avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(thread.author?.account_username || 'A')}&background=random`
             },
-            tag: 'Discussion',
+            tag: thread.thread_category || 'Discussion',
             createdAt: new Date(thread.thread_created),
             replies: thread.comment_count || 0,
             views: 0

@@ -23,6 +23,7 @@ export interface Thread {
   thread_id: number;
   thread_title: string;
   thread_content: string;
+  thread_category?: string;
   thread_created: string;
   thread_deleted: boolean;
   author: {
