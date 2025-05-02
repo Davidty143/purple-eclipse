@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Plus } from 'lucide-react';
 
 interface CreateForumDialogProps {
   onSuccess?: () => void;
@@ -67,7 +68,10 @@ export function CreateForumDialog({ onSuccess }: CreateForumDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Add Forum</Button>
+        <Button variant="outline" className="text-[#267858] border-[#267858]  hover:bg-gray-50 w-full sm:w-auto">
+          <Plus className="w-4 h-4 mr-2" />
+          Add Forum
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

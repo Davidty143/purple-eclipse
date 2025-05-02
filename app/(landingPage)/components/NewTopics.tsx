@@ -17,7 +17,6 @@ interface Thread {
   };
 }
 
-// Create a suspense-ready data fetcher
 const fetchNewThreads = async (): Promise<Thread[]> => {
   try {
     const supabase = createClient();
@@ -94,7 +93,7 @@ export function NewTopics() {
   if (loading) {
     return (
       <Card className="w-[300px] p-0 rounded-lg border-gray-300">
-        <CardHeader className="pb-3 px-4 pt-3 border-b rounded-t-lg bg-gray-50">
+        <CardHeader className="pb-3 px-5 pt-3 border-b rounded-t-lg bg-[#edf4f2]">
           <CardTitle className="text-md text-start font-medium">New Topics</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 px-2 pt-3 pb-4">
@@ -129,8 +128,8 @@ export function NewTopics() {
 
   return (
     <Card className="w-[300px] p-0 rounded-lg border-gray-300">
-      <CardHeader className="pb-3 px-4 pt-3 border-b rounded-t-lg bg-gray-50">
-        <CardTitle className="text-md text-start font-medium">New Topics</CardTitle>
+      <CardHeader className="pb-2.5 px-4 pt-2.5 border-b rounded-t-lg bg-[#edf4f2]">
+        <CardTitle className="text-base text-start bg-[#edf4f2] font-medium">New Topics</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 px-2 pt-3 pb-4">
         {threadItems}

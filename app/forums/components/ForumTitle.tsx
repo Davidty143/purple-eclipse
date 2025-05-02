@@ -32,7 +32,7 @@ export function ForumTitle({ title, forumId, showActions = true, onAddSuccess, o
   };
 
   return (
-    <div className="flex items-center justify-between border py-4 px-6 rounded-lg bg-gray-50">
+    <div className="flex items-center justify-between border py-4 px-6 rounded-lg bg-[#edf4f2]">
       <div className="flex flex-col">
         <h1 className="text-lg font-semibold">{title}</h1>
         {currentDescription && <p className="text-sm text-gray-500 mt-1">{currentDescription}</p>}
