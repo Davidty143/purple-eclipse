@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { SidebarThreadRow } from './SidebarThreadRow';
 import { createClient } from '@/utils/supabase/client';
 import { createCachedFetch } from '@/lib/use-cached-fetch';
+import { Flame } from 'lucide-react'; // Importing the Fire icon
 
 // Match the interface from SidebarThreadRow
 interface Thread {
@@ -25,7 +26,7 @@ const fetchNewThreads = async (): Promise<Thread[]> => {
     const { data, error } = await supabase
       .from('Thread')
       .select(
-        `
+        ` 
         thread_id,
         thread_title,
         thread_created,
@@ -50,7 +51,6 @@ const fetchNewThreads = async (): Promise<Thread[]> => {
       title: thread.thread_title,
       author: {
         name: thread.author?.account_username || 'Anonymous',
-        // Ensure avatar is either string or undefined, not null
         avatar: thread.author?.account_avatar_url || undefined
       }
     }));
@@ -71,7 +71,6 @@ const getNewThreadsData = createCachedFetch<Thread[]>(
 );
 
 export function NewTopics() {
-  // Replace the React 'use' hook with useState and useEffect for client-side rendering
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
@@ -89,7 +88,6 @@ export function NewTopics() {
       });
   }, []);
 
-  // Handle loading state
   if (loading) {
     return (
       <Card className="w-[300px] p-0 rounded-lg border-gray-300">
@@ -116,7 +114,6 @@ export function NewTopics() {
   const displayedThreads = showAll ? threads : threads.slice(0, 10);
   const hasMore = threads.length > 10;
 
-  // Ensure we always have the same JSX structure
   const threadItems =
     displayedThreads.length > 0
       ? displayedThreads.map((thread: Thread) => <SidebarThreadRow key={thread.id} thread={thread} />)
@@ -128,10 +125,15 @@ export function NewTopics() {
 
   return (
     <Card className="w-[300px] p-0 rounded-lg border-gray-300">
-      <CardHeader className="pb-2.5 px-4 pt-2.5 border-b rounded-t-lg bg-[#edf4f2]">
-        <CardTitle className="text-base text-start bg-[#edf4f2] font-medium">New Topics</CardTitle>
+      <CardHeader className="pb-3.5 px-5 pt-3.5 border-b rounded-t-lg bg-[#edf4f2]">
+        <div className="flex items-center gap-2">
+          <div className="p-1 bg-[#267858] rounded">
+            <Flame className="w-4 h-4 text-[#edf4f2]" />
+          </div>
+          <CardTitle className="text-base text-start bg-[#edf4f2] font-medium">New Topics</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-3 px-2 pt-3 pb-4">
+      <CardContent className="space-y-2 px-2 pt-3 pb-4">
         {threadItems}
         {hasMore && !showAll && (
           <Button variant="ghost" size="sm" className="w-full text-primary text-gray-600 hover:underline hover:font-semibold hover:bg-white" onClick={() => setShowAll(true)}>

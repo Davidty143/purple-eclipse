@@ -16,5 +16,6 @@ export interface SubforumData {
   subforum_id: number;
   subforum_name: string | null;
   subforum_description: string | null;
+  subforum_icon?: string | null;
   threads: ThreadData[];
 }
