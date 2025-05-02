@@ -128,7 +128,7 @@ export function NewTopics() {
       <CardHeader className="pb-3.5 px-5 pt-3.5 border-b rounded-t-lg bg-[#edf4f2]">
         <div className="flex items-center gap-2">
           <div className="p-1 bg-[#267858] rounded">
-            <Flame className="w-4 h-4 text-[#edf4f2]" />
+            <Flame className="w-4 h-4 text-white" />
           </div>
           <CardTitle className="text-base text-start bg-[#edf4f2] font-medium">New Topics</CardTitle>
         </div>
