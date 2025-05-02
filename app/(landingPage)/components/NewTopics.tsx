@@ -124,13 +124,13 @@ export function NewTopics() {
         ];
 
   return (
-    <Card className="w-[300px] p-0 rounded-lg border-gray-300">
-      <CardHeader className="pb-3.5 px-5 pt-3.5 border-b rounded-t-lg bg-[#edf4f2]">
-        <div className="flex items-center gap-2">
-          <div className="p-1 bg-[#267858] rounded">
+    <Card className="w-full max-w-sm p-0 rounded-lg border border-gray-300">
+      <CardHeader className="pb-3.5 px-4 sm:px-5 pt-3.5 border-b rounded-t-lg bg-[#edf4f2]">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="p-1 bg-[#267858] rounded shrink-0">
             <Flame className="w-4 h-4 text-[#edf4f2]" />
           </div>
-          <CardTitle className="text-base text-start bg-[#edf4f2] font-medium">New Topics</CardTitle>
+          <CardTitle className="text-base font-medium text-start truncate">New Topics</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="space-y-2 px-2 pt-3 pb-4">

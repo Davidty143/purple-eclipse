@@ -51,7 +51,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-white  sticky top-0 z-50">
       <div className="w-full py-3 px-4 md:px-0">
         <div className="flex items-center justify-between w-full">
           {/* Hamburger Menu - Left */}
@@ -73,7 +73,7 @@ const Header = () => {
         <div className={`md:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setMobileMenuOpen(false)} />
 
         {/* Mobile slide menu */}
-        <div className={`md:hidden fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-xl transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`md:hidden fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <div className="p-4 h-full flex flex-col">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
@@ -127,7 +127,7 @@ const DesktopDropdown = ({ title, link, items, icon: Icon }: { title: string; li
       </Link>
 
       {/* Dropdown menu */}
-      <div className="absolute left-0 mt-2 text-sm w-56 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      <div className="absolute left-0 mt-2 text-sm w-56 origin-top-right bg-white rounded-lg ring-1 ring-black ring-opacity-5 focus:outline-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="py-1">
           {items.map((item, index) => (
             <Link key={index} href={item.href} className="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors">
