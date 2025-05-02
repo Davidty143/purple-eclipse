@@ -13,30 +13,10 @@ export function useNotifications(userId: string | undefined) {
   const supabaseRef = useRef<SupabaseClient | null>(null);
   const [channelStatus, setChannelStatus] = useState<REALTIME_SUBSCRIBE_STATES | null>(null);
   const [newNotification, setNewNotification] = useState(false);
-  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
   const channelEstablished = useRef(false);
 
-  // Initialize notification sound
-  useEffect(() => {
-    if (typeof Audio !== 'undefined') {
-      notificationSoundRef.current = new Audio('/notification-sound.mp3');
-    }
-  }, []);
-
-  // Play notification sound and animation
+  // Trigger notification animation effect
   const triggerNewNotificationEffect = useCallback(() => {
-    // Play sound if available and not muted
-    if (notificationSoundRef.current) {
-      try {
-        notificationSoundRef.current.play().catch((err) => {
-          // Suppress errors from browsers that require user interaction before playing
-          console.log('Could not play notification sound:', err);
-        });
-      } catch (err) {
-        console.log('Error playing notification sound:', err);
-      }
-    }
-
     // Trigger animation
     setNewNotification(true);
     setTimeout(() => setNewNotification(false), 1000);
