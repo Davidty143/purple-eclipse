@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Notification } from '@/components/notifications/types';
 import { getNotificationText, getNotificationLink, getTimeAgo } from '@/components/notifications/utils';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
@@ -159,7 +160,7 @@ export default function NotificationsPage() {
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="animate-pulse flex p-4 border rounded-md">
-              <div className="h-12 w-12 rounded-full bg-gray-200 mr-4"></div>
+              <div className="h-12 w-12 rounded-full bg-gray-200 mr-4 flex-shrink-0"></div>
               <div className="flex-1">
                 <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                 <div className="h-3 bg-gray-200 rounded w-1/4"></div>
@@ -176,7 +177,7 @@ export default function NotificationsPage() {
           {notifications.map((notification) => (
             <div key={notification.notification_id} className={`p-4 border rounded-md flex items-start ${!notification.is_read ? 'bg-blue-50' : ''}`}>
               {/* Avatar */}
-              <div className="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mr-4">{notification.sender.account_avatar_url ? <img src={notification.sender.account_avatar_url} alt={`${notification.sender.account_username}'s avatar`} className="w-full h-full object-cover" /> : <span className="text-lg font-medium text-gray-600">{notification.sender.account_username?.charAt(0).toUpperCase() || '?'}</span>}</div>
+              <Avatar className="h-12 w-12 mr-4 flex-shrink-0">{notification.sender.account_avatar_url ? <AvatarImage src={notification.sender.account_avatar_url} alt={`${notification.sender.account_username}'s avatar`} className="object-cover" /> : <AvatarFallback className="bg-gray-200 text-gray-700 text-lg">{notification.sender.account_username?.charAt(0).toUpperCase() || '?'}</AvatarFallback>}</Avatar>
 
               {/* Content */}
               <div className="flex-1">

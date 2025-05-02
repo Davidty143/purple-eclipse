@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Check, MoreVertical, Trash } from 'lucide-react';
 import { Notification } from './types';
 import { getNotificationText, getNotificationLink, getTimeAgo } from './utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -33,11 +34,14 @@ export default function NotificationItem({ notification, handleMarkAsRead, handl
     closeMenu();
   };
 
+  // Generate fallback text (first letter of username or '?')
+  const fallbackText = notification.sender.account_username?.charAt(0).toUpperCase() || '?';
+
   return (
     <li className={`${!notification.is_read ? 'bg-blue-50' : ''} transition-colors duration-200`}>
       <div className="px-4 py-3 flex items-start space-x-3 hover:bg-gray-50">
         {/* Avatar */}
-        <div className="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">{notification.sender.account_avatar_url ? <img src={notification.sender.account_avatar_url} alt={`${notification.sender.account_username}'s avatar`} className="w-full h-full object-cover" /> : <span className="text-lg font-medium text-gray-600">{notification.sender.account_username?.charAt(0).toUpperCase() || '?'}</span>}</div>
+        <Avatar className="h-10 w-10 flex-shrink-0">{notification.sender.account_avatar_url ? <AvatarImage src={notification.sender.account_avatar_url} alt={`${notification.sender.account_username}'s avatar`} className="object-cover" /> : <AvatarFallback className="bg-gray-200 text-gray-700">{fallbackText}</AvatarFallback>}</Avatar>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
