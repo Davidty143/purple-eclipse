@@ -80,7 +80,7 @@ export function ForumComponentWrapper() {
   return (
     <div className="space-y-8">
       {/* Main content header */}
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2">
         <h2 className="text-lg font-semibold">Forums List</h2>
         <CreateForumDialog onSuccess={handleAddSuccess} />
       </div>
