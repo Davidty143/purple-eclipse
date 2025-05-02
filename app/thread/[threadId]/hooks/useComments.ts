@@ -111,6 +111,50 @@ export function useComments(initialThread: Thread, user: any | null) {
         throw new Error('No data returned from comment insertion');
       }
 
+      // Get the thread author to notify them about the new comment
+      const { data: threadData, error: threadError } = await supabase.from('Thread').select('author_id').eq('thread_id', thread.thread_id).single();
+
+      if (threadError) {
+        console.error('Error fetching thread author:', threadError);
+      } else if (threadData && threadData.author_id !== user.id) {
+        // Create notification for thread comment
+        const notificationData = {
+          recipient_id: threadData.author_id,
+          sender_id: user.id,
+          thread_id: thread.thread_id,
+          comment_id: data.comment_id,
+          type: 'COMMENT',
+          is_read: false,
+          created_at: new Date().toISOString()
+        };
+
+        // Validate notification data
+        const missingFields = Object.entries(notificationData)
+          .filter(([_, value]) => value === undefined || value === null)
+          .map(([key]) => key);
+
+        if (missingFields.length > 0) {
+          console.error(`Cannot create notification: missing fields: ${missingFields.join(', ')}`);
+        } else {
+          console.log('Attempting to create notification with data:', notificationData);
+          try {
+            // Use 'notifications' (plural and lowercase) as the table name to match the schema
+            const { error: notificationError } = await supabase.from('notifications').insert(notificationData);
+
+            if (notificationError) {
+              console.error('Error creating notification:', notificationError.message || JSON.stringify(notificationError));
+              console.error('Error details:', notificationError);
+              // Continue execution - don't throw an error here
+            } else {
+              console.log('Thread comment notification created successfully');
+            }
+          } catch (notifError) {
+            console.error('Exception creating notification:', notifError);
+            // Continue execution - notification errors shouldn't block comment posting
+          }
+        }
+      }
+
       // Update with real comment data
       setThread((prev) => ({
         ...prev,
@@ -163,60 +207,36 @@ export function useComments(initialThread: Thread, user: any | null) {
       }
     };
 
+    // Optimistically update UI by adding the reply to the correct parent comment
+    setThread((prev) => ({
+      ...prev,
+      comments: prev.comments.map((comment) => {
+        if (comment.comment_id === parentCommentId) {
+          // Add to the parent comment's replies
+          const updatedComment = { ...comment };
+          if (!updatedComment.replies) {
+            updatedComment.replies = [];
+          }
+          updatedComment.replies = [...updatedComment.replies, optimisticReply];
+          return updatedComment;
+        } else if (comment.parent_comment_id === parentCommentId) {
+          // If we're replying to a reply that's directly in the main comment list
+          const updatedReplies = prev.comments.filter((c) => c.parent_comment_id === parentCommentId || c.comment_id === parentCommentId).concat([optimisticReply]);
+
+          return comment;
+        }
+        return comment;
+      })
+    }));
+
+    // Only clear replyContent if we're using it (not using passed content parameter)
+    if (!content) {
+      setReplyContent('');
+      setReplyingTo(null);
+    }
+
     try {
-      // Use createBrowserClient for consistency with the rest of the application
       const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-
-      // Find the exact parent comment (could be a reply itself)
-      const findComment = (comments: Comment[], targetId: number): Comment | null => {
-        for (const comment of comments) {
-          if (comment.comment_id === targetId) {
-            return comment;
-          }
-          if (comment.replies && comment.replies.length > 0) {
-            const found = findComment(comment.replies, targetId);
-            if (found) return found;
-          }
-        }
-        return null;
-      };
-
-      // Optimistically update UI
-      setThread((prev) => {
-        const updatedComments = [...prev.comments];
-
-        // Find if we're replying to a comment or a reply
-        const parentComment = findComment(updatedComments, parentCommentId);
-
-        if (parentComment) {
-          // If parent has no replies array, create one
-          if (!parentComment.replies) {
-            parentComment.replies = [];
-          }
-
-          // Check if this is a duplicate reply (same content to same parent within 5 seconds)
-          const isDuplicate = parentComment.replies.some((reply) => reply.comment_content === commentContent && reply.author.account_email === user.email && Math.abs(new Date(reply.comment_created).getTime() - new Date().getTime()) < 5000);
-
-          if (!isDuplicate) {
-            // Add the new reply to the parent's replies
-            parentComment.replies.push(optimisticReply);
-          }
-        } else {
-          // If parent not found, add as a regular comment
-          updatedComments.push(optimisticReply);
-        }
-
-        return {
-          ...prev,
-          comments: updatedComments
-        };
-      });
-
-      // Only clear replyContent if we're using it (not using passed content parameter)
-      if (!content) {
-        setReplyContent('');
-        setReplyingTo(null);
-      }
 
       // First check if the account exists in the Account table
       const { data: accountData, error: accountError } = await supabase.from('Account').select('account_id').eq('account_id', user.id).single();
@@ -274,34 +294,74 @@ export function useComments(initialThread: Thread, user: any | null) {
         throw new Error('No data returned from reply insertion');
       }
 
-      // Update with real reply data by recursively searching and updating the comment tree
-      const updateReplyInComments = (comments: Comment[], optimisticId: number, realData: Comment): Comment[] => {
-        return comments.map((comment) => {
-          // Check if this comment is the parent of our optimistic reply
-          if (comment.replies) {
-            const replyIndex = comment.replies.findIndex((r) => r.comment_id === optimisticId);
-            if (replyIndex !== -1) {
-              // Replace the optimistic reply with real data
-              const updatedReplies = [...comment.replies];
-              updatedReplies[replyIndex] = realData;
-              return { ...comment, replies: updatedReplies };
-            }
+      // Get the parent comment author to notify them about the reply
+      const { data: parentCommentData, error: parentCommentError } = await supabase.from('Comment').select('author_id').eq('comment_id', parentCommentId).single();
 
-            // Check if the optimistic reply is in nested replies
+      if (parentCommentError) {
+        console.error('Error fetching parent comment author:', parentCommentError);
+      } else if (parentCommentData && parentCommentData.author_id !== user.id) {
+        // Create notification for comment reply
+        const notificationData = {
+          recipient_id: parentCommentData.author_id,
+          sender_id: user.id,
+          thread_id: thread.thread_id,
+          comment_id: data.comment_id,
+          type: 'REPLY',
+          is_read: false,
+          created_at: new Date().toISOString()
+        };
+
+        // Validate notification data
+        const missingFields = Object.entries(notificationData)
+          .filter(([_, value]) => value === undefined || value === null)
+          .map(([key]) => key);
+
+        if (missingFields.length > 0) {
+          console.error(`Cannot create notification: missing fields: ${missingFields.join(', ')}`);
+        } else {
+          console.log('Attempting to create notification with data:', notificationData);
+          try {
+            // Use 'notifications' (plural and lowercase) as the table name to match the schema
+            const { error: notificationError } = await supabase.from('notifications').insert(notificationData);
+
+            if (notificationError) {
+              console.error('Error creating notification:', notificationError.message || JSON.stringify(notificationError));
+              console.error('Error details:', notificationError);
+              // Continue execution - don't throw an error here
+            } else {
+              console.log('Comment reply notification created successfully');
+            }
+          } catch (notifError) {
+            console.error('Exception creating notification:', notifError);
+            // Continue execution - notification errors shouldn't block comment posting
+          }
+        }
+      }
+
+      // Update UI with actual data
+      setThread((prev) => {
+        // Replace the optimistic comment with the real one
+        const updatedComments = prev.comments.map((comment) => {
+          if (comment.comment_id === optimisticReply.comment_id) {
+            return data;
+          }
+
+          if (comment.comment_id === parentCommentId && comment.replies) {
             return {
               ...comment,
-              replies: updateReplyInComments(comment.replies, optimisticId, realData)
+              replies: comment.replies.map((reply) => (reply.comment_id === optimisticReply.comment_id ? data : reply))
             };
           }
+
           return comment;
         });
-      };
 
-      // Update the thread with real data
-      setThread((prev) => ({
-        ...prev,
-        comments: updateReplyInComments(prev.comments, optimisticReply.comment_id, data)
-      }));
+        // Make sure the reply appears in the right place
+        return {
+          ...prev,
+          comments: updatedComments
+        };
+      });
 
       toast.success('Reply posted successfully');
     } catch (error: any) {
