@@ -93,7 +93,7 @@ export function NewTopics() {
   // Handle loading state
   if (loading) {
     return (
-      <Card className="w-[300px] p-0 rounded-lg border-gray-300">
+      <Card className="w-full md:w-[300px] p-0 rounded-lg border-gray-300">
         <CardHeader className="pb-3 px-4 pt-3 border-b rounded-t-lg bg-gray-50">
           <CardTitle className="text-md text-start font-medium">New Topics</CardTitle>
         </CardHeader>
@@ -128,7 +128,7 @@ export function NewTopics() {
         ];
 
   return (
-    <Card className="w-[300px] p-0 rounded-lg border-gray-300">
+    <Card className="w-full md:w-[300px] p-0 rounded-lg border-gray-300">
       <CardHeader className="pb-3 px-4 pt-3 border-b rounded-t-lg bg-gray-50">
         <CardTitle className="text-md text-start font-medium">New Topics</CardTitle>
       </CardHeader>
