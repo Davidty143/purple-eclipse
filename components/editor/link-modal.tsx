@@ -110,7 +110,7 @@ const LinkModal: React.FC<LinkModalProps> = ({ isOpen, onClose, onSubmit, initia
                     handleSubmit();
                   }
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#267858] focus:border-[#267858]"
                 placeholder="Text to display"
               />
             </div>
@@ -131,16 +131,16 @@ const LinkModal: React.FC<LinkModalProps> = ({ isOpen, onClose, onSubmit, initia
                   handleSubmit();
                 }
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#267858] focus:border-[#267858]"
               placeholder="https://example.com"
             />
           </div>
 
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#267858]">
               Cancel
             </button>
-            <button type="button" onClick={() => handleSubmit()} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <button type="button" onClick={() => handleSubmit()} className="px-4 py-2 text-sm font-medium text-white bg-[#267858] border border-transparent rounded-md hover:bg-[#267858] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#267858]">
               Insert Link
             </button>
           </div>

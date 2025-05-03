@@ -250,7 +250,7 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
                               <div className="mt-2 pl-2 sm:pl-3 border-l border-blue-100 py-2">
                                 <textarea value={nestedReplyContent} onChange={(e) => setNestedReplyContent(e.target.value)} placeholder={`Reply to ${reply.author.account_username}...`} className="w-full min-h-[50px] sm:min-h-[60px] p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm" disabled={isSubmitting} />
                                 <div className="mt-1 flex justify-end">
-                                  <Button size="sm" disabled={isSubmitting || !nestedReplyContent.trim()} onClick={() => onNestedReplySubmit(reply.comment_id)} className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs h-7 sm:h-8">
+                                  <Button size="sm" disabled={isSubmitting || !nestedReplyContent.trim()} onClick={() => onNestedReplySubmit(reply.comment_id)} className="bg-[#267858] text-white hover:bg-[#267858] disabled:opacity-50 disabled:cursor-not-allowed text-xs h-7 sm:h-8">
                                     {isSubmitting ? (
                                       <>
                                         <Loader2 className="w-3 h-3 mr-1 animate-spin" />
