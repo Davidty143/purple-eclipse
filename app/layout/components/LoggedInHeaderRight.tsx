@@ -5,10 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, MessageCircle, Bell } from 'lucide-react';
+import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
+import { NotificationDropdown } from '@/components/notifications';
 
 export default function LoggedInHeaderRight() {
   const router = useRouter();
@@ -130,11 +131,8 @@ export default function LoggedInHeaderRight() {
         {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-red-500 text-white text-[8px] flex items-center justify-center">{unreadCount}</span>}
       </Link>
 
-      {/* Notification Icon */}
-      <Link href="/notifications" className="relative p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Notifications">
-        <Bell className="h-5 w-5 text-gray-700" />
-        <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-red-500 ring-2 ring-white" />
-      </Link>
+      {/* Notification Dropdown */}
+      <NotificationDropdown userId={user?.id} />
 
       {/* Avatar + Dropdown */}
       <DropdownMenu>

@@ -16,6 +16,7 @@ interface Thread {
   thread_id: number;
   thread_title: string;
   thread_content: string;
+  thread_category?: string;
   subforum_id: number;
   subforum: {
     subforum_name: string;
@@ -32,13 +33,14 @@ export default function EditThreadForm({ thread, user }: EditThreadFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState(thread.thread_title);
   const [content, setContent] = useState(thread.thread_content);
+  const [category, setCategory] = useState(thread.thread_category || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !content.trim()) {
-      toast.error('Title and content are required');
+    if (!title.trim() || !content.trim() || !category.trim()) {
+      toast.error('Title, content and category are required');
       return;
     }
 
@@ -53,6 +55,7 @@ export default function EditThreadForm({ thread, user }: EditThreadFormProps) {
         .update({
           thread_title: title,
           thread_content: content,
+          thread_category: category,
           thread_modified: new Date().toISOString()
         })
         .eq('thread_id', thread.thread_id)
@@ -83,6 +86,18 @@ export default function EditThreadForm({ thread, user }: EditThreadFormProps) {
         <div className="space-y-2">
           <Label htmlFor="title">Title</Label>
           <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Thread Title" required />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <select id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-2 border rounded-lg border-gray-300" required>
+            <option value="">Select a category</option>
+            <option value="Help">Help</option>
+            <option value="Discussion">Discussion</option>
+            <option value="Question">Question</option>
+            <option value="Tutorial">Tutorial</option>
+            <option value="News">News</option>
+          </select>
         </div>
 
         <div className="space-y-2">

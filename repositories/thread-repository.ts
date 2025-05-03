@@ -16,8 +16,9 @@ export class ThreadRepository {
         thread_id,
         thread_title,
         thread_created,
+        thread_category,
         comments:Comment(count),
-        author:author_id(
+        author:Account!author_id(
           account_username,
           account_email,
           account_avatar_url
@@ -43,10 +44,11 @@ export class ThreadRepository {
       thread_id: thread.thread_id,
       thread_title: thread.thread_title,
       thread_created: thread.thread_created,
+      thread_category: thread.thread_category,
       author: {
-        account_username: thread.author[0]?.account_username || null,
-        account_email: thread.author[0]?.account_email || null,
-        account_avatar_url: thread.author[0]?.account_avatar_url || null
+        account_username: thread.author?.account_username || null,
+        account_email: thread.author?.account_email || null,
+        account_avatar_url: thread.author?.account_avatar_url || null
       },
       comments: thread.comments || []
     }));

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
 interface Thread {
   id: string;
@@ -15,6 +16,7 @@ interface Thread {
 
 export function SidebarThreadRow({ thread }: { thread: Thread }) {
   return (
+
     <div className="w-full flex items-center gap-3 py-2 px-5 hover:bg-[#edf4f2]  transition-colors cursor-pointer">
       <Avatar className="h-8 w-8">
         <AvatarImage src={thread.author.avatar} />

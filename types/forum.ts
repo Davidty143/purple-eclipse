@@ -8,7 +8,9 @@ export interface ThreadData {
   thread_id: number;
   thread_title: string;
   thread_created: string;
+
   thread_category: string | null; // Change this from string to string | null
+
   author: ThreadAuthor;
   comments?: { count: number }[];
 }

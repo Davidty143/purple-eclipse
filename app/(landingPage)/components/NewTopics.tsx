@@ -90,8 +90,10 @@ export function NewTopics() {
 
   if (loading) {
     return (
+
       <Card className="w-[300px] p-0 rounded-lg border-gray-300">
         <CardHeader className="pb-3 px-5 pt-3 border-b rounded-t-lg bg-[#edf4f2]">
+
           <CardTitle className="text-md text-start font-medium">New Topics</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 px-2 pt-3 pb-4">
@@ -124,6 +126,7 @@ export function NewTopics() {
         ];
 
   return (
+
     <Card className="w-full sm:w-[300px] p-0 rounded-lg border border-gray-300">
       <CardHeader className="pb-3.5 px-5 pt-3.5 border-b rounded-t-lg bg-[#edf4f2]">
         <div className="flex items-center gap-2">
