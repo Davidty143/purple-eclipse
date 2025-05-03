@@ -31,15 +31,16 @@ export function ThreadRow({ thread }: ThreadRowProps) {
     <Link href={`/thread/${thread.thread_id}`}>
       <div className="flex items-start gap-4 py-3 hover:bg-[#edf4f2] transition-colors cursor-pointer w-full p-5 m-0">
         {/* Avatar Section */}
-        <Avatar className="h-12 w-12 flex-shrink-0">{thread.author?.account_avatar_url?.trim() ? <AvatarImage src={thread.author.account_avatar_url} alt={username} /> : <AvatarFallback className="text-xs">{getInitials(username)}</AvatarFallback>}</Avatar>
+        <Avatar className="h-12 w-12 mt-1 flex-shrink-0">{thread.author?.account_avatar_url?.trim() ? <AvatarImage src={thread.author.account_avatar_url} alt={username} /> : <AvatarFallback className="text-xs">{getInitials(username)}</AvatarFallback>}</Avatar>
 
         {/* Thread Details Section */}
         <div className="flex-1 min-w-0 mt-1.5">
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs text-muted-foreground bg-[#267858] text-white hover:bg-[#267858] active:bg-[#267858] focus:bg-[#267858]">
+            <Badge variant="secondary" className="text-xs bg-[#267858] text-white hover:bg-[#267858] active:bg-[#267858] focus:bg-[#267858]">
               {categoryText}
             </Badge>
-            <span className="text-md font-semibold truncate">{thread.thread_title}</span>
+
+            <span className="text-lg font-semibold truncate">{thread.thread_title}</span>
           </div>
 
           {/* Posted by details */}
