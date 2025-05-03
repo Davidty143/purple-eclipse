@@ -24,6 +24,10 @@ export default function SubforumPage() {
   const [subforum, setSubforum] = useState<SubforumData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
+
+  const pageSize = 10; // Number of items per page
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +69,10 @@ export default function SubforumPage() {
     });
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   useEffect(() => {
     console.log('[RENDER] Current subforum state:', subforum);
   }, [subforum]);
@@ -95,7 +103,14 @@ export default function SubforumPage() {
           {/* Main Content */}
           <div className="w-full flex flex-col gap-6">
             <SubforumHeader title={subforum.name} description={subforum.description} subforumId={Number(params.subforumId)} icon={subforum.icon} onEditSuccess={handleEditSuccess} />
-            <SubforumTopics subforumId={Number(params.subforumId)} />
+
+            {/* Subforum Topics with Pagination */}
+            <SubforumTopics
+              subforumId={Number(params.subforumId)}
+              page={currentPage}
+              limit={pageSize}
+              onPageChange={handlePageChange} // Pagination handler
+            />
           </div>
 
           {/* Sidebar */}
