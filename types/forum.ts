@@ -8,14 +8,17 @@ export interface ThreadData {
   thread_id: number;
   thread_title: string;
   thread_created: string;
-  thread_category?: string;
+
+  thread_category: string | null; // Change this from string to string | null
+
   author: ThreadAuthor;
-  comments: { count: number }[];
+  comments?: { count: number }[];
 }
 
 export interface SubforumData {
   subforum_id: number;
   subforum_name: string | null;
   subforum_description: string | null;
+  subforum_icon?: string | null;
   threads: ThreadData[];
 }

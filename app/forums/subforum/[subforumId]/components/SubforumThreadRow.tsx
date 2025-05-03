@@ -53,7 +53,7 @@ export function ThreadRow({ thread, className }: ThreadRowProps) {
                 <h3 className="text-sm font-semibold truncate">{thread.title}</h3>
               </div>
               <p className="text-xs text-muted-foreground">
-                Posted by {thread.author.name} • {format(thread.createdAt, 'MMM d, yyyy')}
+                Posted by {'thread.author.name'} • {format(thread.createdAt, 'MMM d, yyyy')}
               </p>
             </div>
           </div>

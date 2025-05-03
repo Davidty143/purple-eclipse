@@ -75,9 +75,8 @@ const LandingPage = () => {
         <div className="w-[1250px] 2xl:w-[80%] flex flex-col px-3">
           <div className="w-full flex flex-col lg:flex-row justify-between gap-8">
             <div className="w-full flex flex-col gap-4">
-              <div className="border-b-2 mb-3">
-                <BodyHeader />
-              </div>
+              <BodyHeader />
+              <div className="h-1 w-full bg-[#308b6a] rounded-full mt-3 mb-3"></div>
               <ErrorBoundary fallback={<SubforumsErrorFallback />}>
                 <Suspense fallback={<PopularSubforumsSkeletons />}>
                   <PopularSubforumsGrid />

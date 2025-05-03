@@ -16,20 +16,19 @@ interface Thread {
 
 export function SidebarThreadRow({ thread }: { thread: Thread }) {
   return (
-    <Link href={`/thread/${thread.id}`} className="block">
-      <div className="flex items-center gap-3 p-2 hover:bg-accent rounded-md transition-colors cursor-pointer">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={thread.author.avatar} />
-          <AvatarFallback className="bg-secondary">
-            {thread.author.name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')}
-          </AvatarFallback>
-        </Avatar>
-        <p className="text-sm font-medium truncate">{thread.title}</p>
-      </div>
-    </Link>
+
+    <div className="w-full flex items-center gap-3 py-2 px-5 hover:bg-[#edf4f2]  transition-colors cursor-pointer">
+      <Avatar className="h-8 w-8">
+        <AvatarImage src={thread.author.avatar} />
+        <AvatarFallback className="bg-secondary">
+          {thread.author.name
+            .split(' ')
+            .map((n) => n[0])
+            .join('')}
+        </AvatarFallback>
+      </Avatar>
+      <p className="text-sm font-medium truncate">{thread.title}</p>
+    </div>
   );
 }
 

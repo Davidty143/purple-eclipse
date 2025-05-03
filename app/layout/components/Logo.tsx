@@ -3,13 +3,13 @@ import Image from 'next/image';
 
 export default function Logo() {
   return (
-    <Link href="/" className="hover:opacity-80 transition-opacity">
+    <Link href="/">
       <div className="h-[60px] w-auto flex items-center justify-start py-5">
         <Image
-          src="/images/VISCONN.png"
+          src="/visconn_transaprent3.png"
           alt="Visconn Logo"
-          width={150}
-          height={150}
+          width={200}
+          height={200}
           priority // Important for above-the-fold images
         />
       </div>

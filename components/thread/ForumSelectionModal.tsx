@@ -5,6 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { createClient } from '@/utils/supabase/client';
 import { Loader2, HelpCircle } from 'lucide-react';
 
+// Import all icons from lucide-react
+import * as Icons from 'lucide-react';
+
 interface Forum {
   forum_id: number;
   forum_name: string;
@@ -16,6 +19,7 @@ interface Subforum {
   subforum_id: number;
   subforum_name: string;
   subforum_description: string;
+  subforum_icon: string | null; // Ensure this is nullable
 }
 
 interface SubforumWithCounts extends Subforum {
@@ -46,27 +50,23 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
 
         if (forumsError) throw new Error(forumsError.message);
 
+        console.log('Fetched Forums:', forumsData); // Log fetched forums data
+
         // Fetch subforums with thread and post counts for each forum
         const forumsWithSubforums = await Promise.all(
           forumsData.map(async (forum) => {
-            // First get the subforums
-            const { data: subforumsData, error: subforumsError } = await supabase
-              .from('Subforum')
-              .select(
-                `
-                subforum_id,
-                subforum_name,
-                subforum_description
-              `
-              )
-              .eq('forum_id', forum.forum_id)
-              .eq('subforum_deleted', false);
+            // First get the subforums, including the icon
+            const { data: subforumsData, error: subforumsError } = await supabase.from('Subforum').select('subforum_id, subforum_name, subforum_description, subforum_icon').eq('forum_id', forum.forum_id).eq('subforum_deleted', false);
 
             if (subforumsError) throw new Error(subforumsError.message);
+
+            console.log(`Fetched Subforums for Forum ID ${forum.forum_id}:`, subforumsData); // Log fetched subforums data
 
             // Then get the counts for each subforum
             const subforumsWithCounts = await Promise.all(
               (subforumsData || []).map(async (subforum) => {
+                console.log(`Processing Subforum ${subforum.subforum_id} - Icon: ${subforum.subforum_icon}`); // Log subforum icon
+
                 // Get thread count
                 const { count: threadCount, error: threadError } = await supabase.from('Thread').select('*', { count: 'exact', head: true }).eq('subforum_id', subforum.subforum_id).eq('thread_deleted', false);
 
@@ -112,11 +112,11 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-[350px] sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto p-4 sm:p-6 md:p-8 overflow-y-auto rounded-lg">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Select a Forum</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-[#267858] text-center sm:text-left">Select a Subforum to Post</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
+        <div className="py-2">
           {loading ? (
             <div className="flex justify-center items-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
@@ -126,26 +126,35 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
           ) : (
             <div className="space-y-6">
               {forums.map((forum) => (
-                <div key={forum.forum_id} className="border rounded-lg overflow-hidden">
-                  <div className="bg-gray-100 p-4 border-b">
-                    <div className="flex items-center gap-3">
-                      <HelpCircle className="h-6 w-6 text-gray-600" />
-                      <h3 className="text-xl font-semibold text-gray-900">{forum.forum_name}</h3>
+                <div key={forum.forum_id} className="border border-gray-300 rounded-lg overflow-hidden">
+                  <div className="bg-[#edf4f2] p-4 border-b border-gray-300">
+                    <div className="flex items-center gap-2 sm:gap-6">
+                      <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+                        {forum.forum_name}
+                        <span className="ml-2 text-xs text-white bg-[#267858] rounded-full px-2 py-1">Forum</span>
+                      </h3>
                     </div>
-                    {forum.forum_description && <p className="text-sm text-gray-600 mt-1 ml-9">{forum.forum_description}</p>}
+                    {forum.forum_description && <p className="text-sm text-gray-600 mt-1">{forum.forum_description}</p>}
                   </div>
                   <div className="divide-y">
-                    {forum.subforums.map((subforum) => (
-                      <button key={subforum.subforum_id} onClick={() => handleSubforumSelect(subforum)} className="w-full text-left p-4 hover:bg-gray-50 transition-colors flex items-center justify-between group">
-                        <div>
-                          <h4 className="font-medium text-gray-900 group-hover:text-blue-600">{subforum.subforum_name}</h4>
-                          {subforum.subforum_description && <p className="text-sm text-gray-500 mt-0.5">{subforum.subforum_description}</p>}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          <span className="mr-4">Threads: {subforum.thread_count}</span>
-                        </div>
-                      </button>
-                    ))}
+                    {forum.subforums.map((subforum) => {
+                      const LucideIcon = (Icons[subforum.subforum_icon as keyof typeof Icons] as React.ComponentType<React.SVGProps<SVGSVGElement>>) || HelpCircle;
+
+                      return (
+                        <button key={subforum.subforum_id} onClick={() => handleSubforumSelect(subforum)} className="w-full text-left p-4 px-5 hover:bg-[#edf4f2] transition-colors flex items-start justify-between group">
+                          <div className="flex justify-start items-start gap-3">
+                            <LucideIcon className="h-6 w-6 text-gray-600 group-hover:text-[#267858]" />
+                            <div className="flex flex-col">
+                              <h4 className="font-medium text-gray-900 group-hover:text-[#267858]">{subforum.subforum_name}</h4>
+                              {subforum.subforum_description && <p className="text-sm text-gray-500 mt-1">{subforum.subforum_description}</p>}
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            <span className="mr-4">Threads: {subforum.thread_count}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

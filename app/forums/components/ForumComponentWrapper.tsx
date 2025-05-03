@@ -79,14 +79,20 @@ export function ForumComponentWrapper() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between border-t-2 pt-4 mt-2">
+      {/* Main content header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2">
         <h2 className="text-lg font-semibold">Forums List</h2>
         <CreateForumDialog onSuccess={handleAddSuccess} />
       </div>
-
       {forums.map((forum) => (
         <div key={forum.id} className="space-y-4">
+          {/* Rounded line above each forum */}
+          <div className="h-1 bg-[#267858] rounded-full w-full mb-6" />
+
+          {/* Forum Title */}
           <ForumTitle title={forum.name} forumId={forum.id} description={forum.description} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} onEditSuccess={handleEditSuccess} />
+
+          {/* Subforum grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {forum.subforums.map((subforum) => (
               <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} icon={subforum.icon} />

@@ -55,7 +55,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Write your content her
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 hover:text-blue-800 underline',
+          class: 'text-[#267858] hover:text-[#267858] underline',
           rel: 'noopener noreferrer',
           target: '_blank'
         },
@@ -164,7 +164,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Write your content her
         editor.chain().focus().extendMarkRange('link').setLink({ href: formattedUrl }).run();
       } else {
         // Insert new text with link
-        editor.chain().focus().insertContent(`<a href="${formattedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">${text}</a>`).run();
+        editor.chain().focus().insertContent(`<a href="${formattedUrl}" target="_blank" rel="noopener noreferrer" class="text-[#267858] hover:text-[#267858] underline">${text}</a>`).run();
       }
     },
     [editor, hasTextSelection]
@@ -227,7 +227,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Write your content her
       {error && <div className="bg-red-50 text-red-600 px-4 py-2 text-sm">{error}</div>}
 
       <div className="flex-1 overflow-y-auto">
-        <EditorContent editor={editor} className={cn('w-full p-4', 'prose-headings:font-semibold prose-headings:tracking-tight', 'prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline', 'prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:bg-gray-50 prose-blockquote:py-2 prose-blockquote:rounded-r', 'prose-img:rounded-lg prose-img:shadow-md prose-img:max-w-[80%] prose-img:mx-auto prose-img:my-4 prose-img:block', 'prose-ul:list-disc prose-ul:pl-5', 'prose-ol:list-decimal prose-ol:pl-5', 'min-h-[200px] max-h-[600px] overflow-y-auto')} />
+        <EditorContent editor={editor} className={cn('w-full p-4', 'prose-headings:font-semibold prose-headings:tracking-tight', 'prose-a:text-[#267858] prose-a:no-underline hover:prose-a:underline', 'prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:bg-gray-50 prose-blockquote:py-2 prose-blockquote:rounded-r', 'prose-img:rounded-lg prose-img:shadow-md prose-img:max-w-[80%] prose-img:mx-auto prose-img:my-4 prose-img:block', 'prose-ul:list-disc prose-ul:pl-5', 'prose-ol:list-decimal prose-ol:pl-5', 'min-h-[200px] max-h-[600px] overflow-y-auto')} />
       </div>
 
       <LinkModal isOpen={isLinkModalOpen} onClose={() => setIsLinkModalOpen(false)} onSubmit={handleLinkSubmit} initialText={initialLinkText} initialUrl={initialLinkUrl} hasTextSelection={hasTextSelection} />
