@@ -136,7 +136,7 @@ const PostThread = () => {
           {
             thread_title: formData.title,
             thread_content: formData.content,
-            thread_category: formData.category,
+            thread_category: formData.category, // Add this line
             subforum_id: selectedSubforumId,
             thread_deleted: false,
             thread_created: new Date().toISOString(),
