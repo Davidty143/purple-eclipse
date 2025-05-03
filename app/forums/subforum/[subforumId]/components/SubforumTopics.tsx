@@ -1,4 +1,3 @@
-// app/forums/subforum/[subforumId]/components/SubforumTopics.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import { ThreadRow } from './SubforumThreadRow';
@@ -10,13 +9,14 @@ interface SubforumTopicsProps {
   subforumId: number;
 }
 
+// Update to reflect correct structure
 interface DatabaseThread {
   thread_id: number;
   thread_title: string;
   thread_created: string;
   thread_content: string;
   thread_category?: string;
-  comment_count: number;
+  comment_count: { count: number }; // <-- Note the shape here
   author: {
     account_username: string | null;
     account_email: string | null;
@@ -68,7 +68,7 @@ export function SubforumTopics({ subforumId }: SubforumTopicsProps) {
             },
             tag: thread.thread_category || 'Discussion',
             createdAt: new Date(thread.thread_created),
-            replies: thread.comment_count || 0,
+            replies: thread.comment_count?.count || 0, // ✅ FIXED LINE
             views: 0
           }));
           setThreads(formattedThreads);

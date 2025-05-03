@@ -1,9 +1,11 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
-import { Edit } from 'lucide-react';
 import { EditSubforumDialog, SubforumData } from './EditSubforumDialog';
 import { useRouter } from 'next/navigation';
 import * as LucideIcons from 'lucide-react';
-import { LucideProps } from 'lucide-react'; // <-- Import LucideProps
+import { LucideProps } from 'lucide-react';
+import { FiPlus } from 'react-icons/fi';
 
 interface SubforumHeaderProps {
   title: string;
@@ -17,7 +19,7 @@ const SubforumHeader = ({ title, description, icon, subforumId, onEditSuccess }:
   const router = useRouter();
 
   const handlePostThread = () => {
-    router.push(`/forums/subforum/${subforumId}/create-thread`);
+    router.push(`/post-thread`);
   };
 
   const handleEditSuccess = (updatedSubforum: SubforumData) => {
@@ -27,29 +29,25 @@ const SubforumHeader = ({ title, description, icon, subforumId, onEditSuccess }:
   const IconComponent = icon && (LucideIcons[icon as keyof typeof LucideIcons] as React.ComponentType<LucideProps> | undefined);
 
   return (
-    <div className="relative border border-gray-300 rounded-lg px-5 py-4 bg-white">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center space-x-2">
-          {IconComponent && <IconComponent className="w-6 h-6 text-[#267859]" strokeWidth={2} />}
-          <div className="flex flex-col">
-            <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
-          </div>
+    <div className="bg-gradient-to-r from-[#267858] to-[#3a9f7e] text-white p-5 rounded-md mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          {IconComponent && <IconComponent className="w-6 h-6 text-white" strokeWidth={2} />}
+          <h1 className="text-lg font-semibold">{title}</h1>
 
-          <div className="ml-4">
-            <EditSubforumDialog subforumId={subforumId} currentTitle={title} currentDescription={description} currentIcon={icon} onSuccess={onEditSuccess || handleEditSuccess} />
-          </div>
+          <EditSubforumDialog subforumId={subforumId} currentTitle={title} currentDescription={description} currentIcon={icon} onSuccess={onEditSuccess || handleEditSuccess} />
         </div>
-      </div>
 
-      <p className="text-sm text-gray-600">{description}</p>
-
-      <div className="absolute top-2 right-2">
-        <Button variant="outline" className="px-4 py-2 text-sm font-medium border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors" onClick={handlePostThread}>
-          Post Thread
+        <Button onClick={handlePostThread} className="flex items-center justify-between gap-2 px-4 text-sm border border-white bg-white text-[#267858] hover:bg-gray-100 w-full sm:w-auto">
+          <span>Post Thread</span>
+          <FiPlus className="text-[#267858]" />
         </Button>
       </div>
+
+      <p className="mt-3 pl-3 text-sm text-white w-full sm:w-3/5">{description}</p>
     </div>
   );
 };
 
 export default SubforumHeader;
+//working
