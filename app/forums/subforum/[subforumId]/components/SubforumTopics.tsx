@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ThreadRow } from './SubforumThreadRow';
 import { createBrowserClient } from '@supabase/ssr';
-import { ShadPaginationNav } from '@/components/ShadPaginationNav'; // adjust path if needed
+import { ShadPaginationNav } from '@/components/ShadPaginationNav';
 
 interface SubforumTopicsProps {
   subforumId: number;
@@ -18,7 +18,7 @@ interface Thread {
   title: string;
   author: {
     name: string;
-    avatar: string;
+    avatar?: string;
   };
   tag: string;
   createdAt: Date;
@@ -36,6 +36,7 @@ interface DatabaseThread {
   author: {
     account_username: string | null;
     account_email: string | null;
+    account_avatar_url?: string | null;
   };
 }
 
@@ -64,7 +65,7 @@ export function SubforumTopics({ subforumId, page, limit, onPageChange }: Subfor
             thread_created,
             thread_content,
             thread_category,
-            author:author_id(account_username, account_email),
+            author:author_id(account_username, account_email, account_avatar_url),
             comment_count:Comment(count)
           `,
             { count: 'exact' }
@@ -83,7 +84,7 @@ export function SubforumTopics({ subforumId, page, limit, onPageChange }: Subfor
             title: thread.thread_title,
             author: {
               name: thread.author?.account_username || 'Anonymous',
-              avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(thread.author?.account_username || 'A')}&background=random`
+              avatar: thread.author?.account_avatar_url?.trim() || undefined
             },
             tag: thread.thread_category || 'Discussion',
             createdAt: new Date(thread.thread_created),
