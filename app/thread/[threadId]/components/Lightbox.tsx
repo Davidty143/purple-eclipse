@@ -1,6 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
+import Image from 'next/image'; // Import Image component from Next.js
 
 interface LightboxProps {
   lightboxImage: string | null;
@@ -16,7 +17,16 @@ export default function Lightbox({ lightboxImage, closeLightbox }: LightboxProps
         <X className="h-6 w-6" />
       </button>
       <div className="relative max-w-full max-h-[90vh] w-auto h-auto">
-        <img src={lightboxImage} alt="Enlarged thread image" className="max-w-full max-h-[90vh] object-contain rounded shadow-lg" onClick={(e) => e.stopPropagation()} />
+        {/* Replace <img> with <Image> */}
+        <Image
+          src={lightboxImage}
+          alt="Enlarged thread image"
+          className="max-w-full max-h-[90vh] object-contain rounded shadow-lg"
+          layout="intrinsic" // Preserves aspect ratio
+          onClick={(e) => e.stopPropagation()}
+          width={800} // You can adjust the width and height as needed
+          height={600} // Adjust the height accordingly
+        />
       </div>
     </div>
   );

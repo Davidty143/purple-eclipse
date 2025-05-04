@@ -20,8 +20,9 @@ interface MessageListProps {
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
+const supabase = createClient(); // ✅ moved outside component
+
 export function MessageList({ messages, currentUserId, otherUserId, setMessages }: MessageListProps) {
-  const supabase = createClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,13 +53,11 @@ export function MessageList({ messages, currentUserId, otherUserId, setMessages 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentUserId, otherUserId]);
+  }, [currentUserId, otherUserId, setMessages]); // ✅ added setMessages
 
   useEffect(() => {
-    // Auto-scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 
-    // Mark messages as read when the conversation is opened
     const markMessagesAsRead = async () => {
       const unreadMessages = messages.filter((msg) => msg.sender_id === otherUserId && !msg.is_read);
 
@@ -78,7 +77,7 @@ export function MessageList({ messages, currentUserId, otherUserId, setMessages 
     };
 
     markMessagesAsRead();
-  }, [otherUserId, messages]);
+  }, [messages, otherUserId, setMessages]); // ✅ added setMessages
 
   return (
     <div className="flex flex-col gap-3 p-4">

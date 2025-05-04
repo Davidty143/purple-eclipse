@@ -198,8 +198,8 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
   if (!threads || threads.length === 0) {
     return (
       <div className="py-10 text-center">
-        <p className="text-gray-600">No results found for "{query}"</p>
-        <p className="mt-2 text-sm">Try different keywords or check your spelling.</p>
+        <p className="text-gray-600"> {`No results found for "${query}"`}</p>
+        <p className="mt-2 text-sm">{`Try different keywords or check your spelling.`}</p>
       </div>
     );
   }

@@ -21,19 +21,14 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
 
-  // Mark messages as read when conversation is selected
   useEffect(() => {
     if (!selectedReceiverId) return;
 
     const markMessagesAsRead = async () => {
-      try {
-        const { error } = await supabase.from('direct_messages').update({ is_read: true }).eq('receiver_id', userId).eq('sender_id', selectedReceiverId).eq('is_read', false);
+      const { error } = await supabase.from('direct_messages').update({ is_read: true }).eq('receiver_id', userId).eq('sender_id', selectedReceiverId).eq('is_read', false);
 
-        if (!error) {
-          setPartners((prev) => prev.map((p) => (p.id === selectedReceiverId ? { ...p, unread_count: 0 } : p)));
-        }
-      } catch (error) {
-        console.error('Error marking messages as read:', error);
+      if (!error) {
+        setPartners((prev) => prev.map((p) => (p.id === selectedReceiverId ? { ...p, unread_count: 0 } : p)));
       }
     };
 
@@ -65,34 +60,28 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
 
             const partner = partnerMap.get(partnerId)!;
 
-            // Only count as unread if:
-            // 1. It's an incoming message
-            // 2. It's not read
-            // 3. It's not from the currently viewed conversation
             if (isIncoming && !conv.is_read && partnerId !== selectedReceiverId) {
               partner.unread_count = (partner.unread_count || 0) + 1;
             }
 
-            // Update last message if newer
             if (new Date(conv.created_at) > new Date(partner.last_message_at || 0)) {
               partner.last_message = isIncoming ? conv.content : `You: ${conv.content}`;
               partner.last_message_at = conv.created_at;
             }
           });
 
-          // Get usernames for all partners
           const { data: users } = await supabase.from('Account').select('account_id, account_username').in('account_id', Array.from(partnerMap.keys()));
 
           if (users) {
-            const enrichedPartners = Array.from(partnerMap.values()).map((partner) => ({
-              ...partner,
-              username: users.find((u) => u.account_id === partner.id)?.account_username || 'Unknown'
+            const enriched = Array.from(partnerMap.values()).map((p) => ({
+              ...p,
+              username: users.find((u) => u.account_id === p.id)?.account_username ?? 'Unknown'
             }));
-            setPartners(enrichedPartners);
+            setPartners(enriched);
           }
         }
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
+      } catch (err) {
+        console.error('Error loading conversations:', err);
       } finally {
         setLoading(false);
       }
@@ -105,53 +94,53 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
       const partnerId = newMessage.sender_id === userId ? newMessage.receiver_id : newMessage.sender_id;
       const isIncoming = newMessage.sender_id !== userId;
 
-      // If viewing this conversation and it's incoming, mark as read
       if (isIncoming && partnerId === selectedReceiverId) {
         await supabase.from('direct_messages').update({ is_read: true }).eq('id', newMessage.id);
       }
 
       setPartners((prev) => {
-        const existingIndex = prev.findIndex((p) => p.id === partnerId);
-        const updatedPartners = [...prev];
+        const index = prev.findIndex((p) => p.id === partnerId);
+        const updated = [...prev];
 
-        if (existingIndex >= 0) {
-          // Update existing conversation
-          updatedPartners[existingIndex] = {
-            ...updatedPartners[existingIndex],
+        if (index >= 0) {
+          const old = updated[index];
+          updated[index] = {
+            ...old,
             last_message: isIncoming ? newMessage.content : `You: ${newMessage.content}`,
             last_message_at: newMessage.created_at,
-            unread_count: isIncoming && !newMessage.is_read && partnerId !== selectedReceiverId ? (updatedPartners[existingIndex].unread_count || 0) + 1 : updatedPartners[existingIndex].unread_count
+            unread_count: isIncoming && !newMessage.is_read && partnerId !== selectedReceiverId ? (old.unread_count || 0) + 1 : old.unread_count
           };
-          // Move to top
-          const [updated] = updatedPartners.splice(existingIndex, 1);
-          return [updated, ...updatedPartners];
+
+          const [moved] = updated.splice(index, 1);
+          return [moved, ...updated];
         }
 
-        // For new conversations
-        return [
-          {
-            id: partnerId,
-            username: 'Loading...',
-            last_message: isIncoming ? newMessage.content : `You: ${newMessage.content}`,
-            unread_count: isIncoming && !newMessage.is_read && partnerId !== selectedReceiverId ? 1 : 0,
-            last_message_at: newMessage.created_at
-          },
-          ...prev
-        ];
+        // New conversation
+        const newPartner: ConversationPartner = {
+          id: partnerId,
+          username: 'Loading...',
+          last_message: isIncoming ? newMessage.content : `You: ${newMessage.content}`,
+          unread_count: isIncoming && !newMessage.is_read && partnerId !== selectedReceiverId ? 1 : 0,
+          last_message_at: newMessage.created_at
+        };
+
+        // Fetch username asynchronously
+        supabase
+          .from('Account')
+          .select('account_id, account_username')
+          .eq('account_id', partnerId)
+          .single()
+          .then(({ data }) => {
+            if (data) {
+              setPartners((prev2) => prev2.map((p) => (p.id === partnerId && p.username === 'Loading...' ? { ...p, username: data.account_username } : p)));
+            }
+          });
+
+        return [newPartner, ...prev];
       });
-
-      // Fetch username if new conversation
-      if (!partners.some((p) => p.id === partnerId)) {
-        const { data: user } = await supabase.from('Account').select('account_id, account_username').eq('account_id', partnerId).single();
-
-        if (user) {
-          setPartners((prev) => prev.map((p) => (p.id === partnerId && p.username === 'Loading...' ? { ...p, username: user.account_username } : p)));
-        }
-      }
     };
 
-    // Subscribe to both incoming and outgoing messages
-    const incomingChannel = supabase
+    const incoming = supabase
       .channel('incoming-messages')
       .on(
         'postgres_changes',
@@ -165,7 +154,7 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
       )
       .subscribe();
 
-    const outgoingChannel = supabase
+    const outgoing = supabase
       .channel('outgoing-messages')
       .on(
         'postgres_changes',
@@ -180,10 +169,10 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
       .subscribe();
 
     return () => {
-      supabase.removeChannel(incomingChannel);
-      supabase.removeChannel(outgoingChannel);
+      supabase.removeChannel(incoming);
+      supabase.removeChannel(outgoing);
     };
-  }, [userId, selectedReceiverId, supabase]);
+  }, [userId, selectedReceiverId, supabase]); // ✅ fixed dependencies
 
   if (loading) {
     return (
@@ -204,7 +193,7 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
           </div>
         ) : (
           partners.map((partner) => (
-            <Link key={partner.id} href={`/messages/${partner.id}`} onClick={onSelect} className={cn('flex items-center p-3 rounded-lg transition-colors', 'hover:bg-muted/50', 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', { 'bg-muted': partner.id === selectedReceiverId })}>
+            <Link key={partner.id} href={`/messages/${partner.id}`} onClick={onSelect} className={cn('flex items-center p-3 rounded-lg transition-colors', 'hover:bg-muted/50', { 'bg-muted': partner.id === selectedReceiverId })}>
               <div className="relative">
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>
                 {partner.unread_count ? <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">{partner.unread_count}</span> : null}

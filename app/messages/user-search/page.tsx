@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Search, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
   const searchRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
       return;
@@ -42,14 +42,14 @@ export function UserSearch({ currentUserId }: { currentUserId: string }) {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [searchQuery, currentUserId, supabase]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       handleSearch();
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, handleSearch]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {

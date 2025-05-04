@@ -24,7 +24,6 @@ interface Message {
 
 export default function MessagePage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
-  const supabase = createClient();
   const searchParams = useSearchParams();
   const username = searchParams.get('username') || 'Messages';
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,6 +35,9 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
   const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
+    // Initialize supabase inside the effect
+    const supabase = createClient();
+
     const fetchData = async () => {
       const {
         data: { user }
@@ -55,7 +57,7 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId]); // No need to include supabase here
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
