@@ -1,59 +1,79 @@
-// app/actions/messages.ts
-'use server';
+// app/api/messages/route.ts
+import { sendMessage } from '@/lib/message-actions'; // Import sendMessage function
+import { NextResponse } from 'next/server';
 
-import { createClientForServer } from '@/utils/supabase/server';
-import { revalidatePath } from 'next/cache';
+export async function POST(request: Request) {
+  try {
+    const { receiverId, content } = await request.json();
 
-export async function sendMessage(receiverId: string, content: string) {
-  const supabase = await createClientForServer();
+    if (!receiverId || !content) {
+      return NextResponse.json({ error: 'ReceiverId and content are required' }, { status: 400 });
+    }
 
-  // Get current user
-  const {
-    data: { user },
-    error: authError
-  } = await supabase.auth.getUser();
-  if (authError || !user) {
-    throw new Error('Not authenticated');
+    const message = await sendMessage(receiverId, content); // Call the sendMessage function from your actions
+    return NextResponse.json(message, { status: 200 });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    return NextResponse.json;
   }
-
-  // Insert message
-  const { data, error } = await supabase
-    .from('direct_messages')
-    .insert({
-      content,
-      sender_id: user.id,
-      receiver_id: receiverId
-    })
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  revalidatePath(`/messages/${receiverId}`);
-  return data;
 }
 
-export async function getConversation(otherUserId: string) {
-  const supabase = await createClientForServer();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+// // app/actions/messages.ts
+// 'use server';
 
-  if (!user) {
-    throw new Error('Not authenticated');
-  }
+// import { createClientForServer } from '@/utils/supabase/server';
+// import { revalidatePath } from 'next/cache';
 
-  const { data, error } = await supabase
-    .from('direct_messages')
-    .select('*')
-    .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),` + `and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
-    .order('created_at', { ascending: true });
+// export async function sendMessage(receiverId: string, content: string) {
+//   const supabase = await createClientForServer();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+//   // Get current user
+//   const {
+//     data: { user },
+//     error: authError
+//   } = await supabase.auth.getUser();
+//   if (authError || !user) {
+//     throw new Error('Not authenticated');
+//   }
 
-  return data || [];
-}
+//   // Insert message
+//   const { data, error } = await supabase
+//     .from('direct_messages')
+//     .insert({
+//       content,
+//       sender_id: user.id,
+//       receiver_id: receiverId
+//     })
+//     .select()
+//     .single();
+
+//   if (error) {
+//     throw new Error(error.message);
+//   }
+
+//   revalidatePath(`/messages/${receiverId}`);
+//   return data;
+// }
+
+// export async function getConversation(otherUserId: string) {
+//   const supabase = await createClientForServer();
+//   const {
+//     data: { user }
+//   } = await supabase.auth.getUser();
+
+//   if (!user) {
+//     throw new Error('Not authenticated');
+//   }
+
+//   const { data, error } = await supabase
+//     .from('direct_messages')
+//     .select('*')
+//     .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),` + `and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
+//     .order('created_at', { ascending: true });
+
+//   if (error) {
+//     throw new Error(error.message);
+//   }
+
+//   return data || [];
+// }
