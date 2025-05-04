@@ -1,5 +1,4 @@
 //layout.tsx
-import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -9,8 +8,6 @@ import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
 import '@radix-ui/themes/styles.css';
 import Logo from './layout/components/Logo';
-import { MessageCircle } from 'lucide-react';
-import Link from 'next/link';
 import { Toaster } from 'sonner';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
