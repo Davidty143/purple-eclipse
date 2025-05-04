@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { UserSearch } from './user-search/page';
+import UserSearch from './user-search/page';
 import { MessageCircle, User } from 'lucide-react';
 import { createClientForServer } from '@/app/utils/supabase/server';
 
