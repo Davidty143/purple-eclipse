@@ -115,6 +115,18 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
           return [updated, ...updatedPartners];
         }
 
+        // Username fetch for new partner
+        supabase
+          .from('Account')
+          .select('account_id, account_username')
+          .eq('account_id', partnerId)
+          .single()
+          .then(({ data: user }) => {
+            if (user) {
+              setPartners((latest) => latest.map((p) => (p.id === partnerId && p.username === 'Loading...' ? { ...p, username: user.account_username } : p)));
+            }
+          });
+
         return [
           {
             id: partnerId,
@@ -126,14 +138,6 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
           ...prev
         ];
       });
-
-      if (!partners.some((p) => p.id === partnerId)) {
-        const { data: user } = await supabase.from('Account').select('account_id, account_username').eq('account_id', partnerId).single();
-
-        if (user) {
-          setPartners((prev) => prev.map((p) => (p.id === partnerId && p.username === 'Loading...' ? { ...p, username: user.account_username } : p)));
-        }
-      }
     };
 
     const incomingChannel = supabase
@@ -169,14 +173,6 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
       supabase.removeChannel(outgoingChannel);
     };
   }, [userId, selectedReceiverId, supabase]);
-
-  if (loading) {
-    return (
-      <div className="p-4 space-y-4">
-        <p className="text-center text-muted-foreground">Loading conversations...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="p-2">
