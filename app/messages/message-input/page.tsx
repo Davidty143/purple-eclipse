@@ -31,7 +31,7 @@ interface MessageInputProps {
   >;
 }
 
-export function MessageInput({ receiverId, currentUserId, setMessages }: MessageInputProps) {
+export default function MessageInput({ receiverId, currentUserId, setMessages }: MessageInputProps) {
   const [content, setContent] = useState('');
   const [state, action, isPending] = useActionState<MessageState, FormData>(sendMessage, { error: null, success: null });
   const [isPendingTransition, startTransition] = useTransition();

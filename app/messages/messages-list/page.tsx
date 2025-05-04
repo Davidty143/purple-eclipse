@@ -1,7 +1,7 @@
 'use client';
 import { createClient } from '@/app/utils/supabase/client';
 import { useEffect, useRef } from 'react';
-import { MessageBubble } from '../message-bubble/page';
+import MessageBubble from '../message-bubble/page';
 
 interface Message {
   id: string;
@@ -21,7 +21,7 @@ interface MessageListProps {
 
 const supabase = createClient(); // ✅ moved outside component
 
-export function MessageList({ messages, currentUserId, otherUserId, setMessages }: MessageListProps) {
+export default function MessageList({ messages, currentUserId, otherUserId, setMessages }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -15,7 +15,7 @@ interface User {
   account_email: string;
 }
 
-export function UserSearch({ currentUserId }: { currentUserId: string }) {
+export default function UserSearch({ currentUserId }: { currentUserId: string }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
