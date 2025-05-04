@@ -2,14 +2,13 @@
 
 import { useEffect, useState, use, useRef } from 'react';
 import { useSearchParams, redirect } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-import ConversationsList from '../conversations-list/page';
-import { UserSearch } from '../user-search/page';
-import { MessageList } from '../messages-list/page';
-import { MessageInput } from '../message-input/page';
-import { cn } from '@/lib/utils';
+import { createClient } from '@/app/utils/supabase/client';
+import ConversationsList from '../conversations-list/components/ConversationList';
+import UserSearch from '@/app/messages/user-search/components/UserSearch';
+import MessageInput from '@/app/messages/message-input/components/MessageInput';
+import MessageList from '@/app/messages/messages-list/components/MessageListComponent';
 import { MessageCircle, ListPlus, X } from 'lucide-react';
-import MessageHeader from '../message-header/page';
+import MessageHeader from '@/app/messages/message-header/components/MessageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -24,7 +23,6 @@ interface Message {
 
 export default function MessagePage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
-  const supabase = createClient();
   const searchParams = useSearchParams();
   const username = searchParams.get('username') || 'Messages';
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,6 +34,9 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
   const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
+    // Initialize supabase inside the effect
+    const supabase = createClient();
+
     const fetchData = async () => {
       const {
         data: { user }
@@ -55,7 +56,7 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId]); // No need to include supabase here
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

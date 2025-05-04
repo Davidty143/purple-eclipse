@@ -1,6 +1,4 @@
 import React from 'react';
-import ThreadRow from '@/components/ThreadRow';
-
 const ThreadBlock = () => {
   return (
     <div className="border-2 rounded-md">
@@ -13,11 +11,6 @@ const ThreadBlock = () => {
 
       {/* Content Section */}
       <div className="thread-content text-gray-600">
-        <ThreadRow />
-        <ThreadRow />
-        <ThreadRow />
-        <ThreadRow />
-        <ThreadRow />
         <button className="hover:text-black underline text-sm text-start px-6 py-3.5"> See More...</button>
       </div>
     </div>

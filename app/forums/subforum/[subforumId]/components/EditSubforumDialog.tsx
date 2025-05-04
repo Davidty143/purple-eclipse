@@ -98,7 +98,7 @@ export function EditSubforumDialog({ subforumId, currentTitle, currentDescriptio
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700 hover:bg-gray-200" aria-label="Edit subforum">
+        <Button variant="ghost" size="icon" className="text-gray-white hover:font-semibold hover:bg-white hover:text-[#267858]" aria-label="Edit subforum">
           <Edit className="h-4 w-4" />
         </Button>
       </DialogTrigger>

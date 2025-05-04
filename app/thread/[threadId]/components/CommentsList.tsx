@@ -112,7 +112,7 @@ function CommentCard({ comment, user, isSubmitting, replyingTo, setReplyingTo, r
       });
       setShowNestedReplies(initialState);
     }
-  }, [comment.comment_id]); // Only run when the comment id changes, not on every render
+  }, [uniqueReplies]); // Include uniqueReplies as a dependency
 
   const toggleNestedReplies = (replyId: number) => {
     setShowNestedReplies((prev) => ({

@@ -1,15 +1,16 @@
-//utils/supabase/server.ts
-
+// utils/supabase/server.ts
 import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 
 export async function createClientForServer() {
-  const cookieStore = await cookies(); // Await the cookies() Promise
+  const { cookies } = await import('next/headers');
+
+  // Await the cookies promise
+  const cookieStore = await cookies();
 
   return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
     cookies: {
       getAll() {
-        return cookieStore.getAll(); // Now it's safe to call getAll() on the resolved cookieStore
+        return cookieStore.getAll(); // Now it's safe to call getAll() after awaiting cookies
       },
       setAll(cookiesToSet) {
         try {

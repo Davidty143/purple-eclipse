@@ -9,6 +9,13 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as LucideIcons from 'lucide-react';
+import { isValidElementType } from 'react-is';
+import { SVGProps } from 'react'; // Import SVGProps from React
+
+// Helper function to check if an icon is a valid Lucide component
+function isLucideIconComponent(value: any): value is React.ComponentType<SVGProps<SVGSVGElement>> {
+  return typeof value === 'function' || (typeof value === 'object' && isValidElementType(value));
+}
 
 interface Forum {
   id: number;
@@ -138,7 +145,7 @@ export default function CreateSubforumForm({ parentId }: CreateSubforumFormProps
                   {formData.icon &&
                     (() => {
                       const Icon = LucideIcons[formData.icon as keyof typeof LucideIcons];
-                      return <Icon className="w-4 h-4" />;
+                      return isLucideIconComponent(Icon) ? <Icon className="w-4 h-4" /> : null;
                     })()}
                   <SelectValue placeholder="Select an icon" />
                 </div>
@@ -146,6 +153,8 @@ export default function CreateSubforumForm({ parentId }: CreateSubforumFormProps
               <SelectContent className="max-h-64 overflow-y-auto z-50">
                 {iconOptions.map((iconName) => {
                   const IconComponent = LucideIcons[iconName as keyof typeof LucideIcons];
+                  if (!isLucideIconComponent(IconComponent)) return null;
+
                   return (
                     <SelectItem key={iconName} value={iconName}>
                       <div className="flex items-center gap-2">

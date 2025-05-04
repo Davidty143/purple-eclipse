@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/app/utils/supabase/client';
 import ForumItem from './ForumItem';
 import { Forum, ForumSelectionModalProps } from './types';
 

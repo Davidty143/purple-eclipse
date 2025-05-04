@@ -1,7 +1,7 @@
-import { createClientForServer } from '../utils/supabase/server';
 import { SubforumRepository } from '../repositories/subforum-repository';
 import { ThreadRepository } from '../repositories/thread-repository';
 import { SubforumData } from '../types/forum';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 export async function getPopularSubforums(): Promise<SubforumData[]> {
   const supabase = await createClientForServer();

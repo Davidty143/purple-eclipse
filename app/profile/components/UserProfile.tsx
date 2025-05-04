@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/app/utils/supabase/client';
 import { Pencil, Trash2, Loader2, Upload, X } from 'lucide-react';
 import Link from 'next/link';
 import { format } from 'date-fns';
@@ -76,7 +76,7 @@ export default function UserProfile({ user }: UserProfileProps) {
     };
 
     fetchData();
-  }, [user.id]);
+  }, [user.id, user.email]); // Include `user.email` in the dependency array
 
   const handleDeleteThread = async (threadId: number) => {
     try {
@@ -252,7 +252,7 @@ export default function UserProfile({ user }: UserProfileProps) {
 
       <Card className="overflow-hidden border border-gray-300">
         <CardHeader className="bg-slate-50 border-b border-gray-300 rounded-t-md">
-          <CardDescription className="text-lg text-gray-800 font-semibold">Manage threads you've created</CardDescription>
+          <CardDescription className="text-lg text-gray-800 font-semibold">{`Manage threads you've created`}</CardDescription>
         </CardHeader>
         <CardContent className="p-6">
           {threadLoading ? (
@@ -292,7 +292,7 @@ export default function UserProfile({ user }: UserProfileProps) {
             </div>
           ) : (
             <div className="py-12 text-center rounded-lg">
-              <p className="text-gray-500 text-lg">You haven't created any threads yet.</p>
+              <p className="text-gray-500 text-lg">{`You haven't created any threads yet.`}</p>
               <Button className="mt-6 px-6 py-2 text-base" size="lg" asChild>
                 <Link href="/post-thread">Create Your First Thread</Link>
               </Button>

@@ -1,10 +1,10 @@
+import { createClientForServer } from '@/app/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClientForServer } from '@/utils/supabase/server';
 
 // GET: Fetch subforum by ID
-export async function GET(request: NextRequest, { params }: { params: { subforumId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ subforumId: string }> }) {
   try {
-    const { subforumId } = await params;
+    const { subforumId } = await params; // resolve params here
 
     if (!subforumId || isNaN(Number(subforumId))) {
       return NextResponse.json({ error: 'Invalid subforum ID format' }, { status: 400 });
@@ -50,9 +50,9 @@ export async function GET(request: NextRequest, { params }: { params: { subforum
 }
 
 // ✅ PUT: Update subforum
-export async function PUT(request: NextRequest, { params }: { params: { subforumId: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ subforumId: string }> }) {
   try {
-    const { subforumId } = await params;
+    const { subforumId } = await params; // resolve params here
     const subforumIdNumber = Number(subforumId);
 
     if (isNaN(subforumIdNumber)) {

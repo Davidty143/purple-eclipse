@@ -1,4 +1,4 @@
-import { createClientForServer } from '@/utils/supabase/server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 export async function createForum(input: { forum_name: string; forum_description?: string }) {
   const supabase = await createClientForServer();

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/app/utils/supabase/client';
 import { Loader2, HelpCircle } from 'lucide-react';
 
 // Import all icons from lucide-react
@@ -167,3 +167,5 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
 };
 
 export default ForumSelectionModal;
+
+//working

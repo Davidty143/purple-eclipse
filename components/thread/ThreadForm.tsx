@@ -41,12 +41,21 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm(formData, setErrors)) return;
+
+    console.log('Form submit initiated...');
+    console.log('Form data before validation:', formData);
+
+    if (!validateForm(formData, setErrors)) {
+      console.warn('Validation failed', errors);
+      return;
+    }
 
     if (!externalIsSubmitting) setInternalIsSubmitting(true);
 
     try {
+      console.log('Submitting thread with data:', { ...formData, images: selectedImages });
       await onSubmit({ ...formData, images: selectedImages });
+      console.log('Thread submitted successfully.');
     } catch (error) {
       console.error('Error posting thread:', error);
       setErrors({ submit: 'Failed to create thread. Please try again.' });
@@ -72,7 +81,7 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Category Field with Tag Icon inside the Select dropdown */}
+      {/* Category Field */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Category <span className="text-red-500">*</span>
@@ -81,32 +90,21 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
           <Select
             value={formData.category}
             onValueChange={(value) => {
+              console.log('Category changed to:', value);
               setFormData((prev) => ({ ...prev, category: value }));
               if (errors.category) setErrors((prev) => ({ ...prev, category: undefined }));
             }}>
             <SelectTrigger className="w-full h-12 px-4 border border-gray-300 rounded-md bg-white text-sm text-gray-700 focus:ring-2 focus:ring-[#267858] focus:outline-none flex items-center justify-start">
-              {/* Tag Icon inside the Select Trigger */}
               <Tag className="text-gray-400 w-5 h-5 mr-3" />
               <SelectValue placeholder="Select a category" className="text-left" />
-              {/* Chevron Icon on the rightmost */}
               <ChevronDown className="ml-auto text-white w-5 h-5" />
             </SelectTrigger>
             <SelectContent className="text-left px-3">
-              <SelectItem value="Help" className="text-left">
-                Help
-              </SelectItem>
-              <SelectItem value="Discussion" className="text-left">
-                Discussion
-              </SelectItem>
-              <SelectItem value="Question" className="text-left">
-                Question
-              </SelectItem>
-              <SelectItem value="Tutorial" className="text-left">
-                Tutorial
-              </SelectItem>
-              <SelectItem value="News" className="text-left">
-                News
-              </SelectItem>
+              <SelectItem value="Help">Help</SelectItem>
+              <SelectItem value="Discussion">Discussion</SelectItem>
+              <SelectItem value="Question">Question</SelectItem>
+              <SelectItem value="Tutorial">Tutorial</SelectItem>
+              <SelectItem value="News">News</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -125,7 +123,7 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
         {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
       </div>
 
-      {/* Content Field with RichTextEditor */}
+      {/* Content Field */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Content <span className="text-red-500">*</span>

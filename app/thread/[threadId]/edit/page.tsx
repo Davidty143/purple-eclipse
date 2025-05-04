@@ -1,15 +1,13 @@
 import { notFound, redirect } from 'next/navigation';
 import EditThreadForm from './components/EditThreadForm';
-import { createClientForServer } from '@/utils/supabase/server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 interface EditThreadPageProps {
-  params: {
-    threadId: string;
-  };
+  params: Promise<{ threadId: string }>; // Ensure params is a Promise
 }
 
 export default async function EditThreadPage({ params }: EditThreadPageProps) {
-  const { threadId } = params;
+  const { threadId } = await params; // Await the params to get the threadId
   const supabase = await createClientForServer();
 
   // Check authentication
@@ -24,13 +22,11 @@ export default async function EditThreadPage({ params }: EditThreadPageProps) {
   const { data: thread, error } = await supabase
     .from('Thread')
     .select(
-      `
-      *,
+      `*,
       subforum:subforum_id(
         subforum_name,
         subforum_id
-      )
-    `
+      )`
     )
     .eq('thread_id', threadId)
     .eq('thread_deleted', false)

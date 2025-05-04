@@ -1,10 +1,9 @@
 //lib/auth-actions.ts
 'use server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-
-import { createClientForServer } from '@/utils/supabase/server';
 
 export async function login(formData: FormData) {
   console.log('Starting login process...');
@@ -126,7 +125,9 @@ const sendResetPasswordEmail = async (formData: FormData) => {
     };
   }
 
-  const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`;
+  //const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`;
+
+  const redirectUrl = process.env.NODE_ENV === 'development' ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/update-password` : `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`;
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: redirectUrl

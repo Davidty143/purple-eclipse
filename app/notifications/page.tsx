@@ -17,10 +17,47 @@ export default function NotificationsPage() {
   const [markingAll, setMarkingAll] = useState(false);
   const [menuOpen, setMenuOpen] = useState<number | null>(null);
 
+  // Move the fetchNotifications function inside the useEffect
   useEffect(() => {
     if (!user) return;
+
+    const fetchNotifications = async () => {
+      if (!user?.id) return;
+
+      setLoading(true);
+      try {
+        const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+        const { data, error } = await supabase
+          .from('notifications')
+          .select(
+            `*,
+            sender:sender_id (
+              account_username,
+              account_avatar_url
+            ),
+            thread:thread_id (
+              thread_title
+            )`
+          )
+          .eq('recipient_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) {
+          console.error('Error fetching notifications:', error);
+        } else {
+          setNotifications(data as Notification[]);
+        }
+      } catch (err) {
+        console.error('Unexpected error in fetchNotifications:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchNotifications();
-  }, [user]);
+  }, [user]); // Only depend on user since fetchNotifications is now inside the effect
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -31,43 +68,6 @@ export default function NotificationsPage() {
     window.addEventListener('click', handleClickOutside);
     return () => window.removeEventListener('click', handleClickOutside);
   }, []);
-
-  const fetchNotifications = async () => {
-    if (!user?.id) return;
-
-    setLoading(true);
-    try {
-      const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-
-      const { data, error } = await supabase
-        .from('notifications')
-        .select(
-          `
-          *,
-          sender:sender_id (
-            account_username,
-            account_avatar_url
-          ),
-          thread:thread_id (
-            thread_title
-          )
-        `
-        )
-        .eq('recipient_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) {
-        console.error('Error fetching notifications:', error);
-      } else {
-        setNotifications(data as Notification[]);
-      }
-    } catch (err) {
-      console.error('Unexpected error in fetchNotifications:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleMarkAsRead = async (notificationId: number) => {
     if (!user?.id) return;
@@ -170,14 +170,14 @@ export default function NotificationsPage() {
         </div>
       ) : notifications.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-md">
-          <p className="text-gray-500">You don't have any notifications yet.</p>
+          <p className="text-gray-500">You don&apos;t have any notifications yet.</p>
         </div>
       ) : (
         <div className="space-y-2">
           {notifications.map((notification) => (
             <div key={notification.notification_id} className={`p-4 border rounded-md flex items-start ${!notification.is_read ? 'bg-blue-50' : ''}`}>
               {/* Avatar */}
-              <Avatar className="h-12 w-12 mr-4 flex-shrink-0">{notification.sender.account_avatar_url ? <AvatarImage src={notification.sender.account_avatar_url} alt={`${notification.sender.account_username}'s avatar`} className="object-cover" /> : <AvatarFallback className="bg-gray-200 text-gray-700 text-lg">{notification.sender.account_username?.charAt(0).toUpperCase() || '?'}</AvatarFallback>}</Avatar>
+              <Avatar className="h-12 w-12 mr-4 flex-shrink-0">{notification.sender.account_avatar_url ? <AvatarImage src={notification.sender.account_avatar_url} alt={`${notification.sender.account_username?.replace("'", '&apos;')}'s avatar`} className="object-cover" /> : <AvatarFallback className="bg-gray-200 text-gray-700 text-lg">{notification.sender.account_username?.charAt(0).toUpperCase() || '?'}</AvatarFallback>}</Avatar>
 
               {/* Content */}
               <div className="flex-1">
