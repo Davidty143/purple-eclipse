@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { login } from '@/lib/auth-actions';
 import { createClient } from '@/utils/supabase/client';
 import SignInWithGoogleButton from './SignInWithGoogleButton';
@@ -22,7 +21,6 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +106,7 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
           {/* Sign Up Link */}
           {showSignUpLink && (
             <div className="mt-4 text-center text-sm">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <button
                 type="button"
                 onClick={() => {

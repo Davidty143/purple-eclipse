@@ -51,7 +51,7 @@ export default async function Page({ params }: PageProps) {
           storage_path,
           created_at
         )
-      `
+      ` 
       )
       .eq('thread_id', parseInt(threadId))
       .eq('thread_deleted', false)
