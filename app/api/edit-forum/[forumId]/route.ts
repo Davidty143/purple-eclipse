@@ -1,9 +1,9 @@
 import { createClientForServer } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
-export async function PUT(request: Request, { params }: { params: { forumId: string } }) {
+export async function PUT(request: Request, context: { params: { forumId: string } }) {
   try {
-    const { forumId } = await Promise.resolve(params);
+    const { forumId } = context.params; // Accessing the forumId from params
     const supabase = await createClientForServer();
 
     const { name, description } = await request.json();
