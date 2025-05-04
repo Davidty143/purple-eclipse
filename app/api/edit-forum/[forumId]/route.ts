@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function PUT(request: Request, context: { params: { forumId: string } }) {
   try {
-    const { forumId } = context.params; // Accessing the forumId from params
+    const { forumId } = context.params; // Correct usage
     const supabase = await createClientForServer();
 
     const { name, description } = await request.json();
