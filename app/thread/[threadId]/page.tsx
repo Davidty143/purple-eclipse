@@ -1,16 +1,14 @@
-import ThreadView from './components/ThreadView';
 import { notFound } from 'next/navigation';
 import { createClientForServer } from '@/app/utils/supabase/server';
+import ThreadView from './components/ThreadView';
 
 interface PageProps {
-  params: {
-    threadId: string;
-  };
+  params: Promise<{ threadId: string }>;
 }
 
 export default async function Page({ params }: PageProps) {
-  // Get threadId from params and ensure it's a valid value
-  const threadId = params?.threadId;
+  const { threadId } = await params; // Await the params to get the threadId
+  const supabase = await createClientForServer();
 
   // Validate threadId is a number
   if (!threadId || isNaN(parseInt(threadId))) {
@@ -18,14 +16,11 @@ export default async function Page({ params }: PageProps) {
   }
 
   try {
-    const supabase = await createClientForServer();
-
     // Fetch thread data with all related information
     const { data: thread, error: threadError } = await supabase
       .from('Thread')
       .select(
-        `
-        *,
+        `*,
         author:author_id (
           account_username,
           account_email,

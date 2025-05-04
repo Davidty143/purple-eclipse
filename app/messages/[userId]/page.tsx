@@ -4,12 +4,11 @@ import { useEffect, useState, use, useRef } from 'react';
 import { useSearchParams, redirect } from 'next/navigation';
 import { createClient } from '@/app/utils/supabase/client';
 import ConversationsList from '../conversations-list/components/ConversationList';
-import UserSearch from '../user-search/page';
-import MessageList from '../messages-list/page';
-import MessageInput from '../message-input/page';
-import { cn } from '@/lib/utils';
+import UserSearch from '@/app/messages/user-search/components/UserSearch';
+import MessageInput from '@/app/messages/message-input/components/MessageInput';
+import MessageList from '@/app/messages/messages-list/components/MessageListComponent';
 import { MessageCircle, ListPlus, X } from 'lucide-react';
-import MessageHeader from '../message-header/page';
+import MessageHeader from '@/app/messages/message-header/components/MessageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 

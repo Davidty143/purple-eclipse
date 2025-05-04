@@ -1,17 +1,20 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { createClientForServer } from '@/app/utils/supabase/server';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { createClientForServer } from '@/app/utils/supabase/server';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
+// Define the page props type
 type SearchPageProps = {
-  searchParams: { q?: string; type?: string };
+  searchParams: Promise<{ q?: string; type?: string }>; // Search params are now a Promise
 };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q;
-  const searchType = searchParams.type || 'content'; // Default to content search
+  // Await the searchParams Promise
+  const { q, type } = await searchParams;
+  const query = q || ''; // Default to an empty string if no query
+  const searchType = type || 'content'; // Default to 'content' if no type is provided
 
   // If no query, redirect to home
   if (!query) {
@@ -70,10 +73,8 @@ type Thread = {
 };
 
 async function SearchResults({ query, searchType }: { query: string; searchType: string }) {
-  // Get client
   const supabase = await createClientForServer();
 
-  // Ensure the search term is valid
   if (!query || query.trim().length === 0) {
     return (
       <div className="py-10 text-center">
@@ -86,9 +87,7 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
   let threads: any[] = [];
   let error = null;
 
-  // Perform search based on the selected type
   if (searchType === 'content' || searchType === 'all') {
-    // Search threads by content
     const { data: contentThreads, error: contentError } = await supabase
       .from('Thread')
       .select(
@@ -128,16 +127,13 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
   }
 
   if (searchType === 'username' || searchType === 'all') {
-    // First get account IDs matching the username
     const { data: matchingAccounts, error: accountError } = await supabase.from('Account').select('account_id').ilike('account_username', `%${searchTerm}%`);
 
     if (accountError) {
       if (!error) error = accountError;
     } else if (matchingAccounts && matchingAccounts.length > 0) {
-      // Get all author IDs that match the username search
       const authorIds = matchingAccounts.map((account) => account.account_id);
 
-      // Now get threads by these authors
       const { data: usernameThreads, error: usernameError } = await supabase
         .from('Thread')
         .select(
@@ -177,12 +173,10 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
     }
   }
 
-  // Handle errors
   if (error) {
     return <div className="text-red-500">Error loading search results: {error.message}</div>;
   }
 
-  // Remove duplicates if searching for both
   if (searchType === 'all') {
     const uniqueThreadIds = new Set();
     threads = threads.filter((thread) => {
@@ -194,7 +188,6 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
     });
   }
 
-  // No results case
   if (!threads || threads.length === 0) {
     return (
       <div className="py-10 text-center">
@@ -204,7 +197,6 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
     );
   }
 
-  // Display results
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">Found {threads.length} results</p>
@@ -213,13 +205,11 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
           <div key={thread.thread_id} className="border rounded-lg overflow-hidden bg-white hover:bg-gray-50 transition-colors">
             <Link href={`/thread/${thread.thread_id}`} className="block p-5">
               <div className="flex items-start gap-4">
-                {/* Author Avatar */}
                 <Avatar className="h-10 w-10 flex-shrink-0">
                   <AvatarImage src={`https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
                   <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
 
-                {/* Thread Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="text-xs font-semibold bg-gray-200 px-3 py-0.5 rounded-full">{thread.subforum?.forum?.forum_name || 'Discussion'}</span>
@@ -228,7 +218,6 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
 
                   <h3 className="text-lg font-semibold mb-1">{thread.thread_title}</h3>
 
-                  {/* Content Preview */}
                   <p className="text-sm text-gray-700 line-clamp-2 mb-2" dangerouslySetInnerHTML={{ __html: thread.thread_content }}></p>
 
                   <div className="flex items-center text-xs text-gray-500 mt-2">
