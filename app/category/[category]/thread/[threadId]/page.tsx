@@ -2,14 +2,14 @@ import { createClientForServer } from '@/utils/supabase/server';
 import { notFound, redirect } from 'next/navigation';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     category: string;
     threadId: string;
-  };
+  }>;
 }
 
 export default async function Page({ params }: PageProps) {
-  const { category, threadId } = params;
+  const { category, threadId } = await params; // ✅ await the promise
 
   if (!threadId || isNaN(parseInt(threadId))) {
     return notFound();
