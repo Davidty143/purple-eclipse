@@ -3,7 +3,7 @@
 import { useEffect, useState, use, useRef } from 'react';
 import { useSearchParams, redirect } from 'next/navigation';
 import { createClient } from '@/app/utils/supabase/client';
-import ConversationsList from '../conversations-list/page';
+import ConversationsList from '../conversations-list/components/ConversationList';
 import { UserSearch } from '../user-search/page';
 import { MessageList } from '../messages-list/page';
 import { MessageInput } from '../message-input/page';
