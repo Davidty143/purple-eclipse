@@ -1,9 +1,11 @@
 import { createClientForServer } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
-export async function PUT(request: Request, context: { params: { forumId: string } }) {
+// Use Promise and await for dynamic params
+export async function PUT(request: Request, { params }: { params: Promise<{ forumId: string }> }) {
   try {
-    const { forumId } = context.params; // Correct usage
+    // Await params to resolve the promise
+    const { forumId } = await params; // Accessing the forumId from params
     const supabase = await createClientForServer();
 
     const { name, description } = await request.json();
