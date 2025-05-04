@@ -7,8 +7,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useRouter } from 'next/navigation';
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthProvider';
-import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
+import { createClient } from '@/app/utils/supabase/client';
 import { NotificationDropdown } from '@/components/notifications';
 
 export default function LoggedInHeaderRight() {

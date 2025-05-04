@@ -2,8 +2,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Button } from './ui/button';
-import { createClient } from '@/utils/supabase/client';
 import { MdOutlineLogin } from 'react-icons/md';
+import { createClient } from '@/app/utils/supabase/client';
 
 interface SignupProps {
   className?: string;

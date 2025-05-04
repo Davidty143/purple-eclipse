@@ -1,6 +1,6 @@
-import { createClientForServer } from '@/utils/supabase/server';
 import ThreadView from './components/ThreadView';
 import { notFound } from 'next/navigation';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 interface PageProps {
   params: {
@@ -51,7 +51,7 @@ export default async function Page({ params }: PageProps) {
           storage_path,
           created_at
         )
-      ` 
+      `
       )
       .eq('thread_id', parseInt(threadId))
       .eq('thread_deleted', false)

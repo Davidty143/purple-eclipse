@@ -1,10 +1,9 @@
 //lib/auth-actions.ts
 'use server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-
-import { createClientForServer } from '@/utils/supabase/server';
 
 export async function login(formData: FormData) {
   console.log('Starting login process...');

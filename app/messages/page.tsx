@@ -1,9 +1,7 @@
-import { createClientForServer } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import ConversationsList from './conversations-list/page';
 import { UserSearch } from './user-search/page';
 import { MessageCircle, User } from 'lucide-react';
-import MessageHeader from './message-header/page';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 export default async function MessagesPage() {
   const supabase = await createClientForServer();

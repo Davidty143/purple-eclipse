@@ -1,5 +1,5 @@
 //get-forums-with-subforums
-import { createClientForServer } from '@/utils/supabase/server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {

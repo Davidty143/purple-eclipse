@@ -1,8 +1,8 @@
 // lib/message-actions.ts
 'use server';
 
+import { createClientForServer } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { createClientForServer } from '@/utils/supabase/server';
 
 type MessageState = {
   error?: string | null;

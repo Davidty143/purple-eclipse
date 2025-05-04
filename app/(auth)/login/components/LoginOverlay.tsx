@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { login } from '@/lib/auth-actions';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/app/utils/supabase/client';
 import SignInWithGoogleButton from './SignInWithGoogleButton';
 import { Mail, Lock } from 'lucide-react';
 

@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import EditThreadForm from './components/EditThreadForm';
-import { createClientForServer } from '@/utils/supabase/server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 interface EditThreadPageProps {
   params: {

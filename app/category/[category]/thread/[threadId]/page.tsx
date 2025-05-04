@@ -1,4 +1,4 @@
-import { createClientForServer } from '@/utils/supabase/server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 import { notFound, redirect } from 'next/navigation';
 
 interface PageProps {

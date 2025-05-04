@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ThreadRow } from './ThreadRow';
 import * as Icons from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
+import { createClient } from '@/app/utils/supabase/client';
 
 // Types
 export interface ThreadAuthor {

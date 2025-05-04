@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // For client-side navigation
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { createClient } from '@/utils/supabase/client';
 import { createCachedFetch } from '@/lib/use-cached-fetch';
+import { createClient } from '@/app/utils/supabase/client';
+
 import { Flame } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 

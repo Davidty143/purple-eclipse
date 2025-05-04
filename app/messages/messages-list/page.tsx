@@ -1,7 +1,6 @@
 'use client';
-
+import { createClient } from '@/app/utils/supabase/client';
 import { useEffect, useRef } from 'react';
-import { createClient } from '@/utils/supabase/client';
 import { MessageBubble } from '../message-bubble/page';
 
 interface Message {

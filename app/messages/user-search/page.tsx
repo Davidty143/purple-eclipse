@@ -1,7 +1,6 @@
 'use client';
-
+import { createClient } from '@/app/utils/supabase/client';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { createClient } from '@/utils/supabase/client';
 import { Search, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

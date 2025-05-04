@@ -11,10 +11,10 @@ import '@radix-ui/themes/styles.css';
 import Logo from './layout/components/Logo';
 import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import { createClientForServer } from '@/utils/supabase/server'; // Import your server client creator
 import { Toaster } from 'sonner';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { createClientForServer } from '@/app/utils/supabase/server';
 
 const inter = Inter({ subsets: ['latin'] });
 

@@ -1,4 +1,4 @@
-import { createClientForServer } from '@/utils/supabase/server';
+import { createClientForServer } from '@/app/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
 // Use Promise and await for dynamic params

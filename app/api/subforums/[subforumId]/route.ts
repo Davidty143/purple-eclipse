@@ -1,5 +1,5 @@
+import { createClientForServer } from '@/app/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClientForServer } from '@/utils/supabase/server';
 
 // GET: Fetch subforum by ID
 export async function GET(request: NextRequest, { params }: { params: Promise<{ subforumId: string }> }) {

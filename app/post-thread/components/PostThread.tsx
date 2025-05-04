@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import ThreadForm from '@/components/thread/ThreadForm';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthProvider';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/app/utils/supabase/client';
 import ForumSelectionModal from '@/components/thread/ForumSelectionModal';
 import { v4 as uuidv4 } from 'uuid';
 
