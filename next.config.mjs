@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // ✅ Move `pageExtensions` to the root level
-  pageExtensions: ['page.tsx', 'page.ts', 'ts'],
 
   experimental: {
     optimizePackageImports: ['@radix-ui/react-dropdown-menu', '@radix-ui/react-label', '@radix-ui/react-menubar', '@radix-ui/react-navigation-menu', '@radix-ui/react-slot', '@radix-ui/themes', '@shadcn/ui', '@supabase/ssr', '@supabase/supabase-js', 'lucide-react', 'react-icons']
