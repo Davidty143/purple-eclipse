@@ -2,31 +2,38 @@
 
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
+import ErrorBoundary from '@/app/components/error-boundary';
 
 const NewTopicsSkeletons = () => (
-  <div className="w-[300px]">
-    <div className="bg-gray-50 h-12 rounded-t-lg border border-gray-300 flex items-center px-4">
-      <Skeleton className="h-5 w-24" />
-    </div>
-    <div className="p-3 border-x border-b border-gray-300 rounded-b-lg space-y-3">
-      {Array(5)
-        .fill(0)
-        .map((_, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <Skeleton className="w-8 h-8 rounded-full" />
-            <div className="flex-1">
-              <Skeleton className="h-3 w-full max-w-[160px] mb-1" />
-              <Skeleton className="h-2 w-20" />
-            </div>
-          </div>
-        ))}
-    </div>
+  <div className="w-[300px] space-y-3">
+    <Skeleton className="h-5 w-24" />
+    {[...Array(3)].map((_, i) => (
+      <div key={i} className="flex items-center space-x-2">
+        <Skeleton className="w-8 h-8 rounded-full" />
+        <div className="flex-1 space-y-1">
+          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-2 w-20" />
+        </div>
+      </div>
+    ))}
   </div>
 );
 
-// Dynamic import in client component
-const NewTopics = dynamic(() => import('./NewTopics').then((mod) => ({ default: mod.NewTopics })), { ssr: false, loading: () => <NewTopicsSkeletons /> });
+const NewTopics = dynamic(() => import('./NewTopics').then((mod) => mod.NewTopics), {
+  ssr: false,
+  loading: () => <NewTopicsSkeletons />
+});
+
+const ErrorUI = () => (
+  <div className="w-[300px] p-3 rounded-lg bg-gray-50 border border-gray-200 text-center">
+    <p className="text-sm text-gray-600">Unable to load new topics.</p>
+  </div>
+);
 
 export default function NewTopicsWrapper() {
-  return <NewTopics />;
+  return (
+    <ErrorBoundary fallback={<ErrorUI />}>
+      <NewTopics />
+    </ErrorBoundary>
+  );
 }
