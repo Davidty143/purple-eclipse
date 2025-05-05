@@ -6,6 +6,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ErrorBoundary from '@/app/components/error-boundary';
 import NewTopicsWrapper from './components/NewTopicsWrapper';
 
+// Force server-side rendering for this route
+export const dynamic = 'force-dynamic';
+
 // Loading fallbacks
 const PopularSubforumsSkeletons = () => (
   <div className="space-y-6">
@@ -78,16 +81,12 @@ const LandingPage = () => {
               <BodyHeader />
               <div className="h-1 w-full bg-[#308b6a] rounded-full mt-3 mb-3"></div>
               <ErrorBoundary fallback={<SubforumsErrorFallback />}>
-                <Suspense fallback={<PopularSubforumsSkeletons />}>
-                  <PopularSubforumsGrid />
-                </Suspense>
+                <PopularSubforumsGrid />
               </ErrorBoundary>
             </div>
             <div className="flex flex-1 flex-col space-y-14 max-h-auto h-auto">
               <ErrorBoundary fallback={<NewTopicsErrorFallback />}>
-                <Suspense fallback={<NewTopicsSkeletons />}>
-                  <NewTopicsWrapper />
-                </Suspense>
+                <NewTopicsWrapper />
               </ErrorBoundary>
             </div>
           </div>
