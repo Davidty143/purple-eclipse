@@ -21,6 +21,8 @@ interface SubforumData {
 
 export default function SubforumPage() {
   const params = useParams();
+  const subforumId = params?.subforumId as string;
+
   const [subforum, setSubforum] = useState<SubforumData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,9 +33,16 @@ export default function SubforumPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log('[FETCH] Getting subforum:', params.subforumId);
+      if (!subforumId) {
+        console.error('[FETCH] SubforumId is missing');
+        setError('Subforum ID is missing');
+        setLoading(false);
+        return;
+      }
+
+      console.log('[FETCH] Getting subforum:', subforumId);
       try {
-        const response = await fetch(`/api/subforums/${params.subforumId}`);
+        const response = await fetch(`/api/subforums/${subforumId}`);
 
         if (!response.ok) {
           console.error('[FETCH] Failed to fetch subforum:', response.status);
@@ -52,10 +61,13 @@ export default function SubforumPage() {
       }
     };
 
-    if (params.subforumId) {
+    if (subforumId) {
       fetchData();
+    } else {
+      setLoading(false);
+      setError('Subforum ID is missing');
     }
-  }, [params.subforumId]);
+  }, [subforumId]);
 
   const handleEditSuccess = (updatedSubforum: SubforumData) => {
     console.log('[EDIT SUCCESS] Received updated subforum:', updatedSubforum);
@@ -102,11 +114,11 @@ export default function SubforumPage() {
         <div className="w-full flex flex-col lg:flex-row justify-between gap-8">
           {/* Main Content */}
           <div className="w-full flex flex-col gap-6">
-            <SubforumHeader title={subforum.name} description={subforum.description} subforumId={Number(params.subforumId)} icon={subforum.icon} onEditSuccess={handleEditSuccess} />
+            <SubforumHeader title={subforum.name} description={subforum.description} subforumId={Number(subforumId)} icon={subforum.icon} onEditSuccess={handleEditSuccess} />
 
             {/* Subforum Topics with Pagination */}
             <SubforumTopics
-              subforumId={Number(params.subforumId)}
+              subforumId={Number(subforumId)}
               page={currentPage}
               limit={pageSize}
               onPageChange={handlePageChange} // Pagination handler
