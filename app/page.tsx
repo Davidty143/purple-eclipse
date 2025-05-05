@@ -1,5 +1,5 @@
 //root page.tsx
-import LandingPage from './(landingPage)/page';
+import LandingPage from './landing/page';
 //import { createClientForServer } from '@/app/utils/supabase/server';
 
 export default async function Home() {
