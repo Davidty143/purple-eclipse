@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import SubforumHeader from './components/SubforumHeader';
 import { NoSubforumData } from './components/NoSubforumData';
 import { Loader2 } from 'lucide-react';
-import { NewTopics } from '@/app/(landingPage)/components/NewTopics';
+import { NewTopics } from '@/app/landingPage/components/NewTopics';
 import { SubforumTopics } from './components/SubforumTopics';
 
 interface SubforumData {

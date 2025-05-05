@@ -1,10 +1,10 @@
-import { PopularSubforumsGrid } from './components/PopularSubforums';
+import { PopularSubforumsGrid } from '@/app/landingPage/components/PopularSubforums';
 import BodyHeader from '@/components/BodyHeader';
 import Footer from '@/components/Footer';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ErrorBoundary from '@/app/components/error-boundary';
-import NewTopicsWrapper from './components/NewTopicsWrapper';
+import NewTopicsWrapper from '@/app/landingPage/components/NewTopicsWrapper';
 
 // Force server-side rendering for this route
 export const dynamic = 'force-dynamic';

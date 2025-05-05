@@ -1,5 +1,5 @@
 // app/forums/page.tsx
-import { NewTopics } from '@/app/(landingPage)/components/NewTopics';
+import { NewTopics } from '@/app/landingPage/components/NewTopics';
 import { ForumComponentWrapper } from './components/ForumComponentWrapper';
 import BodyHeader from '@/components/BodyHeader';
 

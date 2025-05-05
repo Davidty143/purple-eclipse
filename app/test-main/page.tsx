@@ -1,11 +1,10 @@
-import Image from "next/image";
-import { FeaturedTopics } from "../(landingPage)/components/FeaturedTopics";
-import { LandingHeader } from "../(landingPage)/components/LandingHeader";
-import { NewTopics } from "../(landingPage)/components/NewTopics";
-import BodyHeader from "@/components/BodyHeader";
-import ThreadBlock from "@/components/ThreadBlock";
-import ThreadNameBlock from "@/components/ThreadNameBlock";
-
+import Image from 'next/image';
+import { FeaturedTopics } from '../landingPage/components/FeaturedTopics';
+import { LandingHeader } from '../landingPage/components/LandingHeader';
+import { NewTopics } from '../landingPage/components/NewTopics';
+import BodyHeader from '@/components/BodyHeader';
+import ThreadBlock from '@/components/ThreadBlock';
+import ThreadNameBlock from '@/components/ThreadNameBlock';
 
 export default function TestMain() {
   return (
