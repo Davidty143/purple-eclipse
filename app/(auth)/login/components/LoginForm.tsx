@@ -47,7 +47,7 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <div className="text-start text-sm font-semibold text-gray-900 pb-4">Login</div>
-        <SignInWithGoogleButton />
+        <SignInWithGoogleButton isLoading = {isLoading}/>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <div className="grid gap-2 mt-4">

@@ -59,7 +59,7 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
         <CardContent>
           <div className="text-start text-sm font-semibold text-gray-900 pb-4">Login</div>
 
-          <SignInWithGoogleButton />
+          <SignInWithGoogleButton isLoading={isLoading}/>
 
           {/* OR Divider */}
           <div className="my-4 flex items-center text-gray-400 text-sm">
