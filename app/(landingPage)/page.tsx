@@ -2,9 +2,46 @@
 import dynamic from 'next/dynamic';
 import BodyHeader from '@/components/BodyHeader';
 import Footer from '@/components/Footer';
+import { Skeleton } from '@/components/ui/skeleton';
+import PopularSubforumsWrapper from './components/PopularSubforumsWrapper';
 
-const PopularSubforumsWrapper = dynamic(() => import('./components/PopularSubforumsWrapper'), { ssr: false });
-const NewTopicsWrapper = dynamic(() => import('./components/NewTopicsWrapper'), { ssr: false });
+// Inline fallback skeleton for the NewTopics
+const NewTopicsSkeletons = () => (
+  <div className="w-full h-full sm:w-[300px] space-y-4 rounded-md border">
+    {/* Skeleton for the header */}
+    <div className="flex items-center gap-2 px-5 py-3 rounded-md ">
+      <div className="p-1  rounded">
+        <Skeleton className="h-8 w-8" />
+      </div>
+      <Skeleton className="h-5 w-24 rounded" />
+    </div>
+
+    {/* Skeletons for each thread */}
+    {[...Array(10)].map((_, i) => (
+      <div key={i} className="flex items-center gap-3 px-4 py-2 w-full">
+        {/* Avatar Skeleton */}
+        <Skeleton className="h-8 w-8 rounded-full" />
+
+        {/* Thread title skeleton */}
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-2 w-24" />
+        </div>
+      </div>
+    ))}
+
+    {/* Skeleton for the "Show More" button */}
+    <div className="px-4 py-2">
+      <Skeleton className="h-6 w-full rounded" />
+    </div>
+  </div>
+);
+
+// Dynamically load the NewTopics component with the skeleton as fallback
+const NewTopics = dynamic(() => import('./components/NewTopics').then((mod) => mod.NewTopics), {
+  ssr: false,
+  loading: () => <NewTopicsSkeletons /> // Display loading skeleton
+});
 
 export default function LandingPage() {
   return (
@@ -20,8 +57,9 @@ export default function LandingPage() {
             </div>
 
             {/* Right Column */}
-            <div className="flex flex-1 flex-col space-y-14 max-h-auto h-auto">
-              <NewTopicsWrapper />
+            <div className="flex flex-1 flex-col max-h-auto h-auto">
+              {/* Dynamically load NewTopics with skeleton */}
+              <NewTopics />
             </div>
           </div>
         </div>
