@@ -9,7 +9,7 @@ import PopularSubforumsWrapper from './components/PopularSubforumsWrapper';
 const NewTopicsSkeletons = () => (
   <div className="w-full h-full sm:w-[300px] space-y-4 rounded-md border">
     {/* Skeleton for the header */}
-    <div className="flex items-center gap-2 px-5 py-3 rounded-md ">
+    <div className="flex items-center gap-2 px-5 py-1.5 rounded-md border-b">
       <div className="p-1  rounded">
         <Skeleton className="h-8 w-8" />
       </div>

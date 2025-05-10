@@ -9,6 +9,7 @@ import { createClient } from '@/app/utils/supabase/client';
 
 import { Flame } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import Link from 'next/link'; // Import Link
 
 interface Thread {
   id: string;
@@ -105,10 +106,12 @@ export function NewTopics() {
   const threadItems =
     displayedThreads.length > 0 ? (
       displayedThreads.map((thread) => (
-        <div key={thread.id} className="flex items-center gap-3 px-4 py-2 w-full overflow-hidden">
-          <AvatarWithFallback name={thread.author.name} avatar={thread.author.avatar} />
-          <div className="text-sm font-medium text-gray-800 line-clamp-1 w-full">{thread.title}</div>
-        </div>
+        <Link key={thread.id} href={`/thread/${thread.id}`} passHref>
+          <div className="flex items-center gap-3 px-4 py-2 w-full overflow-hidden cursor-pointer hover:bg-gray-100 rounded-md">
+            <AvatarWithFallback name={thread.author.name} avatar={thread.author.avatar} />
+            <div className="text-sm font-medium text-gray-800 line-clamp-1 w-full">{thread.title}</div>
+          </div>
+        </Link>
       ))
     ) : (
       <div key="no-topics" className="py-3 text-center text-muted-foreground text-sm">
@@ -126,10 +129,10 @@ export function NewTopics() {
           <CardTitle className="text-base text-start font-medium">New Topics</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 px-0 pt-3 pb-4">
+      <CardContent className="space-y-2 px-0 pt-5 pb-4">
         {threadItems}
         {hasMore && (
-          <Button variant="ghost" size="sm" className="w-full text-primary text-gray-600 hover:underline hover:font-semibold hover:bg-white" onClick={handleShowMore}>
+          <Button variant="ghost" size="sm" className="justify-start lg:justify-center w-full text-gray-600 hover:font-semibold hover:bg-white" onClick={handleShowMore}>
             Show More
           </Button>
         )}

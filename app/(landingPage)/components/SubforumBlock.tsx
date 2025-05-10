@@ -114,7 +114,7 @@ export function SubforumBlock({ subforum }: { subforum: SubforumData }) {
         {threads.length > 0 && !loading && (
           <div className="text-start pl-6 pb-2">
             <Link href={`/forums/subforum/${subforum.subforum_id}`} passHref>
-              <button className="text-sm text-gray-500 hover:text-gray-700 hover:font-medium focus:outline-none">Show more</button>
+              <button className="text-sm text-gray-600 font-medium hover:font-semibold focus:outline-none">Show More</button>
             </Link>
           </div>
         )}
