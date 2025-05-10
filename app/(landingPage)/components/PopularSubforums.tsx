@@ -1,9 +1,10 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { SubforumBlock } from './SubforumBlock';
-import { SubforumSkeleton } from './SubforumSkeleton';
 import { getSubforumsData } from '../lib/subforumApi';
 import { SubforumData } from '@/types/forum';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function PopularSubforumsGrid() {
   // State for client-side rendering
@@ -23,18 +24,43 @@ export function PopularSubforumsGrid() {
       });
   }, []);
 
-  // Show loading state during initial render
+  // While loading, show skeletons
   if (loading) {
     return (
       <div className="space-y-6">
-        <SubforumSkeleton />
-        <SubforumSkeleton />
+        {[...Array(5)].map((_, subforumIdx) => (
+          <div key={subforumIdx} className="border rounded-lg space-y-4 w-full">
+            {/* Subforum title skeleton */}
+            <div className="border-b p-4 w-full">
+              <Skeleton className="h-6 w-40 rounded" />
+            </div>
+            {/* 5 thread skeletons per subforum */}
+            {[...Array(5)].map((_, threadIdx) => (
+              <div key={threadIdx} className="flex items-start gap-4 py-3 px-2">
+                {/* Avatar Skeleton */}
+                <Skeleton className="h-12 w-12 rounded-full mt-1 flex-shrink-0" />
+
+                {/* Right Side */}
+                <div className="flex-1 min-w-0 mt-1.5 space-y-2">
+                  {/* Top row: tag + title */}
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                    <Skeleton className="h-6 w-1/3 rounded" />
+                  </div>
+
+                  {/* Bottom row: username + date */}
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     );
   }
 
-  // If there was an error, it would be thrown and caught by the nearest error boundary
-  if (!subforums || subforums.length === 0) {
+  // If no subforums and loading is finished, show the "No active subforums" message
+  if (!loading && subforums.length === 0) {
     return (
       <div className="p-6 text-center bg-gray-50 rounded-lg border border-gray-200">
         <p className="text-gray-600">No active subforums found.</p>
@@ -42,6 +68,7 @@ export function PopularSubforumsGrid() {
     );
   }
 
+  // Once data is available, render the subforums
   return (
     <div className="space-y-6">
       {subforums.map((subforum: SubforumData) => (
