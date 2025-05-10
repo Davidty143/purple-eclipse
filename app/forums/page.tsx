@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const NewTopics = dynamic(() => import('@/app/(landingPage)/components/NewTopics').then((mod) => mod.NewTopics), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full sm:w-[300px] space-y-4 rounded-md border">
+    <div className="w-full h-full lg:w-[300px] space-y-4 rounded-md border">
       {/* Header skeleton */}
       <div className="flex items-center gap-2 px-5 py-1.5 rounded-md border-b">
         <div className="p-1 rounded">

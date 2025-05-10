@@ -65,7 +65,7 @@ export function ForumComponentWrapper() {
         {/* Header Skeleton */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2">
           <Skeleton className="w-32 h-6" />
-          <Skeleton className="w-24 h-8" />
+          <Skeleton className=" w-full sm:w-24  h-8" />
         </div>
 
         <Skeleton className="w-full h-1" />
@@ -75,10 +75,10 @@ export function ForumComponentWrapper() {
           <div className="h-1 rounded-full w-full mb-6" />
 
           <div className="flex flex-col border py-4 px-6 rounded-lg w-full gap-2">
-            <div className="flex flex-row justify-between items-start flex-wrap gap-2">
+            <div className="flex flex-row justify-between items-start flex-wrap gap-4">
               <div className="flex items-center gap-2">
                 <Skeleton className="w-40 h-6" />
-                <span className="px-2 py-0.5 text-xs font-semibold text-white rounded-full">Forum</span>
+                <span className="px-4 py-4 text-xs font-semibold text-white rounded-full">Forum</span>
               </div>
               <div className="flex gap-1 -mt-1.5">
                 <Skeleton className="w-8 h-8" />
@@ -95,7 +95,40 @@ export function ForumComponentWrapper() {
             {[...Array(4)].map((_, i) => (
               <div key={i} className="py-4 px-6 gap-2 border rounded-lg hover:underline hover:text-medium hover:bg-[#edf4f2] cursor-pointer transition-colors">
                 <div className="flex items-center space-x-2">
-                  <Skeleton className="w-5 h-5" />
+                  <Skeleton className="w-8 h-8" />
+                  <Skeleton className="w-24 h-6" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Forum Section Skeleton */}
+        <div className="space-y-4">
+          <div className="h-1 rounded-full w-full mb-6" />
+
+          <div className="flex flex-col border py-4 px-6 rounded-lg w-full gap-2">
+            <div className="flex flex-row justify-between items-start flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <Skeleton className="w-40 h-6" />
+                <span className="px-4 py-4 text-xs font-semibold text-white rounded-full">Forum</span>
+              </div>
+              <div className="flex gap-1 -mt-1.5">
+                <Skeleton className="w-8 h-8" />
+                <Skeleton className="w-8 h-8" />
+                <Skeleton className="w-8 h-8" />
+              </div>
+            </div>
+            <div className="mt-1">
+              <Skeleton className="w-3/4 h-6" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="py-4 px-6 gap-2 border rounded-lg hover:underline hover:text-medium hover:bg-[#edf4f2] cursor-pointer transition-colors">
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="w-8 h-8" />
                   <Skeleton className="w-24 h-6" />
                 </div>
               </div>
