@@ -1,5 +1,7 @@
 import PostThread from './components/PostThread';
+
 import { NewTopics } from '@/app/landing-page/components/NewTopics'; // If you need this sidebar content
+
 import BodyHeader from '@/components/BodyHeader'; // You can include this or customize a header for your page
 
 const PostThreadPage = () => {

@@ -22,11 +22,42 @@
     <td> PE.010.003 </td>
     <td> 2025-04-17</td>
   </tr>
+    <tr>
+    <td> PE.020.000 </td>
+    <td> 2025-05-08</td>
+  </tr>
   <tr>
     <td>...</td>
     <td>...</td>
   </tr>
 </table>
+
+<h2> PE.020.000 Release Notes </h2>
+<ul>
+  <li> What's New </li>
+  <ul>
+    <li> Revamped the overall UI design theme with a minimalistic design and color palette that matches the logo design.  </li>
+    <li> Improved responsiveness coverage across different features.</li>
+    <li> Added user avatar for user accounts.</li>
+    <li> Added sidebar for mobile view.</li>
+    <li> Added a real-time numbered notification flag that reflects the total count of unread messages received.</li>
+    <li> Implemented an immediate update for the conversations list for conversation — no page refresh required.</li>
+    <li> Added a chat header, showing a chat icon and the username of the active conversation partner.</li>
+    <li> Resolved an issue where the search result overlay would remain visible even after clicking outside the user search input.</li>
+    <li> Refactored the subforums page and added a customizable icon upon creating the subforum. All subforums now have a customizable icon.</li>
+    <li> Added edit and delete subforums functionality in the subforums page. Admins can also edit the logo of the subforum.</li>
+    <li> Added a numbered navigation panel, enabling users to navigate through threads inside the subforum page. The navigation panel, clickable number of pages, previous, and next button.</li>
+    <li> Refactored the threads list in the subforum page, adding the poster’s avatar and improving overall UI and responsiveness.</li>
+    <li> Refactored the popular subforum for better component organization.</li>
+    <li> Enhanced new topics and popular subforum pages to improve user experience.</li>
+    <li> Implemented notification updates from comments.</li>
+    <li> Refactor notification avatar for consistency and styling.</li>
+    <li> Implemented notification dropdown for better notification organization and access.</li>
+    <li> Added a settings page wherein the user can change their password by providing their current password, which goes through validation.</li>
+    <li> Added a profile view page where the profile information and the threads posted by the user will be displayed.</li>
+    <li> Implemented edit functionality to change the username or the avatar picture.</li>     
+  </ul>
+</ul>
 
 <h2> PE.010.003 Release Notes </h2>
 <ul>

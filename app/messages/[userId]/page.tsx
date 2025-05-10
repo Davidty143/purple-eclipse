@@ -24,7 +24,7 @@ interface Message {
 export default function MessagePage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
   const searchParams = useSearchParams();
-  const username = searchParams.get('username') || 'Messages';
+  const username = searchParams?.get('username') || 'Messages';
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<Message[]>([]);
