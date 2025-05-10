@@ -108,24 +108,71 @@ export function SubforumTopics({ subforumId, page, limit, onPageChange }: Subfor
 
   const totalPages = Math.ceil(totalThreads / limit);
 
-  if (loading) return <div>Loading threads...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-
   return (
     <div className="space-y-4">
-      {totalPages > 1 && (
-        <div className="mb-4 flex justify-end">
-          <ShadPaginationNav currentPage={page} totalPages={totalPages} onPageChange={onPageChange} />
-        </div>
+      {loading && (
+        <>
+          <div className="mb-4 flex justify-end">
+            <PaginationSkeleton />
+          </div>
+          {Array.from({ length: limit }).map((_, i) => (
+            <ThreadRowSkeleton key={i} />
+          ))}
+        </>
       )}
 
-      {threads.map((thread) => (
-        <div key={thread.id} onClick={() => handleThreadClick(thread.id)} className="cursor-pointer hover:bg-gray-50 transition-colors rounded-lg">
-          <ThreadRow thread={thread} />
-        </div>
-      ))}
+      {!loading && error && <div className="text-red-500">{error}</div>}
 
-      {threads.length === 0 && <div className="text-center py-8 text-gray-500">No threads found in this subforum</div>}
+      {!loading && !error && (
+        <>
+          {totalPages > 1 && (
+            <div className="mb-4 flex justify-end">
+              <ShadPaginationNav currentPage={page} totalPages={totalPages} onPageChange={onPageChange} />
+            </div>
+          )}
+
+          {threads.map((thread) => (
+            <div key={thread.id} onClick={() => handleThreadClick(thread.id)} className="cursor-pointer hover:bg-gray-50 transition-colors rounded-lg">
+              <ThreadRow thread={thread} />
+            </div>
+          ))}
+
+          {threads.length === 0 && <div className="text-center py-8 text-gray-500">No threads found in this subforum</div>}
+        </>
+      )}
+    </div>
+  );
+}
+
+// 🧱 Thread skeleton
+function ThreadRowSkeleton() {
+  return (
+    <div className="p-4 bg-white rounded-md shadow-sm animate-pulse space-y-2 border">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gray-100 rounded-full" />
+        <div className="flex-1 space-y-2">
+          <div className="flex space-x-4">
+            <div className="h-4 w-1/4 bg-gray-100 rounded" />
+
+            <div className="h-4 w-2/3 bg-gray-100 rounded" />
+          </div>
+
+          <div className="h-3 w-1/2 bg-gray-100 rounded" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 🧱 Pagination skeleton
+function PaginationSkeleton() {
+  return (
+    <div className="flex gap-2">
+      <div className="w-16 h-8 bg-gray-100 rounded animate-pulse" />
+      <div className="w-8 h-8 bg-gray-100 rounded animate-pulse" />
+      <div className="w-8 h-8 bg-gray-100 rounded animate-pulse" />
+      <div className="w-8 h-8 bg-gray-100 rounded animate-pulse" />
+      <div className="w-14 h-8 bg-gray-100 rounded animate-pulse" />
     </div>
   );
 }
