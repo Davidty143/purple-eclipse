@@ -15,6 +15,10 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const googleButtonClick = () => {
+    setIsLoading(true);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -47,7 +51,8 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <div className="text-start text-sm font-semibold text-gray-900 pb-4">Login</div>
-        <SignInWithGoogleButton />
+        {/* Added googleButtonClick to disable login button*/}
+        <SignInWithGoogleButton onSuccess={googleButtonClick} isLoading = {isLoading}/>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <div className="grid gap-2 mt-4">
