@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // For client-side navigation
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { createCachedFetch } from '@/lib/use-cached-fetch';
@@ -10,7 +10,6 @@ import { createClient } from '@/app/utils/supabase/client';
 import { Flame } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
-// Thread type
 interface Thread {
   id: string;
   title: string;
@@ -20,7 +19,6 @@ interface Thread {
   };
 }
 
-// Fetch threads
 const fetchNewThreads = async (): Promise<Thread[]> => {
   try {
     const supabase = createClient();
@@ -58,10 +56,8 @@ const fetchNewThreads = async (): Promise<Thread[]> => {
   }
 };
 
-// Cached fetch
 const getNewThreadsData = createCachedFetch<Thread[]>('new-topics', fetchNewThreads, { ttl: 3 * 60 * 1000 });
 
-// Get initials
 const getInitials = (name: string) => {
   const parts = name.trim().split(' ');
   return parts.length === 1
@@ -72,10 +68,9 @@ const getInitials = (name: string) => {
         .join('');
 };
 
-// Avatar fallback
 const AvatarWithFallback = ({ name, avatar }: { name: string; avatar?: string }) => {
   const initials = getInitials(name);
-  return <Avatar className="w-8 h-8">{avatar?.trim() ? <AvatarImage src={avatar} alt={name} /> : <AvatarFallback className="text-xs">{initials}</AvatarFallback>}</Avatar>;
+  return <Avatar className="w-8 h-8 shrink-0">{avatar?.trim() ? <AvatarImage src={avatar} alt={name} /> : <AvatarFallback className="text-xs">{initials}</AvatarFallback>}</Avatar>;
 };
 
 export function NewTopics() {
@@ -98,9 +93,9 @@ export function NewTopics() {
 
   const handleShowMore = () => {
     if (visibleCount >= 20) {
-      router.push('/new-topics'); // Redirect after 20 threads
+      router.push('/new-topics');
     } else {
-      setVisibleCount((prev) => prev + 10); // Show 10 more
+      setVisibleCount((prev) => prev + 10);
     }
   };
 
@@ -110,13 +105,13 @@ export function NewTopics() {
   const threadItems =
     displayedThreads.length > 0 ? (
       displayedThreads.map((thread) => (
-        <div key={thread.id} className="flex items-center gap-2 px-4 py-2">
+        <div key={thread.id} className="flex items-center gap-3 px-4 py-2 w-full overflow-hidden">
           <AvatarWithFallback name={thread.author.name} avatar={thread.author.avatar} />
-          <div className="text-sm font-medium text-gray-800 line-clamp-1">{thread.title}</div>
+          <div className="text-sm font-medium text-gray-800 truncate w-full">{'thread.title'}</div>
         </div>
       ))
     ) : (
-      <div key="no-topics" className="py-3 text-center text-muted-foreground">
+      <div key="no-topics" className="py-3 text-center text-muted-foreground text-sm">
         No recent topics
       </div>
     );
@@ -135,7 +130,7 @@ export function NewTopics() {
         {threadItems}
         {hasMore && (
           <Button variant="ghost" size="sm" className="w-full text-primary text-gray-600 hover:underline hover:font-semibold hover:bg-white" onClick={handleShowMore}>
-            {visibleCount >= 20 ? 'Show More' : `Show More`}
+            Show More
           </Button>
         )}
       </CardContent>
