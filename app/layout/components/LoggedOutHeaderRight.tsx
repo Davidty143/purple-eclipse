@@ -1,11 +1,10 @@
-// layout/components/LoggedOutHeaderRight.tsx
 'use client';
 import { useState } from 'react';
-import LoginButton from '@/components/LoginLogoutButton';
-import Signup from '@/components/SignupButton';
 import { LoginOverlay } from '@/app/(auth)/login/components/LoginOverlay';
 import { SignUpOverlay } from '@/app/(auth)/signup/components/SignUpOverlay';
 import { ResetPasswordOverlay } from '@/app/(auth)/reset-password/components/ResetPasswordForm';
+import { Button } from '@/components/ui/button';
+import { MdOutlineLogin } from 'react-icons/md';
 
 export default function LoggedOutHeaderRight() {
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
@@ -13,18 +12,27 @@ export default function LoggedOutHeaderRight() {
   const [showResetPasswordOverlay, setShowResetPasswordOverlay] = useState(false);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 bg-green-200">
       {/* Login Button */}
-      <LoginButton onOpenLogin={() => setShowLoginOverlay(true)} />
+      <Button variant="default" onClick={() => setShowLoginOverlay(true)} className="focus:outline-none focus:ring-0 text-white">
+        <MdOutlineLogin className="text-lg mr-2" />
+        <span>Login</span>
+      </Button>
 
       {/* Signup Button */}
-      <Signup className="hidden sm:inline-flex" onOpenSignUp={() => setShowSignUpOverlay(true)} />
+      <Button variant="outline" onClick={() => setShowSignUpOverlay(true)} className="hidden sm:inline-flex focus:outline-none focus:ring-0">
+        <MdOutlineLogin className="text-lg mr-2" />
+        <span>Register</span>
+      </Button>
 
       {/* Login Overlay */}
       {showLoginOverlay && (
         <LoginOverlay
           onClose={() => setShowLoginOverlay(false)}
-          onSuccess={() => setShowLoginOverlay(false)}
+          onSuccess={() => {
+            setShowLoginOverlay(false);
+            window.location.reload();
+          }}
           onOpenSignUp={() => {
             setShowLoginOverlay(false);
             setShowSignUpOverlay(true);
@@ -40,7 +48,10 @@ export default function LoggedOutHeaderRight() {
       {showSignUpOverlay && (
         <SignUpOverlay
           onClose={() => setShowSignUpOverlay(false)}
-          onSuccess={() => setShowSignUpOverlay(false)}
+          onSuccess={() => {
+            setShowSignUpOverlay(false);
+            window.location.reload();
+          }}
           onOpenLogin={() => {
             setShowSignUpOverlay(false);
             setShowLoginOverlay(true);
