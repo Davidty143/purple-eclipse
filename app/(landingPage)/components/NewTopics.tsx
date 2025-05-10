@@ -107,7 +107,7 @@ export function NewTopics() {
       displayedThreads.map((thread) => (
         <div key={thread.id} className="flex items-center gap-3 px-4 py-2 w-full overflow-hidden">
           <AvatarWithFallback name={thread.author.name} avatar={thread.author.avatar} />
-          <div className="text-sm font-medium text-gray-800 truncate w-full">{'thread.title'}</div>
+          <div className="text-sm font-medium text-gray-800 line-clamp-1 w-full">{thread.title}</div>
         </div>
       ))
     ) : (
