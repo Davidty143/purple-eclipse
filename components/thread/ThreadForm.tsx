@@ -14,6 +14,8 @@ interface ThreadFormProps {
   isSubmitting?: boolean;
 }
 
+const MAX_TITLE_LENGTH = 60;
+
 const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externalIsSubmitting }) => {
   const [internalIsSubmitting, setInternalIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -42,22 +44,13 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('Form submit initiated...');
-    console.log('Form data before validation:', formData);
-
-    if (!validateForm(formData, setErrors)) {
-      console.warn('Validation failed', errors);
-      return;
-    }
+    if (!validateForm(formData, setErrors)) return;
 
     if (!externalIsSubmitting) setInternalIsSubmitting(true);
 
     try {
-      console.log('Submitting thread with data:', { ...formData, images: selectedImages });
       await onSubmit({ ...formData, images: selectedImages });
-      console.log('Thread submitted successfully.');
     } catch (error) {
-      console.error('Error posting thread:', error);
       setErrors({ submit: 'Failed to create thread. Please try again.' });
     } finally {
       if (!externalIsSubmitting) setInternalIsSubmitting(false);
@@ -66,6 +59,8 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (name === 'title' && value.length > MAX_TITLE_LENGTH) return;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name as keyof FormErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
@@ -90,7 +85,6 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
           <Select
             value={formData.category}
             onValueChange={(value) => {
-              console.log('Category changed to:', value);
               setFormData((prev) => ({ ...prev, category: value }));
               if (errors.category) setErrors((prev) => ({ ...prev, category: undefined }));
             }}>
@@ -118,9 +112,14 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
         </label>
         <div className={cn('flex items-center gap-3 h-12 border rounded-md border-gray-300 px-4 bg-white transition', 'focus-within:ring-2 focus-within:ring-[#267858]', errors.title && 'border-red-500')}>
           <Type className="text-gray-400 w-5 h-5" />
-          <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Enter a descriptive title" className="flex-1 bg-transparent outline-none text-sm text-gray-700" required />
+          <input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Enter a descriptive title" maxLength={MAX_TITLE_LENGTH} className="flex-1 bg-transparent outline-none text-sm text-gray-700" required />
         </div>
-        {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
+        <div className="flex justify-between text-xs mt-1">
+          {errors.title && <p className="text-red-500">{errors.title}</p>}
+          <p className={formData.title.length >= MAX_TITLE_LENGTH * 0.9 ? 'text-red-500' : 'text-gray-500'}>
+            {formData.title.length}/{MAX_TITLE_LENGTH}
+          </p>
+        </div>
       </div>
 
       {/* Content Field */}

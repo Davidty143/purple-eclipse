@@ -33,16 +33,20 @@ export function ThreadRow({ thread, className }: ThreadRowProps) {
   return (
     <Card className={`hover:shadow-md transition-shadow ${className}`}>
       <CardHeader className="p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-w-full sm:max-w-3/4">
           {/* LEFT: Author + Thread Info */}
-          <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className="flex items-start gap-3 min-w-0 sm:max-w-[50%] w-full">
             <AvatarWithFallback name={thread.author.name} avatar={thread.author.avatar} />
-            <div className="space-y-1 min-w-0">
+            <div className="space-y-1 min-w-0 w-full">
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge variant="secondary" className="text-xs text-white bg-[#267858]">
                   {thread.tag}
                 </Badge>
-                <h3 className="text-lg font-semibold truncate">{thread.title}</h3>
+
+                {/* Truncated thread title with line-clamp */}
+                <div className="text-sm md:text-base font-semibold text-gray-900 flex-1 min-w-0 overflow-hidden">
+                  <p className="line-clamp-1 sm:line-clamp-1 break-words">{thread.title}</p>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 Posted by {thread.author.name} • {format(thread.createdAt, 'MMM d, yyyy')}

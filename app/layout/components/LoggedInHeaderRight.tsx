@@ -149,11 +149,11 @@ export default function LoggedInHeaderRight() {
 
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <div className="px-2 py-1.5">{user.email && <p className="text-xs text-muted-foreground">{user.email}</p>}</div>
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem asChild className="hover:font-semibold">
             <Link href="/profile">Profile</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem className="text-red-500 focus:text-red-500" onClick={handleSignOut}>
+          <DropdownMenuItem className="hover:font-semibold">Settings</DropdownMenuItem>
+          <DropdownMenuItem className="text-[#267858]  focus:text-[#267858] font-medium hover:font-semibold" onClick={handleSignOut}>
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
