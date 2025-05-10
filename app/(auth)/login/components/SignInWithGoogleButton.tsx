@@ -8,7 +8,7 @@ import { FcGoogle } from 'react-icons/fc'; // ✅ Colored Google icon
 
 interface SignInWithGoogleButtonProps {
   onSuccess?: () => void,
-  isLoading?: boolean;
+  isLoading?: boolean
 }
 
 const SignInWithGoogleButton = ({ onSuccess, isLoading = false}: SignInWithGoogleButtonProps) => {
