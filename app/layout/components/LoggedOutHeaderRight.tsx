@@ -5,6 +5,7 @@ import { SignUpOverlay } from '@/app/(auth)/signup/components/SignUpOverlay';
 import { ResetPasswordOverlay } from '@/app/(auth)/reset-password/components/ResetPasswordForm';
 import { Button } from '@/components/ui/button';
 import { MdOutlineLogin } from 'react-icons/md';
+import { AiOutlineUserAdd } from 'react-icons/ai';
 
 export default function LoggedOutHeaderRight() {
   const [showLoginOverlay, setShowLoginOverlay] = useState(false);
@@ -12,16 +13,16 @@ export default function LoggedOutHeaderRight() {
   const [showResetPasswordOverlay, setShowResetPasswordOverlay] = useState(false);
 
   return (
-    <div className="flex items-center gap-4 bg-green-200">
+    <div className="flex items-center gap-4">
       {/* Login Button */}
-      <Button variant="default" onClick={() => setShowLoginOverlay(true)} className="focus:outline-none focus:ring-0 text-white">
-        <MdOutlineLogin className="text-lg mr-2" />
+      <Button variant="default" onClick={() => setShowLoginOverlay(true)} className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#267858] text-white bg-[#267858] hover:bg-[#1f5c47] hover:opacity-90 active:bg-[#1f5c47] font-medium py-2 px-4 rounded-lg transition-colors duration-300 ease-in-out flex items-center gap-2">
+        <MdOutlineLogin className="text-lg" />
         <span>Login</span>
       </Button>
 
-      {/* Signup Button */}
-      <Button variant="outline" onClick={() => setShowSignUpOverlay(true)} className="hidden sm:inline-flex focus:outline-none focus:ring-0">
-        <MdOutlineLogin className="text-lg mr-2" />
+      {/* Signup Button with Outlined Icon */}
+      <Button variant="outline" onClick={() => setShowSignUpOverlay(true)} className="hidden sm:inline-flex focus:outline-none focus:ring-2 focus:ring-[#267858] focus:ring-offset-2 text-[#267858] hover:bg-[#267858] hover:text-white hover:opacity-90 active:bg-[#1f5c47] active:text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 ease-in-out flex items-center gap-2">
+        <AiOutlineUserAdd className="text-lg" />
         <span>Register</span>
       </Button>
 
