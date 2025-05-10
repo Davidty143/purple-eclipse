@@ -188,9 +188,9 @@ const PostThread = () => {
           <div className="bg-white rounded-md border-gray-300 shadow-sm border p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-xl md:text-2xl font-semibold text-gray-900">Create New Thread</h1>
+                <h1 className="text-xl md:text-xl font-semibold text-gray-900 mb-2">Create New Thread</h1>
                 {selectedSubforumName && (
-                  <div className="flex items-center space-x-4 mt-3">
+                  <div className="flex items-center space-x-4 mt-4">
                     <p className="text-sm text-gray-600 font-semibold">
                       Posting in: <span className="text-white bg-[#267858] ml-1 px-3 py-1.5 rounded-md">{selectedSubforumName}</span>
                     </p>
