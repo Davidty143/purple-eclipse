@@ -117,7 +117,7 @@ export function NewTopics() {
     );
 
   return (
-    <Card className="w-full sm:w-[300px] p-0 rounded-lg border border-gray-300">
+    <Card className="w-full lg:w-[300px] p-0 rounded-lg border border-gray-300">
       <CardHeader className="pb-3.5 px-5 pt-3.5 border-b rounded-t-lg bg-[#edf4f2]">
         <div className="flex items-center gap-2">
           <div className="p-1 bg-[#267858] rounded">

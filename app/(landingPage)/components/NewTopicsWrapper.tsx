@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ErrorBoundary from '@/app/components/error-boundary';
 
 const NewTopicsSkeletons = () => (
-  <div className="w-[300px] space-y-3">
+  <div className="w-full sm:w-[300px] space-y-3">
     <Skeleton className="h-5 w-24" />
     {[...Array(3)].map((_, i) => (
       <div key={i} className="flex items-center space-x-2">
@@ -25,7 +25,7 @@ const NewTopics = dynamic(() => import('./NewTopics').then((mod) => mod.NewTopic
 });
 
 const ErrorUI = () => (
-  <div className="w-[300px] p-3 rounded-lg bg-gray-50 border border-gray-200 text-center">
+  <div className="w-full sm:w-[300px] p-3 rounded-lg bg-gray-50 border border-gray-200 text-center">
     <p className="text-sm text-gray-600">Unable to load new topics.</p>
   </div>
 );
@@ -33,7 +33,9 @@ const ErrorUI = () => (
 export default function NewTopicsWrapper() {
   return (
     <ErrorBoundary fallback={<ErrorUI />}>
-      <NewTopics />
+      <div className="w-full xl:w-[300px]">
+        <NewTopics />
+      </div>
     </ErrorBoundary>
   );
 }

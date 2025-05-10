@@ -41,7 +41,7 @@ export function ThreadRow({ thread }: ThreadRowProps) {
             </Badge>
 
             {/* Adjusted thread title size for smaller text on mobile */}
-            <div className="text-sm sm:text-lg font-semibold text-gray-900 flex-1 min-w-0 overflow-hidden">
+            <div className="text-sm md:text-base font-semibold text-gray-900 flex-1 min-w-0 overflow-hidden">
               <p className="line-clamp-1 sm:line-clamp-1 break-words">{thread.thread_title}</p>
             </div>
           </div>
