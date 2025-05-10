@@ -100,7 +100,7 @@ export function ForumComponentWrapper() {
 
             {/* Bottom section: description */}
             <div className="mt-1">
-              <Skeleton className="w-full h-6" />
+              <Skeleton className="w-3/4 h-6" />
             </div>
           </div>
 
