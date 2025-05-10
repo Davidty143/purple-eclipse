@@ -38,7 +38,7 @@ const LoginButton = ({ onOpenLogin }: LoginButtonProps) => {
           await signout();
           setUser(null);
         }}>
-        Log out
+        Log outtt
       </Button>
     );
   }

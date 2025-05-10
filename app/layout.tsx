@@ -1,4 +1,5 @@
 //layout.tsx
+
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -53,7 +54,7 @@ export default async function RootLayout({
                   </div>
 
                   {/* Login Section */}
-                  <div className={cn('menu-header h-full flex items-center justify-end flex-shrink-0 gap-4')}>
+                  <div className={cn('menu-header h-full flex items-center justify-end flex-shrink-0 gap-4 pr-3.5')}>
                     <Suspense fallback={<Skeleton className="h-10 w-20" />}>
                       <AuthHeader />
                     </Suspense>

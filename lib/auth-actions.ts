@@ -127,7 +127,7 @@ const sendResetPasswordEmail = async (formData: FormData) => {
 
   //const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`;
 
-  const redirectUrl = process.env.NODE_ENV === 'development' ? `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/update-password` : `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`;
+  const redirectUrl = process.env.NODE_ENV === 'development' ? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://visconn.vercel.app'}/update-password` : `${process.env.NEXT_PUBLIC_SITE_URL}/update-password`;
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: redirectUrl
