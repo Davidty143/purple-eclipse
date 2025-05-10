@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ForumTitle } from './ForumTitle';
 import { SubforumCard } from './SubforumCard';
-import { useEffect, useState } from 'react';
 import { CreateForumDialog } from './CreateForumDialog';
-import { Skeleton } from '@/components/ui/skeleton'; // Assuming you have a Skeleton component
+import { CreateSubforumDialog } from './CreateSubforumDialog';
+import { Button } from '@/components/ui/button';
 
 interface Subforum {
   id: number;
@@ -53,19 +55,11 @@ export function ForumComponentWrapper() {
     fetchForums();
   }, []);
 
-  const handleDeleteSuccess = () => {
-    fetchForums();
-  };
+  const handleDeleteSuccess = () => fetchForums();
+  const handleAddSuccess = () => fetchForums();
+  const handleEditSuccess = () => fetchForums();
 
-  const handleAddSuccess = () => {
-    fetchForums();
-  };
-
-  const handleEditSuccess = () => {
-    fetchForums();
-  };
-
-  if (loading)
+  if (loading) {
     return (
       <div className="space-y-4">
         {/* Header Skeleton */}
@@ -76,35 +70,27 @@ export function ForumComponentWrapper() {
 
         <Skeleton className="w-full h-1" />
 
-        {/* Forum Sections Skeleton */}
+        {/* Forum Section Skeleton */}
         <div className="space-y-4">
           <div className="h-1 rounded-full w-full mb-6" />
 
-          {/* Forum Title Skeleton */}
-          <div className="flex flex-col border py-4 px-6 rounded-lg  w-full gap-2">
-            {/* Top section: title/tag + actions */}
+          <div className="flex flex-col border py-4 px-6 rounded-lg w-full gap-2">
             <div className="flex flex-row justify-between items-start flex-wrap gap-2">
-              {/* Left: title + tag */}
               <div className="flex items-center gap-2">
                 <Skeleton className="w-40 h-6" />
-                <span className="px-2 py-0.5 text-xs font-semibold text-white  rounded-full">Forum</span>
+                <span className="px-2 py-0.5 text-xs font-semibold text-white rounded-full">Forum</span>
               </div>
-
-              {/* Right: action buttons */}
               <div className="flex gap-1 -mt-1.5">
                 <Skeleton className="w-8 h-8" />
                 <Skeleton className="w-8 h-8" />
                 <Skeleton className="w-8 h-8" />
               </div>
             </div>
-
-            {/* Bottom section: description */}
             <div className="mt-1">
               <Skeleton className="w-3/4 h-6" />
             </div>
           </div>
 
-          {/* Subforum Skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="py-4 px-6 gap-2 border rounded-lg hover:underline hover:text-medium hover:bg-[#edf4f2] cursor-pointer transition-colors">
@@ -118,6 +104,7 @@ export function ForumComponentWrapper() {
         </div>
       </div>
     );
+  }
 
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
@@ -136,11 +123,22 @@ export function ForumComponentWrapper() {
 
           <ForumTitle title={forum.name} forumId={forum.id} description={forum.description} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} onEditSuccess={handleEditSuccess} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {forum.subforums.map((subforum) => (
-              <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} icon={subforum.icon} />
-            ))}
-          </div>
+          {forum.subforums.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {forum.subforums.map((subforum) => (
+                <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} icon={subforum.icon} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-start gap-2 text-sm text-gray-500 italic px-1">
+              <span>There are no subforums in this forum yet.</span>
+              <CreateSubforumDialog parentId={forum.id} parentName={forum.name} onSuccess={handleAddSuccess}>
+                <Button variant="outline" className="text-[#267858] border-[#267858] hover:bg-[#edf4f2]">
+                  Create Subforum
+                </Button>
+              </CreateSubforumDialog>
+            </div>
+          )}
         </div>
       ))}
     </div>
