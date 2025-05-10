@@ -41,7 +41,7 @@ export function DeleteSubforumDialog({ subforumId, subforumName, onSuccess }: De
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-white hover:bg-red-100 hover:text-red-600" aria-label="Delete subforum">
+        <Button variant="ghost" size="icon" className="text-white hover:bg-white hover:text-[#267858]" aria-label="Delete subforum">
           <Trash2 className="h-4 w-4" />
         </Button>
       </DialogTrigger>

@@ -36,15 +36,18 @@ const SubforumHeader = ({ title, description, icon, subforumId, onEditSuccess }:
   return (
     <div className="bg-gradient-to-r from-[#267858] to-[#3a9f7e] text-white p-5 rounded-md mb-3">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          {IconComponent && <IconComponent className="w-6 h-6 text-white" strokeWidth={2} />}
-          <h1 className="text-lg font-semibold">{title}</h1>
+        <div className="flex items-center justify-between gap-3">
+          {/* Left: Icon + Title */}
+          <div className="flex items-center gap-2">
+            {IconComponent && <IconComponent className="w-6 h-6 text-white" strokeWidth={2} />}
+            <h1 className="text-lg font-semibold">{title}</h1>
+          </div>
 
-          {/* Edit Dialog */}
-          <EditSubforumDialog subforumId={subforumId} currentTitle={title} currentDescription={description} currentIcon={icon} onSuccess={onEditSuccess || handleEditSuccess} />
-
-          {/* Delete Dialog */}
-          <DeleteSubforumDialog subforumId={subforumId} subforumName={title} onSuccess={handleDeleteSuccess} />
+          {/* Right: Edit + Delete buttons tightly grouped */}
+          <div className="flex items-center space-x-0">
+            <EditSubforumDialog subforumId={subforumId} currentTitle={title} currentDescription={description} currentIcon={icon} onSuccess={onEditSuccess || handleEditSuccess} />
+            <DeleteSubforumDialog subforumId={subforumId} subforumName={title} onSuccess={handleDeleteSuccess} />
+          </div>
         </div>
 
         <Button onClick={handlePostThread} className="flex items-center justify-between gap-2 px-4 text-sm border border-white bg-white text-[#267858] hover:bg-gray-100 w-full sm:w-auto">
