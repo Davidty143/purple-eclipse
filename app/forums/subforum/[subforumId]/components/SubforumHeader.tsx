@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { EditSubforumDialog, SubforumData } from './EditSubforumDialog';
+import { DeleteSubforumDialog } from './DeleteSubforumDialog'; // Import delete dialog
 import { useRouter } from 'next/navigation';
 import * as LucideIcons from 'lucide-react';
 import { LucideProps } from 'lucide-react';
@@ -26,6 +27,10 @@ const SubforumHeader = ({ title, description, icon, subforumId, onEditSuccess }:
     console.log('Updated subforum:', updatedSubforum);
   };
 
+  const handleDeleteSuccess = () => {
+    router.push('/forums'); // Redirect on successful delete
+  };
+
   const IconComponent = icon && (LucideIcons[icon as keyof typeof LucideIcons] as React.ComponentType<LucideProps> | undefined);
 
   return (
@@ -35,7 +40,11 @@ const SubforumHeader = ({ title, description, icon, subforumId, onEditSuccess }:
           {IconComponent && <IconComponent className="w-6 h-6 text-white" strokeWidth={2} />}
           <h1 className="text-lg font-semibold">{title}</h1>
 
+          {/* Edit Dialog */}
           <EditSubforumDialog subforumId={subforumId} currentTitle={title} currentDescription={description} currentIcon={icon} onSuccess={onEditSuccess || handleEditSuccess} />
+
+          {/* Delete Dialog */}
+          <DeleteSubforumDialog subforumId={subforumId} subforumName={title} onSuccess={handleDeleteSuccess} />
         </div>
 
         <Button onClick={handlePostThread} className="flex items-center justify-between gap-2 px-4 text-sm border border-white bg-white text-[#267858] hover:bg-gray-100 w-full sm:w-auto">
@@ -50,4 +59,3 @@ const SubforumHeader = ({ title, description, icon, subforumId, onEditSuccess }:
 };
 
 export default SubforumHeader;
-//working

@@ -49,6 +49,40 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ subforumId: string }> }) {
+  try {
+    const { subforumId } = await params;
+    const subforumIdNumber = Number(subforumId);
+
+    if (isNaN(subforumIdNumber)) {
+      return NextResponse.json({ error: 'Invalid subforum ID' }, { status: 400 });
+    }
+
+    const supabase = await createClientForServer();
+
+    // Start a soft delete for the subforum
+    const { error: subforumError } = await supabase.from('Subforum').update({ subforum_deleted: true, subforum_modified: new Date().toISOString() }).eq('subforum_id', subforumIdNumber);
+
+    if (subforumError) {
+      console.error('Subforum soft delete error:', subforumError);
+      return NextResponse.json({ error: subforumError.message }, { status: 500 });
+    }
+
+    // Now soft delete all threads under this subforum
+    const { error: threadError } = await supabase.from('Thread').update({ thread_deleted: true, thread_modified: new Date().toISOString() }).eq('subforum_id', subforumIdNumber);
+
+    if (threadError) {
+      console.error('Thread soft delete error:', threadError);
+      return NextResponse.json({ error: threadError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('DELETE subforum cascade error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 // ✅ PUT: Update subforum
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ subforumId: string }> }) {
   try {
