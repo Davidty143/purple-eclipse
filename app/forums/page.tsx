@@ -6,7 +6,7 @@ import { ForumComponentWrapper } from './components/ForumComponentWrapper';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Directly inlined skeleton fallback for NewTopics
-const NewTopics = dynamic(() => import('@/app/(landingPage)/components/NewTopics').then((mod) => mod.NewTopics), {
+const NewTopics = dynamic(() => import('@/app/landing-page/components/NewTopics').then((mod) => mod.NewTopics), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full lg:w-[300px] space-y-4 rounded-md border">

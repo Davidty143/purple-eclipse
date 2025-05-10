@@ -37,7 +37,7 @@ const NewTopicsSkeletons = () => (
 );
 
 // Dynamically import NewTopics with fallback skeleton
-const NewTopics = dynamic(() => import('@/app/(landingPage)/components/NewTopics').then((mod) => mod.NewTopics), { ssr: false, loading: () => <NewTopicsSkeletons /> });
+const NewTopics = dynamic(() => import('@/app/landing-page/components/NewTopics').then((mod) => mod.NewTopics), { ssr: false, loading: () => <NewTopicsSkeletons /> });
 
 interface SubforumData {
   id: string;
