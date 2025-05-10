@@ -5,7 +5,9 @@ import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import SubforumHeader from './components/SubforumHeader';
 import { NoSubforumData } from './components/NoSubforumData';
+
 import { Skeleton } from '@/components/ui/skeleton';
+
 import { SubforumTopics } from './components/SubforumTopics';
 
 // Define skeleton fallback for NewTopics
@@ -76,6 +78,8 @@ const SubforumHeaderSkeleton = () => (
 
 export default function SubforumPage() {
   const params = useParams();
+  const subforumId = params?.subforumId as string;
+
   const [subforum, setSubforum] = useState<SubforumData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,9 +89,11 @@ export default function SubforumPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+
       try {
         const response = await fetch(`/api/subforums/${params.subforumId}`);
         if (!response.ok) throw new Error('Subforum not found');
+
         const data = await response.json();
         setSubforum(data);
       } catch (err) {
@@ -98,8 +104,10 @@ export default function SubforumPage() {
       }
     };
 
+
     if (params.subforumId) fetchData();
   }, [params.subforumId]);
+
 
   const handleEditSuccess = (updatedSubforum: SubforumData) => {
     setSubforum((prev) => ({ ...prev, ...updatedSubforum }));
@@ -121,6 +129,7 @@ export default function SubforumPage() {
             {loading ? <SubforumHeaderSkeleton /> : <SubforumHeader title={subforum!.name} description={subforum!.description} subforumId={Number(params.subforumId)} icon={subforum!.icon} onEditSuccess={handleEditSuccess} />}
 
             <SubforumTopics subforumId={Number(params.subforumId)} page={currentPage} limit={pageSize} onPageChange={handlePageChange} />
+
           </div>
 
           {/* Sidebar with skeleton */}

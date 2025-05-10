@@ -1,7 +1,9 @@
 import Image from 'next/image';
+
 import { FeaturedTopics } from '../landing-page/components/FeaturedTopics';
 import { LandingHeader } from '../landing-page/components/LandingHeader';
 import { NewTopics } from '../landing-page/components/NewTopics';
+
 import BodyHeader from '@/components/BodyHeader';
 import ThreadBlock from '@/components/ThreadBlock';
 import ThreadNameBlock from '@/components/ThreadNameBlock';

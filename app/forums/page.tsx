@@ -1,6 +1,8 @@
+
 'use client';
 
 import dynamic from 'next/dynamic';
+
 import BodyHeader from '@/components/BodyHeader';
 import { ForumComponentWrapper } from './components/ForumComponentWrapper';
 import { Skeleton } from '@/components/ui/skeleton';
