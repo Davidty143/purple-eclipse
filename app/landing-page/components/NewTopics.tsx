@@ -11,15 +11,18 @@ import { Flame } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link'; // Import Link
 
+// Thread type
 interface Thread {
   id: string;
   title: string;
   author: {
-    name: string;
-    avatar?: string;
+    account_username: string | null;
+    account_email: string | null;
+    account_avatar_url?: string | null;
   };
 }
 
+// Fetch threads
 const fetchNewThreads = async (): Promise<Thread[]> => {
   try {
     const supabase = createClient();
@@ -30,7 +33,7 @@ const fetchNewThreads = async (): Promise<Thread[]> => {
         thread_id,
         thread_title,
         thread_created,
-        author:author_id(
+        author:author_id (
           account_username,
           account_email,
           account_avatar_url
@@ -47,8 +50,9 @@ const fetchNewThreads = async (): Promise<Thread[]> => {
       id: String(thread.thread_id),
       title: thread.thread_title,
       author: {
-        name: thread.author?.account_username || 'Anonymous',
-        avatar: thread.author?.account_avatar_url || undefined
+        account_username: thread.author?.account_username || null,
+        account_email: thread.author?.account_email || null,
+        account_avatar_url: thread.author?.account_avatar_url || null
       }
     }));
   } catch (err) {
@@ -69,9 +73,10 @@ const getInitials = (name: string) => {
         .join('');
 };
 
-const AvatarWithFallback = ({ name, avatar }: { name: string; avatar?: string }) => {
-  const initials = getInitials(name);
-  return <Avatar className="w-8 h-8 shrink-0">{avatar?.trim() ? <AvatarImage src={avatar} alt={name} /> : <AvatarFallback className="text-xs">{initials}</AvatarFallback>}</Avatar>;
+const AvatarWithFallback = ({ author }: { author: Thread['author'] }) => {
+  const username = author.account_username || 'Anonymous';
+  const initials = getInitials(username);
+  return <Avatar className="w-8 h-8 shrink-0">{author.account_avatar_url?.trim() ? <AvatarImage src={author.account_avatar_url} alt={username} /> : <AvatarFallback className="text-xs">{initials}</AvatarFallback>}</Avatar>;
 };
 
 export function NewTopics() {
@@ -108,7 +113,7 @@ export function NewTopics() {
       displayedThreads.map((thread) => (
         <Link key={thread.id} href={`/thread/${thread.id}`} passHref>
           <div className="flex items-center gap-3 px-4 py-2 w-full overflow-hidden cursor-pointer hover:bg-gray-100 rounded-md">
-            <AvatarWithFallback name={thread.author.name} avatar={thread.author.avatar} />
+            <AvatarWithFallback author={thread.author} />
             <div className="text-sm font-medium text-gray-800 line-clamp-1 w-full">{thread.title}</div>
           </div>
         </Link>
