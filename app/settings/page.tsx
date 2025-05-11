@@ -11,9 +11,9 @@ export default async function SettingsPage() {
   if (!user) redirect('/login');
 
   return (
-    <div className="min-h-screen py-8">
+    <div className="min-h-screen py-6 sm:py-8">
       <div className="w-full max-w-[1250px] mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold mb-8">Settings</h1>
+        <h1 className="text-xl sm:text-2xl font-bold mb-8">Settings</h1>
 
         <div className="w-full flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation */}

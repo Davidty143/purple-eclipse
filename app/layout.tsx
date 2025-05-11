@@ -49,7 +49,7 @@ export default async function RootLayout({
               <div className={cn('menu-header h-16 w-full border-b border-gray-300 flex items-center justify-center')}>
                 <div className={cn('menu-header h-full w-full max-w-[1250px] xl:w-[80%] flex justify-between items-center')}>
                   {/* LOGO Section */}
-                  <div className={cn('menu-header h-[60px] w-auto flex items-center justify-start py-5')}>
+                  <div className={cn('menu-header h-[60px] ml-5 md:ml-2 lg:ml-2 w-auto flex items-center justify-start py-5')}>
                     <Logo />
                   </div>
 
