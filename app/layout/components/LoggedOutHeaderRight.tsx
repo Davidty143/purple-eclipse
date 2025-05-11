@@ -21,7 +21,7 @@ export default function LoggedOutHeaderRight() {
       </Button>
 
       {/* Signup Button with Outlined Icon */}
-      <Button variant="outline" onClick={() => setShowSignUpOverlay(true)} className="hidden sm:inline-flex focus:outline-none focus:ring-2 focus:ring-[#267858] focus:ring-offset-2 text-[#267858] hover:bg-[#267858] hover:text-white hover:opacity-90 active:bg-[#1f5c47] active:text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 ease-in-out flex items-center gap-2">
+      <Button variant="outline" onClick={() => setShowSignUpOverlay(true)} className=" sm:inline-flex focus:outline-none focus:ring-2 focus:ring-[#267858] focus:ring-offset-2 text-[#267858] hover:bg-[#267858] hover:text-white hover:opacity-90 active:bg-[#1f5c47] active:text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 ease-in-out  items-center gap-2 hidden md:flex">
         <AiOutlineUserAdd className="text-lg" />
         <span>Register</span>
       </Button>
