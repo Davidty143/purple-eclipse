@@ -108,19 +108,30 @@ const PostThread = () => {
       if (!user.id) throw new Error('User ID is missing');
 
       // Check if user exists in Account table, if not, create a new account
-      const { data: accountData, error: accountError } = await supabase.from('Account').select('account_id').eq('account_id', user.id).single();
+      const { data: accountData, error: accountError } = await supabase.from('Account').select('account_id, account_username, account_avatar_url').eq('account_id', user.id).single();
 
+      // If account doesn't exist or there was an error, create a new account
       if (accountError || !accountData) {
+        console.log('Account not found, creating new account');
         const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-        const { error: createAccountError } = await supabase.from('Account').insert({
-          account_id: user.id,
-          account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
-          account_email: user.email,
-          account_is_deleted: false,
-          account_avatar_url: avatarUrl
-        });
+        const username = user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous';
 
-        if (createAccountError) throw new Error(`Account creation failed: ${createAccountError.message}`);
+        const { error: createAccountError } = await supabase
+          .from('Account')
+          .insert({
+            account_id: user.id,
+            account_username: username,
+            account_email: user.email,
+            account_is_deleted: false,
+            account_avatar_url: avatarUrl
+          })
+          .select()
+          .single();
+
+        if (createAccountError) {
+          console.error('Error creating account:', createAccountError);
+          throw new Error(`Account creation failed: ${createAccountError.message}`);
+        }
       }
 
       // Upload images if any
