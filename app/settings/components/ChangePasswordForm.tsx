@@ -117,7 +117,7 @@ export default function ChangePasswordForm() {
 
           {message && <p className={`text-sm ${isSuccess ? 'text-green-600' : 'text-red-500'}`}>{message}</p>}
 
-          <Button type="submit" disabled={loading} className="w-full text-sm font-medium py-4">
+          <Button type="submit" disabled={loading} className="w-full text-sm font-medium py-5 bg-[#267858] hover:bg-[#267858] hover:bg-opacity-90">
             {loading ? 'Updating...' : 'Change Password'}
           </Button>
         </form>

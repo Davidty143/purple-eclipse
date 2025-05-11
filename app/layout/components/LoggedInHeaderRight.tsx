@@ -152,7 +152,9 @@ export default function LoggedInHeaderRight() {
           <DropdownMenuItem asChild className="hover:font-semibold">
             <Link href="/profile">Profile</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="hover:font-semibold">Settings</DropdownMenuItem>
+          <DropdownMenuItem asChild className="hover:font-semibold">
+            <Link href="/settings">Settings</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem className="text-[#267858]  focus:text-[#267858] font-medium hover:font-semibold" onClick={handleSignOut}>
             Sign Out
           </DropdownMenuItem>
