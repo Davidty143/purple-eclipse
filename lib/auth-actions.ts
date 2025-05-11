@@ -165,66 +165,56 @@ const updatePassword = async (state: { error: string; success: string }, formDat
 
 export async function updateUsername(formData: FormData) {
   const supabase = await createClientForServer();
+  const username = (formData.get('username') as string)?.trim();
 
-  const username = formData.get('username') as string;
-
-  if (!username || username.trim().length === 0) {
+  if (!username) {
     throw new Error('Username cannot be empty.');
   }
-
-  const { data: session, error: sessionError } = await supabase.auth.getUser();
-  if (sessionError || !session?.user) {
-    throw new Error('User not authenticated.');
+  if (username.length < 3 || username.length > 20) {
+    throw new Error('Username must be between 3 and 20 characters.');
   }
-  console.log('USERNAMEE: ' + username);
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    throw new Error('Username can only contain letters, numbers, and underscores.');
+  }
 
-  const { error } = await supabase.auth.updateUser({
-    data: {
-      username: username
+  const lowercasedUsername = username.toLowerCase();
+
+  try {
+    const { data: existingUsers, error: usernameCheckError } = await supabase.from('Account').select('account_username').ilike('account_username', lowercasedUsername);
+
+    if (usernameCheckError) {
+      console.error('Error checking username availability:', usernameCheckError.message || usernameCheckError);
+      throw new Error('Error checking username availability.');
     }
-  });
 
-  if (error) {
-    console.log('Error updating username:', error);
-    throw new Error(error.message);
-  }
+    if (existingUsers && existingUsers.length > 0) {
+      throw new Error('Username is already taken.');
+    }
 
-  console.log('Debugging variables:');
-  console.log('Username being set:', username);
-  console.log('Session user ID:', session?.user?.id); // Optional chaining to prevent errors
-  console.log('Table name:', 'Account');
-  console.log('Supabase client initialized:', !!supabase); // Check if client exists
+    const { data: session, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError || !session?.user) {
+      throw new Error('User not authenticated.');
+    }
 
-  if (!session?.user?.id) {
-    console.error('No valid session or user ID!');
-    throw new Error('Authentication required');
-  }
-
-  const { error: accountUpdateError } = await supabase
-    .from('Account')
-    .update({
-      account_username: username
-    })
-    .eq('account_id', session.user.id);
-
-  if (accountUpdateError) {
-    console.error('Update error details:', {
-      errorMessage: accountUpdateError.message,
-      errorCode: accountUpdateError.code,
-      attemptedUsername: username,
-      attemptedUserId: session.user.id
+    const { error: authUpdateError } = await supabase.auth.updateUser({
+      data: { username }
     });
-    throw new Error(accountUpdateError.message);
-  } else {
-    console.log('Update successful for:', {
-      userId: session.user.id,
-      newUsername: username
-    });
+    if (authUpdateError) {
+      throw new Error(authUpdateError.message);
+    }
+
+    const { error: accountUpdateError } = await supabase.from('Account').update({ account_username: username }).eq('account_id', session.user.id);
+
+    if (accountUpdateError) {
+      throw new Error(accountUpdateError.message);
+    }
+
+    // Success
+    console.log('Username updated successfully');
+  } catch (error: any) {
+    console.error('Error during username update:', error);
+    throw new Error(error.message || 'Something went wrong.');
   }
-
-  revalidatePath('/');
-
-  redirect('/');
 }
 
 export { updatePassword, sendResetPasswordEmail };
