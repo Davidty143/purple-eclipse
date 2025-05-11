@@ -89,9 +89,8 @@ export default function SubforumPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-
       try {
-        const response = await fetch(`/api/subforums/${params.subforumId}`);
+        const response = await fetch(`/api/subforums/${subforumId}`);
         if (!response.ok) throw new Error('Subforum not found');
 
         const data = await response.json();
@@ -104,10 +103,8 @@ export default function SubforumPage() {
       }
     };
 
-
-    if (params.subforumId) fetchData();
-  }, [params.subforumId]);
-
+    if (subforumId) fetchData();
+  }, [subforumId]);
 
   const handleEditSuccess = (updatedSubforum: SubforumData) => {
     setSubforum((prev) => ({ ...prev, ...updatedSubforum }));
@@ -126,10 +123,9 @@ export default function SubforumPage() {
         <div className="w-full flex flex-col lg:flex-row justify-between gap-8">
           {/* Main Content */}
           <div className="w-full flex flex-col gap-6">
-            {loading ? <SubforumHeaderSkeleton /> : <SubforumHeader title={subforum!.name} description={subforum!.description} subforumId={Number(params.subforumId)} icon={subforum!.icon} onEditSuccess={handleEditSuccess} />}
+            {loading ? <SubforumHeaderSkeleton /> : <SubforumHeader title={subforum!.name} description={subforum!.description} subforumId={Number(subforumId)} icon={subforum!.icon} onEditSuccess={handleEditSuccess} />}
 
-            <SubforumTopics subforumId={Number(params.subforumId)} page={currentPage} limit={pageSize} onPageChange={handlePageChange} />
-
+            <SubforumTopics subforumId={Number(subforumId)} page={currentPage} limit={pageSize} onPageChange={handlePageChange} />
           </div>
 
           {/* Sidebar with skeleton */}

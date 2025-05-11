@@ -14,23 +14,32 @@ export class SubforumRepository {
   }
 
   async getActiveSubforums(limit: number = 5): Promise<Subforum[]> {
-    const { data, error } = await this.supabase
-      .from('Subforum')
-      .select(
+    try {
+      const { data, error } = await this.supabase
+        .from('Subforum')
+        .select(
+          `
+          subforum_id,
+          subforum_name,
+          subforum_description
         `
-        subforum_id,
-        subforum_name,
-        subforum_description
-      `
-      )
-      .eq('subforum_deleted', false)
-      .limit(limit);
+        )
+        .eq('subforum_deleted', false)
+        .limit(limit);
 
-    if (error) {
-      console.error('Error fetching subforums:', error);
-      throw new Error(`Subforum fetch error: ${error.message}`);
+      if (error) {
+        console.error('Error fetching subforums:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Unexpected error in getActiveSubforums:', error);
+      return [];
     }
-
-    return data || [];
   }
 }
