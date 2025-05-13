@@ -24,7 +24,7 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
 
   const googleButtonClick = () => {
     setIsLoading(true);
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +63,7 @@ export function LoginOverlay({ onClose, onSuccess, showSignUpLink = true, onOpen
         <CardContent>
           <div className="text-start text-sm font-semibold text-gray-900 pb-4">Login</div>
 
-          <SignInWithGoogleButton onSuccess = {googleButtonClick} isLoading={isLoading}/>
+          <SignInWithGoogleButton onSuccess={googleButtonClick} isLoading={isLoading} />
 
           {/* OR Divider */}
           <div className="my-4 flex items-center text-gray-400 text-sm">
