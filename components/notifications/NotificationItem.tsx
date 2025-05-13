@@ -39,27 +39,21 @@ export default function NotificationItem({ notification, handleMarkAsRead, handl
   const handleNotificationClick = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    try {
-      if (!notification.is_read) {
-        await handleMarkAsRead(notification.notification_id);
-      }
-
-      // Try to fetch the thread/comment to check if it exists
-      const response = await fetch(getNotificationLink(notification));
-
-      if (!response.ok) {
-        // If the content is not found (404) or any other error, redirect to not-found page
-        router.push('/not-found');
-        return;
-      }
-
-      // If content exists, navigate to it
-      router.push(getNotificationLink(notification));
-    } catch (error) {
-      console.error('Error handling notification click:', error);
-      // If there's an error, redirect to not-found page
-      router.push('/not-found');
+    if (!notification.is_read) {
+      await handleMarkAsRead(notification.notification_id);
     }
+
+    // Try to fetch the thread/comment to check if it exists
+    const response = await fetch(getNotificationLink(notification));
+
+    if (!response.ok) {
+      // If the content is not found (404) or any other error, redirect to not-found page
+      router.push('/not-found');
+      return;
+    }
+
+    // If content exists, navigate to it
+    router.push(getNotificationLink(notification));
   };
 
   // Generate fallback text (first letter of username or '?')
