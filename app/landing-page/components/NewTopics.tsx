@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { createCachedFetch } from '@/lib/use-cached-fetch';
+import { createCachedFetch, invalidateCache } from '@/lib/use-cached-fetch';
 import { createClient } from '@/app/utils/supabase/client';
 
 import { Flame } from 'lucide-react';
@@ -85,16 +85,46 @@ export function NewTopics() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const refreshThreads = async () => {
+    setLoading(true);
+    try {
+      // Invalidate the cache to force a fresh fetch
+      invalidateCache('new-topics');
+      const data = await getNewThreadsData();
+      setThreads(data || []);
+    } catch (error) {
+      console.error('Error refreshing threads:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    getNewThreadsData()
-      .then((data) => {
-        setThreads(data || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching new threads data:', error);
-        setLoading(false);
-      });
+    // Initial fetch
+    refreshThreads();
+
+    // Set up real-time subscription for thread changes
+    const supabase = createClient();
+    const subscription = supabase
+      .channel('thread-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'Thread'
+        },
+        () => {
+          // Refresh threads when any change occurs
+          refreshThreads();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleShowMore = () => {
