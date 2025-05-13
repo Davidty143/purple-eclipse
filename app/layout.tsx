@@ -1,5 +1,3 @@
-//layout.tsx
-
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -13,10 +11,10 @@ import { Toaster } from 'sonner';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createClientForServer } from '@/app/utils/supabase/server';
+import MobileSidebarMenu from './layout/components/MobileSidebarMenu';
 
 const inter = Inter({ subsets: ['latin'] });
 
-// Loading fallbacks
 const HeaderFallback = () => (
   <div className="h-full w-300px flex items-center justify-center">
     <Skeleton className="h-8 w-48" />
@@ -44,12 +42,13 @@ export default async function RootLayout({
       <body className={cn('bg-background', inter.className)}>
         <AuthProvider serverUser={user}>
           <div className="w-full">
-            <div className="w-full header-wrapper border-b border-gray-300">
+            <div className="w-full header-wrapper border-b ">
               {/* Menu Header */}
-              <div className={cn('menu-header h-16 w-full border-b border-gray-300 flex items-center justify-center')}>
+              <div className={cn('menu-header h-16 w-full lg:border-b  flex items-center justify-center')}>
                 <div className={cn('menu-header h-full w-full max-w-[1250px] xl:w-[80%] flex justify-between items-center')}>
-                  {/* LOGO Section */}
-                  <div className={cn('menu-header h-[60px] w-auto flex items-center justify-start py-5')}>
+                  {/* LOGO Section with Hamburger for Mobile */}
+                  <div className={cn('menu-header h-[60px] ml-2 w-auto flex items-center justify-start py-5 gap-2')}>
+                    <MobileSidebarMenu />
                     <Logo />
                   </div>
 
@@ -63,14 +62,17 @@ export default async function RootLayout({
               </div>
 
               {/* Bottom Green Header */}
-              <div className={cn('menu-header h-16 w-full flex p-4 items-center justify-center')}>
+              {/* Hidden on mobile, displayed on medium screens and above */}
+              <div className={cn('menu-header h-16 w-full p-4 items-center justify-center hidden lg:flex ')}>
                 <div className={cn('menu-header h-full w-[1250px] xl:w-[80%] flex justify-between items-center')}>
                   <div className={cn('menu-header h-full w-300px flex items-center justify-center')}>
                     <Suspense fallback={<HeaderFallback />}>
                       <Header />
                     </Suspense>
                   </div>
-                  <div className={cn('menu-header py-4 h-full w-300px flex pl-2 items-center justify-center')}>
+
+                  {/* SearchBar - Desktop only */}
+                  <div className={cn('menu-header py-4 h-full w-300px pl-2 items-center justify-center hidden md:flex')}>
                     <Suspense fallback={<SearchBarFallback />}>
                       <SearchBar />
                     </Suspense>
@@ -79,10 +81,11 @@ export default async function RootLayout({
               </div>
             </div>
 
+            {/* Main Content */}
             <Suspense
               fallback={
                 <div className="min-h-[600px] flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-4">
+                  <div className="flex flex-col items-center">
                     <Skeleton className="h-8 w-56" />
                     <Skeleton className="h-64 w-full max-w-3xl" />
                   </div>
@@ -90,6 +93,7 @@ export default async function RootLayout({
               }>
               {children}
             </Suspense>
+
             <Toaster />
           </div>
         </AuthProvider>
