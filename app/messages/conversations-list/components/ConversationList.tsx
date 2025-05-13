@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface ConversationPartner {
   id: string;
@@ -205,7 +206,7 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
               })}>
               <div className="relative">
                 {/* Render avatar if available */}
-                {partner.avatar_url ? <img src={partner.avatar_url} alt={`${partner.username}'s avatar`} className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>}
+                {partner.avatar_url ? <Image src={partner.avatar_url} alt={`${partner.username}'s avatar`} width={40} height={40} className="rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>}
                 {partner.unread_count ? <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">{partner.unread_count}</span> : null}
               </div>
               <div className="ml-3 flex-1 min-w-0">
