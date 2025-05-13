@@ -62,7 +62,7 @@ export function ThreadRow({ thread, className }: ThreadRowProps) {
 
           {/* RIGHT: Last Comment (hidden on mobile) */}
           {thread.lastComment ? (
-            <div className="flex items-center gap-2 min-w-[120px] sm:flex-row flex-col sm:items-end hidden sm:flex">
+            <div className="items-center gap-2 min-w-[120px] sm:flex-row flex-col sm:items-end hidden sm:flex">
               <div className="text-right">
                 <p className="font-medium text-xs">{format(thread.lastComment.createdAt, 'MMM d')}</p>
                 <p className="text-xs truncate max-w-[120px]">by {thread.lastComment.author.name}</p>
