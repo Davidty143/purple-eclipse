@@ -276,7 +276,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                           {thread.subforum.subforum_name}
                         </Badge>
                       </div>
-                      <p className="mt-3 text-base text-gray-600 line-clamp-2">{thread.thread_content}</p>
+                      <p className="mt-3 text-base text-gray-600 line-clamp-2">{thread.thread_content.replace(/<[^>]*>/g, '')}</p>
                     </div>
                     <div className="flex space-x-3 ml-6">
                       <Button variant="outline" onClick={() => router.push(`/thread/${thread.thread_id}/edit`)}>
