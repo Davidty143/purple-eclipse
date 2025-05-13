@@ -9,7 +9,7 @@ export default function NotFound() {
           <p className="mt-2 text-sm text-gray-600">The content you&apos;re looking for may have been deleted or is no longer available.</p>
         </div>
         <div className="mt-8">
-          <Link href="/" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Link href="/" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#267a59] hover:#267a59 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             Return to Home
           </Link>
         </div>
