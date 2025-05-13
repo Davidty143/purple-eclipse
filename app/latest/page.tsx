@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { ShadPaginationNav } from '@/components/ShadPaginationNav';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 interface DatabaseAuthor {
   account_username: any;
@@ -56,6 +57,7 @@ export default function LatestPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalThreads, setTotalThreads] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   useEffect(() => {
     const fetchThreads = async () => {
@@ -64,7 +66,7 @@ export default function LatestPage() {
         const from = (currentPage - 1) * PAGE_SIZE;
         const to = from + PAGE_SIZE - 1;
 
-        const { data, error, count } = await supabase
+        let query = supabase
           .from('Thread')
           .select(
             `
@@ -83,8 +85,14 @@ export default function LatestPage() {
             { count: 'exact' }
           )
           .eq('thread_deleted', false)
-          .order('thread_created', { ascending: false })
-          .range(from, to);
+          .order('thread_created', { ascending: false });
+
+        // Add category filter if selected and not 'all'
+        if (selectedCategory && selectedCategory !== 'all') {
+          query = query.eq('thread_category', selectedCategory);
+        }
+
+        const { data, error, count } = await query.range(from, to);
 
         if (error) {
           console.error('Error fetching threads:', error);
@@ -110,7 +118,7 @@ export default function LatestPage() {
     };
 
     fetchThreads();
-  }, [currentPage]);
+  }, [currentPage, selectedCategory]);
 
   const totalPages = Math.ceil(totalThreads / PAGE_SIZE);
 
@@ -133,6 +141,21 @@ export default function LatestPage() {
         <div className="w-full flex flex-col gap-4 sm:gap-6">
           <div className="flex items-center justify-between">
             <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Latest Threads</h1>
+            <div className="w-[200px]">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="Help">Help</SelectItem>
+                  <SelectItem value="Discussion">Discussion</SelectItem>
+                  <SelectItem value="Question">Question</SelectItem>
+                  <SelectItem value="Tutorial">Tutorial</SelectItem>
+                  <SelectItem value="News">News</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <Card className="border-gray-200">
