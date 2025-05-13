@@ -1,53 +1,65 @@
-// components/auth/UpdatePasswordForm.tsx
-"use client";
-import { updatePassword } from "@/lib/auth-actions";
-import { useActionState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+'use client';
+
+import { updatePassword } from '@/lib/auth-actions';
+import { useActionState } from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Lock } from 'lucide-react';
 
 export const UpdatePasswordForm = () => {
   const [state, formAction, isPending] = useActionState(updatePassword, {
-    error: "",
-    success: "",
+    error: '',
+    success: ''
   });
 
   const { error, success } = state;
+  const router = useRouter();
+
+  // Redirect to homepage on success
+  useEffect(() => {
+    if (success) {
+      const timeout = setTimeout(() => router.push('/'), 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [success, router]);
+
+  // Handler for the ✕ button
+  const handleClose = () => {
+    router.push('/');
+  };
 
   return (
-    <Card className="mx-auto w-[350px] sm:w-[400px] h-[500px]">
-      <CardHeader>
-        <CardTitle className="text-2xl text-center font-semibold">
-          VISCONN
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-start text-sm font-semibold text-gray-900 pb-4">
-          Update Password
-        </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+      <Card className="mx-auto w-[350px] sm:w-[400px] h-[500px] sm:h-[540px] relative shadow-lg rounded-xl">
+        {/* ✕ Close Button */}
+        <button onClick={handleClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-lg" aria-label="Close">
+          ✕
+        </button>
 
-        <form action={formAction}>
-          <div className="grid gap-4">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center font-bold text-[#267858]">VISCONN</CardTitle>
+        </CardHeader>
+
+        <CardContent>
+          <div className="text-start text-sm font-semibold text-gray-900 pb-4">Update Password</div>
+
+          <form action={formAction}>
             <div className="grid gap-4">
-              <Input
-                name="password"
-                type="password"
-                placeholder="Enter new password"
-                className="text-sm"
-                required
-                disabled={isPending}
-              />
+              {/* Password Input */}
+              <div className="flex items-center gap-3 h-12 border border-gray-300 rounded-2xl px-4 bg-white focus-within:ring-2 focus-within:ring-[#267858] transition">
+                <Lock className="text-gray-400 w-5 h-5" />
+                <input name="password" type="password" placeholder="Enter new password" className="flex-1 bg-transparent outline-none text-sm" required disabled={isPending} />
+              </div>
 
-              <Input
-                name="confirmPassword"
-                type="password"
-                placeholder="Confirm new password"
-                className="text-sm"
-                required
-                disabled={isPending}
-              />
+              {/* Confirm Password Input */}
+              <div className="flex items-center gap-3 h-12 border border-gray-300 rounded-2xl px-4 bg-white focus-within:ring-2 focus-within:ring-[#267858] transition">
+                <Lock className="text-gray-400 w-5 h-5" />
+                <input name="confirmPassword" type="password" placeholder="Confirm new password" className="flex-1 bg-transparent outline-none text-sm" required disabled={isPending} />
+              </div>
 
+              {/* Password Requirements */}
               <div className="text-xs text-muted-foreground mt-1">
                 Password must contain:
                 <ul className="list-disc pl-4">
@@ -56,26 +68,19 @@ export const UpdatePasswordForm = () => {
                   <li>At least 1 number</li>
                 </ul>
               </div>
+
+              {/* Error / Success Messages */}
+              {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+              {success && <div className="text-green-500 text-sm mt-1">{success}</div>}
+
+              {/* Submit Button */}
+              <Button type="submit" className="w-full h-12 text-base rounded-2xl bg-[#267858] hover:bg-[#1f5e4a] transition text-white" disabled={isPending}>
+                {isPending ? 'Updating...' : 'Update Password'}
+              </Button>
             </div>
-
-            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
-            {success && (
-              <div className="text-green-500 text-sm mt-2">{success}</div>
-            )}
-
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Updating..." : "Update Password"}
-            </Button>
-          </div>
-        </form>
-
-        <div className="mt-4 text-center text-sm">
-          Return to{" "}
-          <Link href="/login" className="underline">
-            Login
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
