@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { createClient } from '@/app/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import RichTextEditor from '@/components/ui/rich-editor-text';
 
 interface Thread {
   thread_id: number;
@@ -66,8 +66,8 @@ export default function EditThreadForm({ thread, user }: EditThreadFormProps) {
       }
 
       toast.success('Thread updated successfully');
-      // Redirect to the thread page
-      router.push(`/thread/${thread.thread_id}`);
+      // Redirect to the profile page
+      router.push('/profile');
       router.refresh();
     } catch (error: any) {
       toast.error(`Failed to update thread: ${error.message}`);
@@ -102,7 +102,7 @@ export default function EditThreadForm({ thread, user }: EditThreadFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="content">Content</Label>
-          <Textarea id="content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Write your thread content here..." className="min-h-[200px]" required />
+          <RichTextEditor value={content} onChange={setContent} placeholder="Write your thread content here..." />
         </div>
 
         <div className="flex items-center space-x-3 justify-end">
