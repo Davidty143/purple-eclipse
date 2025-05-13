@@ -21,9 +21,9 @@ const Header = () => {
       link: '/forums',
       icon: FiUsers,
       items: [
-        { text: 'Academics', href: '/forum1' },
-        { text: 'Courses', href: '/forum2' },
-        { text: 'Lifestyle', href: '/forum3' }
+        { text: 'Academics', href: '/forums' },
+        { text: 'Courses', href: '/forums' },
+        { text: 'Lifestyle', href: '/forums' }
       ]
     },
     trending: {
@@ -31,9 +31,9 @@ const Header = () => {
       link: '/trending',
       icon: FiTrendingUp,
       items: [
-        { text: 'Today', href: '/daily-trending' },
-        { text: 'This Week', href: '/weekly-trending' },
-        { text: 'This Month', href: '/monthly-trending' }
+        { text: 'Today', href: '/trending' },
+        { text: 'This Week', href: '/trending' },
+        { text: 'This Month', href: '/trending' }
       ]
     },
     latest: {
@@ -41,9 +41,9 @@ const Header = () => {
       link: '/latest',
       icon: FiClock,
       items: [
-        { text: 'New Topics', href: '/newtopics' },
-        { text: 'New Questions', href: '/newquestions' },
-        { text: 'New Solutions', href: '/newsolutions' }
+        { text: 'New Topics', href: '/latest' },
+        { text: 'New Questions', href: '/latest' },
+        { text: 'New Solutions', href: '/latest' }
       ]
     }
   };
