@@ -217,4 +217,26 @@ export async function updateUsername(formData: FormData) {
   }
 }
 
+export async function setAdminRole(accountId: string) {
+  const supabase = await createClientForServer();
+
+  // First get the admin role ID
+  const { data: adminRole, error: roleError } = await supabase.from('Role').select('role_id').eq('role_type', 'ADMIN').single();
+
+  if (roleError) {
+    console.error('Failed to fetch admin role:', roleError);
+    throw new Error('Failed to fetch admin role');
+  }
+
+  // Update the account with the admin role
+  const { error: updateError } = await supabase.from('Account').update({ account_role_id: adminRole.role_id }).eq('account_id', accountId);
+
+  if (updateError) {
+    console.error('Failed to update account role:', updateError);
+    throw new Error('Failed to update account role');
+  }
+
+  return true;
+}
+
 export { updatePassword, sendResetPasswordEmail };

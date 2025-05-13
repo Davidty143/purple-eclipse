@@ -1,10 +1,17 @@
 import { createForum } from '@/lib/forum-actions';
+import { requireAdminRole } from '@/lib/auth-middleware';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   console.log('[API] Forum creation request received');
 
   try {
+    // Check if user has admin role
+    const adminCheck = await requireAdminRole(request);
+    if (adminCheck instanceof NextResponse) {
+      return adminCheck; // Returns error response if not admin
+    }
+
     const formData = await request.json();
     console.log('[API] Request body:', JSON.stringify(formData, null, 2));
 

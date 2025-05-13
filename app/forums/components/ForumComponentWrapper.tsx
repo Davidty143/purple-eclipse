@@ -7,6 +7,7 @@ import { SubforumCard } from './SubforumCard';
 import { CreateForumDialog } from './CreateForumDialog';
 import { CreateSubforumDialog } from './CreateSubforumDialog';
 import { Button } from '@/components/ui/button';
+import { useUserRole } from '@/lib/useUserRole';
 
 interface Subforum {
   id: number;
@@ -25,6 +26,11 @@ export function ForumComponentWrapper() {
   const [forums, setForums] = useState<ForumData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { isAdmin, loading: roleLoading, userRole } = useUserRole();
+
+  console.log('ForumComponentWrapper - isAdmin:', isAdmin);
+  console.log('ForumComponentWrapper - userRole:', userRole);
+  console.log('ForumComponentWrapper - roleLoading:', roleLoading);
 
   const fetchForums = async () => {
     try {
@@ -59,7 +65,7 @@ export function ForumComponentWrapper() {
   const handleAddSuccess = () => fetchForums();
   const handleEditSuccess = () => fetchForums();
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="space-y-4">
         {/* Header Skeleton */}
@@ -146,7 +152,7 @@ export function ForumComponentWrapper() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2">
         <h2 className="text-lg font-semibold">Forums List</h2>
-        <CreateForumDialog onSuccess={handleAddSuccess} />
+        {isAdmin && <CreateForumDialog onSuccess={handleAddSuccess} />}
       </div>
 
       {/* Forum Sections */}
@@ -154,22 +160,24 @@ export function ForumComponentWrapper() {
         <div key={forum.id} className="space-y-4">
           <div className="h-1 bg-[#267858] rounded-full w-full mb-6" />
 
-          <ForumTitle title={forum.name} forumId={forum.id} description={forum.description} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} onEditSuccess={handleEditSuccess} />
+          <ForumTitle title={forum.name} forumId={forum.id} description={forum.description} onAddSuccess={handleAddSuccess} onDeleteSuccess={handleDeleteSuccess} onEditSuccess={handleEditSuccess} showActions={isAdmin} />
 
           {forum.subforums.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {forum.subforums.map((subforum) => (
-                <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} icon={subforum.icon} />
+                <SubforumCard key={subforum.id} name={subforum.name} subforumId={subforum.id} icon={subforum.icon} showActions={isAdmin} />
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-start gap-2 text-sm text-gray-500 italic px-1">
               <span>There are no subforums in this forum yet.</span>
-              <CreateSubforumDialog parentId={forum.id} parentName={forum.name} onSuccess={handleAddSuccess}>
-                <Button variant="outline" className="text-[#267858] border-[#267858] hover:bg-[#edf4f2]">
-                  Create Subforum
-                </Button>
-              </CreateSubforumDialog>
+              {isAdmin && (
+                <CreateSubforumDialog parentId={forum.id} parentName={forum.name} onSuccess={handleAddSuccess}>
+                  <Button variant="outline" className="text-[#267858] border-[#267858] hover:bg-[#edf4f2]">
+                    Create Subforum
+                  </Button>
+                </CreateSubforumDialog>
+              )}
             </div>
           )}
         </div>
