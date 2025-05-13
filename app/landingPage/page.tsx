@@ -73,7 +73,7 @@ const NewTopicsErrorFallback = () => (
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col justify-between">
+    <div className="min-h-screen  flex flex-col justify-between">
       <div className="flex justify-center py-8 flex-grow">
         <div className="w-[1250px] 2xl:w-[80%] flex flex-col px-3">
           <div className="w-full flex flex-col lg:flex-row justify-between gap-8">

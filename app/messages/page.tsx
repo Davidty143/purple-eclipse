@@ -22,8 +22,8 @@ export default async function MessagesPage() {
   }
 
   return (
-    <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto py-4">
-      <div className="flex h-[calc(100vh-160px)] border rounded-lg overflow-hidden">
+    <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto">
+      <div className="flex min-h-screen border rounded-lg overflow-hidden">
         <div className="w-1/4 border-r bg-background flex flex-col">
           <UserSearch currentUserId={user.id} />
           <div className="flex-1 overflow-y-auto">

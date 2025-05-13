@@ -120,8 +120,8 @@ export default function MessagePage({ params }: { params: Promise<{ userId: stri
   }
 
   return (
-    <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto md:px-4 xl:px-2 py-4">
-      <div className="flex md:flex-row flex-col h-[calc(100vh-160px)] border md:rounded-md bg-background">
+    <div className="w-full max-w-[1250px] xl:w-[80%] mx-auto md:px-4 xl:px-2 md:py-4">
+      <div className="flex md:flex-row flex-col h-[calc(100vh-100px)] md:h-[calc(100vh-160px)] border border-t-0 md:border-t md:rounded-md bg-background">
         {/* Desktop Sidebar */}
         <div className="hidden md:flex flex-col w-full md:w-1/4 border-r">
           <div className="">
