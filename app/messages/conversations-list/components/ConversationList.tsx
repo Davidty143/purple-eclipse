@@ -1,5 +1,3 @@
-'use client';
-
 import { createClient } from '@/app/utils/supabase/client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -9,6 +7,7 @@ import { cn } from '@/lib/utils';
 interface ConversationPartner {
   id: string;
   username: string;
+  avatar_url?: string; // Add avatar_url to the interface
   last_message?: string;
   unread_count?: number;
   last_message_at?: string;
@@ -46,14 +45,17 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
         if (conversations) {
           const partnerMap = new Map<string, ConversationPartner>();
 
-          conversations.forEach((conv) => {
+          // Process conversations and store partner data
+          for (const conv of conversations) {
             const partnerId = conv.sender_id === userId ? conv.receiver_id : conv.sender_id;
             const isIncoming = conv.sender_id !== userId;
 
+            // If the partner hasn't been processed yet, initialize their data
             if (!partnerMap.has(partnerId)) {
               partnerMap.set(partnerId, {
                 id: partnerId,
-                username: '',
+                username: 'Loading...',
+                avatar_url: '', // Initialize avatar_url as empty
                 last_message: isIncoming ? conv.content : `You: ${conv.content}`,
                 unread_count: 0,
                 last_message_at: conv.created_at
@@ -70,16 +72,24 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
               partner.last_message = isIncoming ? conv.content : `You: ${conv.content}`;
               partner.last_message_at = conv.created_at;
             }
-          });
+          }
 
-          const { data: users } = await supabase.from('Account').select('account_id, account_username').in('account_id', Array.from(partnerMap.keys()));
+          // Query the Account table to get the username and avatar_url
+          const partnerIds = Array.from(partnerMap.keys());
+          const { data: users } = await supabase.from('Account').select('account_id, account_username, account_avatar_url').in('account_id', partnerIds);
 
           if (users) {
-            const enrichedPartners = Array.from(partnerMap.values()).map((partner) => ({
-              ...partner,
-              username: users.find((u) => u.account_id === partner.id)?.account_username || 'Unknown'
-            }));
-            setPartners(enrichedPartners);
+            // Update the partnerMap with usernames and avatar URLs
+            users.forEach((user) => {
+              if (partnerMap.has(user.account_id)) {
+                const partner = partnerMap.get(user.account_id)!;
+                partner.username = user.account_username || 'Unknown';
+                partner.avatar_url = user.account_avatar_url || ''; // Update avatar_url
+              }
+            });
+
+            // Convert the partnerMap to an array and set it in the state
+            setPartners(Array.from(partnerMap.values()));
           }
         }
       } catch (error) {
@@ -115,15 +125,15 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
           return [updated, ...updatedPartners];
         }
 
-        // Username fetch for new partner
+        // Fetch username and avatar for a new partner
         supabase
           .from('Account')
-          .select('account_id, account_username')
+          .select('account_id, account_username, account_avatar_url')
           .eq('account_id', partnerId)
           .single()
           .then(({ data: user }) => {
             if (user) {
-              setPartners((latest) => latest.map((p) => (p.id === partnerId && p.username === 'Loading...' ? { ...p, username: user.account_username } : p)));
+              setPartners((latest) => latest.map((p) => (p.id === partnerId && p.username === 'Loading...' ? { ...p, username: user.account_username, avatar_url: user.account_avatar_url || '' } : p)));
             }
           });
 
@@ -131,6 +141,7 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
           {
             id: partnerId,
             username: 'Loading...',
+            avatar_url: '',
             last_message: isIncoming ? newMessage.content : `You: ${newMessage.content}`,
             unread_count: isIncoming && !newMessage.is_read && partnerId !== selectedReceiverId ? 1 : 0,
             last_message_at: newMessage.created_at
@@ -193,7 +204,8 @@ export default function ConversationsList({ userId, selectedReceiverId, onSelect
                 'bg-muted': partner.id === selectedReceiverId
               })}>
               <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>
+                {/* Render avatar if available */}
+                {partner.avatar_url ? <img src={partner.avatar_url} alt={`${partner.username}'s avatar`} className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">{partner.username.charAt(0).toUpperCase()}</div>}
                 {partner.unread_count ? <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">{partner.unread_count}</span> : null}
               </div>
               <div className="ml-3 flex-1 min-w-0">
