@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/app/utils/supabase/client';
 import { User } from '@/app/types/user';
 import { RestrictionReason } from '@/app/types/restriction';
@@ -26,7 +26,7 @@ export default function AdminUserManagement() {
 
   const supabase = createClient();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -68,11 +68,11 @@ export default function AdminUserManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   // Filter users based on search query
   const filteredUsers = users.filter((user) => {

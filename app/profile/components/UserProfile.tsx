@@ -322,7 +322,7 @@ export default function UserProfile({ user }: UserProfileProps) {
 
       <Card className="overflow-hidden border border-gray-300">
         <CardHeader className="bg-slate-50 border-b border-gray-300 rounded-t-md">
-          <CardDescription className="text-lg text-gray-800 font-semibold">{`Manage threads you've created`}</CardDescription>
+          <CardDescription className="text-lg text-gray-800 font-semibold">{`Manage threads you&apos;ve created`}</CardDescription>
         </CardHeader>
         <CardContent className="p-6">
           {threadLoading ? (
@@ -354,7 +354,7 @@ export default function UserProfile({ user }: UserProfileProps) {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500">You haven't created any threads yet.</p>
+              <p className="text-gray-500">You haven&apos;t created any threads yet.</p>
             </div>
           )}
         </CardContent>
