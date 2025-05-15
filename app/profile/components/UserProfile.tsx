@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useUserRole } from '@/lib/useUserRole';
 
 interface Thread {
   thread_id: number;
@@ -32,6 +33,7 @@ interface UserProfileProps {
 
 export default function UserProfile({ user }: UserProfileProps) {
   const router = useRouter();
+  const { isAdmin } = useUserRole();
   const [accountData, setAccountData] = useState<any>(null);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
@@ -179,28 +181,96 @@ export default function UserProfile({ user }: UserProfileProps) {
   const username = accountData?.account_username || user.email?.split('@')[0];
   const provider = user.app_metadata?.provider || 'email';
 
+  if (loading) {
+    return (
+      <div className="grid gap-8 animate-pulse">
+        <Card className="overflow-hidden border border-gray-300">
+          <CardHeader className="py-4 border-b border-gray-300 bg-slate-50">
+            <div className="flex justify-between items-center">
+              <div className="h-6 w-32 bg-gray-200 rounded"></div>
+              <div className="h-9 w-24 bg-gray-200 rounded"></div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-start gap-8">
+              <div className="relative self-center md:self-start">
+                <div className="w-32 h-32 rounded-xl bg-gray-200"></div>
+              </div>
+              <div className="space-y-4 flex-1">
+                <div>
+                  <div className="h-4 w-20 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-7 w-48 bg-gray-200 rounded"></div>
+                </div>
+                <div>
+                  <div className="h-4 w-20 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-7 w-64 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="h-8 w-40 bg-gray-200 rounded"></div>
+
+        <Card className="overflow-hidden border border-gray-300">
+          <CardHeader className="bg-slate-50 border-b border-gray-300 rounded-t-md">
+            <div className="h-6 w-48 bg-gray-200 rounded"></div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex justify-between items-start p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="h-6 w-3/4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 w-1/2 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {isAdmin && (
+          <Card className="overflow-hidden border border-gray-300">
+            <CardHeader className="bg-slate-50 border-b border-gray-300 rounded-t-md">
+              <div className="h-6 w-32 bg-gray-200 rounded"></div>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="h-9 w-32 bg-gray-200 rounded"></div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-8">
       <Card className="overflow-hidden border border-gray-300">
         <CardHeader className="py-4 border-b border-gray-300 bg-slate-50">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-xl">User Information</CardTitle>
-            {!editMode ? (
-              <Button variant="outline" className="border border-gray-300" onClick={() => setEditMode(true)}>
-                <Pencil className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setEditMode(false)} disabled={isSaving}>
-                  Cancel
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-xl">User Information</CardTitle>
+            </div>
+            <div className="flex gap-2">
+              {!editMode ? (
+                <Button variant="outline" className="border border-gray-300" onClick={() => setEditMode(true)}>
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit Profile
                 </Button>
-                <Button onClick={handleSaveProfile} disabled={isSaving}>
-                  {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                  Save Changes
-                </Button>
-              </div>
-            )}
+              ) : (
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setEditMode(false)} disabled={isSaving}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveProfile} disabled={isSaving}>
+                    {isSaving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                    Save Changes
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-6">
@@ -263,43 +333,45 @@ export default function UserProfile({ user }: UserProfileProps) {
           ) : threads.length > 0 ? (
             <div className="space-y-6">
               {threads.map((thread) => (
-                <div key={thread.thread_id} className="p-5 border rounded-lg bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <Link href={`/thread/${thread.thread_id}`} className="hover:underline">
-                        <h3 className="font-semibold text-xl">{thread.thread_title}</h3>
-                      </Link>
-                      <div className="text-sm text-gray-500 mt-2">
-                        <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
-                        <span className="mx-2">•</span>
-                        <Badge variant="outline" className="font-normal">
-                          {thread.subforum.subforum_name}
-                        </Badge>
-                      </div>
-                      <p className="mt-3 text-base text-gray-600 line-clamp-2">{thread.thread_content.replace(/<[^>]*>/g, '')}</p>
+                <div key={thread.thread_id} className="flex justify-between items-start p-4 border rounded-lg hover:bg-gray-50">
+                  <div className="flex-1">
+                    <Link href={`/thread/${thread.thread_id}`} className="text-lg font-semibold hover:text-blue-600">
+                      {thread.thread_title}
+                    </Link>
+                    <div className="mt-1 text-sm text-gray-500">
+                      <span>Posted in {thread.subforum.subforum_name}</span>
+                      <span className="mx-2">•</span>
+                      <span>{format(new Date(thread.thread_created), 'MMM d, yyyy')}</span>
                     </div>
-                    <div className="flex space-x-3 ml-6">
-                      <Button variant="outline" onClick={() => router.push(`/thread/${thread.thread_id}/edit`)}>
-                        <Pencil className="h-4 w-4 mr-1" /> Edit
-                      </Button>
-                      <Button variant="destructive" onClick={() => handleDeleteThread(thread.thread_id)} disabled={deleteLoading === thread.thread_id}>
-                        {deleteLoading === thread.thread_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />} Delete
-                      </Button>
-                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => handleDeleteThread(thread.thread_id)} disabled={deleteLoading === thread.thread_id}>
+                      {deleteLoading === thread.thread_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                    </Button>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="py-12 text-center rounded-lg">
-              <p className="text-gray-500 text-lg">{`You haven't created any threads yet.`}</p>
-              <Button className="mt-6 px-6 py-2 text-base" size="lg" asChild>
-                <Link href="/post-thread">Create Your First Thread</Link>
-              </Button>
+            <div className="text-center py-12">
+              <p className="text-gray-500">You haven't created any threads yet.</p>
             </div>
           )}
         </CardContent>
       </Card>
+
+      {isAdmin && (
+        <Card className="overflow-hidden border border-gray-300">
+          <CardHeader className="bg-slate-50 border-b border-gray-300 rounded-t-md">
+            <CardTitle className="text-xl">Admin Controls</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => router.push('/admin/user-management')}>
+              User Management
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

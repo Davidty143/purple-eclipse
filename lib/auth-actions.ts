@@ -5,6 +5,29 @@ import { createClientForServer } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+enum RestrictionReason {
+  SPAM = 'SPAM',
+  HARASSMENT = 'HARASSMENT',
+  INAPPROPRIATE_CONTENT = 'INAPPROPRIATE_CONTENT',
+  VIOLATION_OF_RULES = 'VIOLATION_OF_RULES',
+  OTHER = 'OTHER'
+}
+
+interface UserRole {
+  Role: {
+    role_type: string;
+  };
+}
+
+interface UserRoleData {
+  account_id: string;
+  account_role_id: string;
+  Role: {
+    role_id: string;
+    role_type: string;
+  };
+}
+
 export async function login(formData: FormData) {
   console.log('Starting login process...');
   const supabase = await createClientForServer();
@@ -234,6 +257,249 @@ export async function setAdminRole(accountId: string) {
   if (updateError) {
     console.error('Failed to update account role:', updateError);
     throw new Error('Failed to update account role');
+  }
+
+  return true;
+}
+
+export async function restrictUser(userId: string, reason: RestrictionReason, endDate: Date | null, notes: string | null, adminId: string) {
+  const supabase = await createClientForServer();
+
+  // First check if the user has the correct role type
+  const { data: userRole, error: roleError } = (await supabase
+    .from('Account')
+    .select(
+      `
+      account_id,
+      account_role_id,
+      Role (
+        role_id,
+        role_type
+      )
+    `
+    )
+    .eq('account_id', userId)
+    .single()) as { data: UserRoleData | null; error: any };
+
+  console.log('Role check response:', { userRole, roleError });
+
+  if (roleError) {
+    console.error('Error checking user role:', roleError);
+    throw new Error('Failed to check user role');
+  }
+
+  if (!userRole || !userRole.Role || !userRole.Role.role_type) {
+    console.log('User role data:', {
+      hasUserRole: !!userRole,
+      hasRole: !!userRole?.Role,
+      roleType: userRole?.Role?.role_type
+    });
+    throw new Error('User role not found');
+  }
+
+  console.log('User role type:', userRole.Role.role_type);
+
+  if (userRole.Role.role_type !== 'USER') {
+    throw new Error('Cannot restrict non-user accounts');
+  }
+
+  const { error } = await supabase
+    .from('Account')
+    .update({
+      account_status: 'RESTRICTED',
+      restriction_reason: reason,
+      restriction_date: new Date().toISOString(),
+      restriction_end_date: endDate?.toISOString() || null,
+      restriction_notes: notes,
+      restricted_by: adminId
+    })
+    .eq('account_id', userId);
+
+  if (error) {
+    console.error('Failed to restrict user:', error);
+    throw new Error('Failed to restrict user');
+  }
+
+  return true;
+}
+
+export async function banUser(userId: string, reason: RestrictionReason, notes: string | null, adminId: string) {
+  const supabase = await createClientForServer();
+
+  // First check if the user has the correct role type
+  const { data: userRole, error: roleError } = (await supabase
+    .from('Account')
+    .select(
+      `
+      account_id,
+      account_role_id,
+      Role (
+        role_id,
+        role_type
+      )
+    `
+    )
+    .eq('account_id', userId)
+    .single()) as { data: UserRoleData | null; error: any };
+
+  console.log('Role check response:', { userRole, roleError });
+
+  if (roleError) {
+    console.error('Error checking user role:', roleError);
+    throw new Error('Failed to check user role');
+  }
+
+  if (!userRole || !userRole.Role || !userRole.Role.role_type) {
+    console.log('User role data:', {
+      hasUserRole: !!userRole,
+      hasRole: !!userRole?.Role,
+      roleType: userRole?.Role?.role_type
+    });
+    throw new Error('User role not found');
+  }
+
+  console.log('User role type:', userRole.Role.role_type);
+
+  if (userRole.Role.role_type !== 'USER') {
+    throw new Error('Cannot ban non-user accounts');
+  }
+
+  const { error } = await supabase
+    .from('Account')
+    .update({
+      account_status: 'BANNED',
+      restriction_reason: reason,
+      restriction_date: new Date().toISOString(),
+      restriction_notes: notes,
+      banned_by: adminId
+    })
+    .eq('account_id', userId);
+
+  if (error) {
+    console.error('Failed to ban user:', error);
+    throw new Error('Failed to ban user');
+  }
+
+  return true;
+}
+
+export async function unrestrictUser(userId: string) {
+  const supabase = await createClientForServer();
+
+  // First check if the user has the correct role type
+  const { data: userRole, error: roleError } = (await supabase
+    .from('Account')
+    .select(
+      `
+      account_id,
+      account_role_id,
+      Role (
+        role_id,
+        role_type
+      )
+    `
+    )
+    .eq('account_id', userId)
+    .single()) as { data: UserRoleData | null; error: any };
+
+  console.log('Role check response:', { userRole, roleError });
+
+  if (roleError) {
+    console.error('Error checking user role:', roleError);
+    throw new Error('Failed to check user role');
+  }
+
+  if (!userRole || !userRole.Role || !userRole.Role.role_type) {
+    console.log('User role data:', {
+      hasUserRole: !!userRole,
+      hasRole: !!userRole?.Role,
+      roleType: userRole?.Role?.role_type
+    });
+    throw new Error('User role not found');
+  }
+
+  console.log('User role type:', userRole.Role.role_type);
+
+  if (userRole.Role.role_type !== 'USER') {
+    throw new Error('Cannot unrestrict non-user accounts');
+  }
+
+  const { error } = await supabase
+    .from('Account')
+    .update({
+      account_status: 'ACTIVE',
+      restriction_reason: null,
+      restriction_date: null,
+      restriction_end_date: null,
+      restriction_notes: null,
+      restricted_by: null
+    })
+    .eq('account_id', userId);
+
+  if (error) {
+    console.error('Failed to unrestrict user:', error);
+    throw new Error('Failed to unrestrict user');
+  }
+
+  return true;
+}
+
+export async function unbanUser(userId: string) {
+  const supabase = await createClientForServer();
+
+  // First check if the user has the correct role type
+  const { data: userRole, error: roleError } = (await supabase
+    .from('Account')
+    .select(
+      `
+      account_id,
+      account_role_id,
+      Role (
+        role_id,
+        role_type
+      )
+    `
+    )
+    .eq('account_id', userId)
+    .single()) as { data: UserRoleData | null; error: any };
+
+  console.log('Role check response:', { userRole, roleError });
+
+  if (roleError) {
+    console.error('Error checking user role:', roleError);
+    throw new Error('Failed to check user role');
+  }
+
+  if (!userRole || !userRole.Role || !userRole.Role.role_type) {
+    console.log('User role data:', {
+      hasUserRole: !!userRole,
+      hasRole: !!userRole?.Role,
+      roleType: userRole?.Role?.role_type
+    });
+    throw new Error('User role not found');
+  }
+
+  console.log('User role type:', userRole.Role.role_type);
+
+  if (userRole.Role.role_type !== 'USER') {
+    throw new Error('Cannot unban non-user accounts');
+  }
+
+  const { error } = await supabase
+    .from('Account')
+    .update({
+      account_status: 'ACTIVE',
+      restriction_reason: null,
+      restriction_date: null,
+      restriction_end_date: null,
+      restriction_notes: null,
+      banned_by: null
+    })
+    .eq('account_id', userId);
+
+  if (error) {
+    console.error('Failed to unban user:', error);
+    throw new Error('Failed to unban user');
   }
 
   return true;

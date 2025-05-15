@@ -20,6 +20,12 @@
     threads               Thread[]
     sentNotifications     Notification[] @relation("NotificationSender")
     receivedNotifications Notification[] @relation("NotificationRecipient")
+    restriction_reason    RestrictionReason?
+    restriction_date      DateTime?      @db.Timestamptz(6)
+    restriction_end_date  DateTime?      @db.Timestamptz(6)
+    restriction_notes     String?
+    banned_by             String?        @db.Uuid
+    restricted_by         String?        @db.Uuid
   }
 
   model Role {
@@ -164,4 +170,12 @@
   enum NotificationType {
     COMMENT
     REPLY
+  }
+
+  enum RestrictionReason {
+    SPAM
+    HARASSMENT
+    INAPPROPRIATE_CONTENT
+    VIOLATION_OF_RULES
+    OTHER
   }
