@@ -9,6 +9,13 @@ interface AccountWithRole {
   };
 }
 
+interface AccountData {
+  account_id: string;
+  Role: {
+    role_type: string;
+  };
+}
+
 export async function checkUserRole(request: Request, requiredRole: RoleType = 'ADMIN') {
   const supabase = await createClientForServer();
 
@@ -26,18 +33,18 @@ export async function checkUserRole(request: Request, requiredRole: RoleType = '
   }
 
   // Get the user's account with role information
-  const { data: account, error: accountError } = await supabase
+  const { data: account, error: accountError } = (await supabase
     .from('Account')
     .select(
       `
       account_id,
-      account_role:Role!inner (
+      Role (
         role_type
       )
     `
     )
     .eq('account_id', session.user.id)
-    .single();
+    .single()) as { data: AccountData | null; error: any };
 
   if (accountError || !account) {
     return {
@@ -46,11 +53,19 @@ export async function checkUserRole(request: Request, requiredRole: RoleType = '
     };
   }
 
-  // Since we used !inner join, we know account_role exists and is not null
+  // Check if role exists
+  if (!account.Role || !account.Role.role_type) {
+    return {
+      error: 'Role not found',
+      status: 404
+    };
+  }
+
+  // Create typed account with role
   const typedAccount: AccountWithRole = {
     account_id: account.account_id,
     account_role: {
-      role_type: account.account_role[0].role_type as RoleType
+      role_type: account.Role.role_type as RoleType
     }
   };
 
