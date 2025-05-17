@@ -44,7 +44,8 @@ export default function LoggedInHeaderRight() {
             account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
             account_email: user.email,
             account_is_deleted: false,
-            account_avatar_url: avatarUrl
+            account_avatar_url: avatarUrl,
+            account_status: 'PENDING_VERIFICATION'
           })
           .select('account_username, account_avatar_url')
           .single();
