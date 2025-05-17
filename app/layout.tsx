@@ -46,12 +46,14 @@ export default async function RootLayout({
           <div className="w-full">
             <div className="w-full header-wrapper border-b ">
               {/* Menu Header */}
-              <div className={cn('menu-header h-16 w-full lg:border-b  flex items-center justify-center')}>
-                <div className={cn('menu-header h-full w-full max-w-[1250px] xl:w-[80%] flex justify-between items-center')}>
+              <div className="menu-header h-[60px] w-full lg:border-b flex items-center justify-center">
+                <div className="menu-header h-[60px] w-full max-w-[1250px] xl:w-[80%] flex justify-between items-center">
                   {/* LOGO Section with Hamburger for Mobile */}
-                  <div className={cn('menu-header h-[60px] ml-2 w-auto flex items-center justify-start py-5 gap-2')}>
+                  <div className="ml-2 flex items-center justify-start gap-2 min-h-[60px]">
                     <MobileSidebarMenu />
-                    <Logo />
+                    <div className="w-[160px] h-[40px]">
+                      <img src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" />
+                    </div>
                   </div>
 
                   {/* Login Section */}
