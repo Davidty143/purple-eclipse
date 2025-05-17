@@ -12,6 +12,7 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createClientForServer } from '@/app/utils/supabase/server';
 import MobileSidebarMenu from './layout/components/MobileSidebarMenu';
+import { AccountStatusChecker } from './components/AccountStatusChecker';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -41,6 +42,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={cn('bg-background', inter.className)}>
         <AuthProvider serverUser={user}>
+          <AccountStatusChecker />
           <div className="w-full">
             <div className="w-full header-wrapper border-b ">
               {/* Menu Header */}
