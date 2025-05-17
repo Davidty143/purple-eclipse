@@ -25,36 +25,16 @@ export default function LoggedInHeaderRight() {
       if (!user) return;
       const supabase = createClient();
 
-      // First check if account exists
-      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id);
+      // Fetch account data
+      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id).single();
 
-      if (!error && data && data.length > 0) {
-        setAccountData(data[0]);
-      } else {
-        // If account doesn't exist or there was an error, create a new account
-        console.log('Account not found or error occurred, creating new account');
+      if (error) {
+        console.error('Error fetching account data:', error);
+        return;
+      }
 
-        // Get avatar URL from user metadata if available
-        const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-
-        const { error: createAccountError, data: newAccount } = await supabase
-          .from('Account')
-          .insert({
-            account_id: user.id,
-            account_username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
-            account_email: user.email,
-            account_is_deleted: false,
-            account_avatar_url: avatarUrl,
-            account_status: 'PENDING_VERIFICATION'
-          })
-          .select('account_username, account_avatar_url')
-          .single();
-
-        if (!createAccountError && newAccount) {
-          setAccountData(newAccount);
-        } else {
-          console.error('Failed to create account:', createAccountError);
-        }
+      if (data) {
+        setAccountData(data);
       }
     };
 
@@ -156,7 +136,7 @@ export default function LoggedInHeaderRight() {
           <DropdownMenuItem asChild className="hover:font-semibold">
             <Link href="/settings">Settings</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className="text-[#267858]  focus:text-[#267858] font-medium hover:font-semibold" onClick={handleSignOut}>
+          <DropdownMenuItem className="text-[#267858] focus:text-[#267858] font-medium hover:font-semibold" onClick={handleSignOut}>
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
