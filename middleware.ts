@@ -5,7 +5,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 const protectedRoutes = ['/dashboard', '/admin/settings', '/protected'];
 
 // Define routes that are accessible even when restricted
-const allowedRestrictedRoutes = ['/profile', '/settings'];
+const allowedRestrictedRoutes = ['/profile', '/settings', '/restricted'];
 
 /**
  * Middleware function to handle session management and route protection

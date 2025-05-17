@@ -39,7 +39,7 @@ export default function RestrictedPage() {
         <h1 className="text-2xl font-bold text-yellow-600 mb-4">Account Restricted</h1>
 
         <div className="space-y-4">
-          <p className="text-gray-700">Your account has been restricted. You cannot post or comment until the restriction is lifted.</p>
+          <p className="text-gray-700">Your account has been restricted. You have limited access to certain features of this website.</p>
 
           {restrictionDetails && (
             <div className="bg-yellow-50 p-4 rounded-md">
@@ -49,7 +49,7 @@ export default function RestrictedPage() {
               </p>
               {restrictionDetails.endDate && (
                 <p>
-                  <strong>End Date:</strong> {new Date(restrictionDetails.endDate).toLocaleDateString()}
+                  <strong>Restriction ends:</strong> {new Date(restrictionDetails.endDate).toLocaleDateString()}
                 </p>
               )}
               {restrictionDetails.notes && (
