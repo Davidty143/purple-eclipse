@@ -52,7 +52,7 @@ export const middleware = async (request: NextRequest) => {
 
   // If the user is authenticated, check their status
   if (session) {
-    const { data: account, error: accountError } = await supabase.from('Account').select('account_status, restriction_end_date').eq('account_id', session.user.id).single();
+    const { data: account, error: accountError } = await supabase.from('Account').select('account_status, restriction_end_date, restriction_reason').eq('account_id', session.user.id).single();
 
     if (!accountError && account) {
       // Handle banned users
@@ -60,12 +60,22 @@ export const middleware = async (request: NextRequest) => {
         return NextResponse.redirect(new URL('/banned', request.url));
       }
 
-      // Handle restricted users - only update status if restriction has expired
+      // Handle restricted users
       if (account.account_status === 'RESTRICTED') {
-        // Check if restriction has expired
+        // Only update status if restriction has expired AND there is an end date
         if (account.restriction_end_date && new Date(account.restriction_end_date) < new Date()) {
-          // Restriction has expired, update status to ACTIVE
-          await supabase.from('Account').update({ account_status: 'ACTIVE' }).eq('account_id', session.user.id);
+          // Restriction has expired, update status to ACTIVE and clear restriction data
+          await supabase
+            .from('Account')
+            .update({
+              account_status: 'ACTIVE',
+              restriction_reason: null,
+              restriction_date: null,
+              restriction_end_date: null,
+              restriction_notes: null,
+              restricted_by: null
+            })
+            .eq('account_id', session.user.id);
         }
       }
     }
