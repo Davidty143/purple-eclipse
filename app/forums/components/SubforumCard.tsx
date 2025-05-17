@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Edit, Trash } from 'lucide-react';
 import { EditSubforumDialog } from './EditSubforumDialog';
 import { DeleteSubforumDialog } from './DeleteSubforumDialog';
+import { useUserRole } from '@/lib/useUserRole';
+import { createClient } from '@/app/utils/supabase/client';
+import { useEffect, useState } from 'react';
 
 interface SubforumCardProps {
   name: string;
@@ -17,8 +20,33 @@ interface SubforumCardProps {
 
 export function SubforumCard({ name, subforumId, icon, showActions = false }: SubforumCardProps) {
   const router = useRouter();
+  const { isAdmin } = useUserRole();
+  const [user, setUser] = useState<any>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    checkUser();
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
 
   const handleClick = () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
     router.push(`/forums/subforum/${subforumId}`);
   };
 
@@ -31,7 +59,7 @@ export function SubforumCard({ name, subforumId, icon, showActions = false }: Su
         <h3 className="font-medium hover:underline">{name}</h3>
       </div>
 
-      {showActions && (
+      {showActions && isAdmin && (
         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
           <EditSubforumDialog subforumId={subforumId} currentName={name}>
             <Button variant="ghost" size="icon" className="text-gray-700 hover:text-[#edf4f2] hover:bg-[#267858]" aria-label="Edit subforum">
