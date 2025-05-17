@@ -4,8 +4,8 @@ import Image from 'next/image';
 export default function Logo() {
   return (
     <Link href="/" className="block">
-      <div className="h-[60px] w-[160px] relative flex items-center justify-start">
-        <Image src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} priority loading="eager" className="object-contain" />
+      <div className="relative" style={{ width: '160px', height: '60px' }}>
+        <Image src="/visconn_transaprent6.png" alt="Visconn Logo" fill priority loading="eager" className="object-contain" />
       </div>
     </Link>
   );
