@@ -46,10 +46,10 @@ export default async function RootLayout({
           <div className="w-full">
             <div className="w-full header-wrapper border-b ">
               {/* Menu Header */}
-              <div className={cn('menu-header h-16 w-full lg:border-b  flex items-center justify-center')}>
-                <div className={cn('menu-header h-full w-full max-w-[1250px] xl:w-[80%] flex justify-between items-center')}>
+              <div className="menu-header h-[60px] w-full lg:border-b flex items-center justify-center">
+                <div className="menu-header h-[60px] w-full max-w-[1250px] xl:w-[80%] flex justify-between items-center">
                   {/* LOGO Section with Hamburger for Mobile */}
-                  <div className="ml-2 flex items-center justify-start gap-2" style={{ height: '60px', width: '160px' }}>
+                  <div className="ml-2 flex items-center justify-start gap-2" style={{ height: '60px' }}>
                     <MobileSidebarMenu />
                     <Logo />
                   </div>
