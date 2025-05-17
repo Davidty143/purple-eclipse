@@ -17,7 +17,6 @@ export default function LoggedInHeaderRight() {
   const [accountData, setAccountData] = useState<{
     account_username: string | null;
     account_avatar_url: string | null;
-    account_status: string | null;
   } | null>(null);
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
@@ -26,8 +25,8 @@ export default function LoggedInHeaderRight() {
       if (!user) return;
       const supabase = createClient();
 
-      // Fetch account data including status
-      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url, account_status').eq('account_id', user.id).single();
+      // Fetch account data
+      const { data, error } = await supabase.from('Account').select('account_username, account_avatar_url').eq('account_id', user.id).single();
 
       if (error) {
         console.error('Error fetching account data:', error);
@@ -89,11 +88,6 @@ export default function LoggedInHeaderRight() {
   }, [user]);
 
   const handleSignOut = async () => {
-    // Prevent sign out if user is restricted
-    if (accountData?.account_status === 'RESTRICTED') {
-      return;
-    }
-
     try {
       const supabase = createClient();
       await supabase.auth.signOut();
@@ -109,7 +103,6 @@ export default function LoggedInHeaderRight() {
   const username = accountData?.account_username || '';
   const avatarUrl = accountData?.account_avatar_url || '';
   const fallbackInitial = username ? username.charAt(0).toUpperCase() : '?';
-  const isRestricted = accountData?.account_status === 'RESTRICTED';
 
   return (
     <div className="flex items-center gap-4">
@@ -143,8 +136,8 @@ export default function LoggedInHeaderRight() {
           <DropdownMenuItem asChild className="hover:font-semibold">
             <Link href="/settings">Settings</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem className={`${isRestricted ? 'text-gray-400 cursor-not-allowed' : 'text-[#267858] focus:text-[#267858]'} font-medium hover:font-semibold`} onClick={handleSignOut} disabled={isRestricted}>
-            {isRestricted ? 'Sign Out (Disabled)' : 'Sign Out'}
+          <DropdownMenuItem className="text-[#267858] focus:text-[#267858] font-medium hover:font-semibold" onClick={handleSignOut}>
+            Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
