@@ -51,8 +51,17 @@ export default async function RootLayout({
                   {/* LOGO Section with Hamburger for Mobile */}
                   <div className="ml-2 flex items-center justify-start gap-2 min-h-[60px]">
                     <MobileSidebarMenu />
-                    <div className="w-[160px] h-[60px]">
-                      <img src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" />
+                    <div className="w-[160px] h-[60px] relative overflow-hidden">
+                      <img
+                        src="/visconn_transaprent6.png"
+                        alt="Visconn Logo"
+                        width={160}
+                        height={60}
+                        className="object-contain w-full h-full block"
+                        style={{
+                          aspectRatio: '160 / 60'
+                        }}
+                      />
                     </div>
                   </div>
 
