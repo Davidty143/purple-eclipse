@@ -22,7 +22,7 @@ interface Thread {
   };
   tag: string;
   createdAt: Date;
-  replies: number;
+  comments: { count: number }[];
   views: number;
 }
 
@@ -31,8 +31,8 @@ interface DatabaseThread {
   thread_title: string;
   thread_created: string;
   thread_content: string;
-  thread_category?: string;
-  comment_count: { count: number };
+  thread_modified: string;
+  Comment: { count: number }[];
   author: {
     account_username: string | null;
     account_email: string | null;
@@ -64,9 +64,15 @@ export function SubforumTopics({ subforumId, page, limit, onPageChange }: Subfor
             thread_title,
             thread_created,
             thread_content,
-            thread_category,
-            author:author_id(account_username, account_email, account_avatar_url),
-            comment_count:Comment(count)
+            thread_modified,
+            author:author_id (
+              account_username,
+              account_email,
+              account_avatar_url
+            ),
+            Comment (
+              count
+            )
           `,
             { count: 'exact' }
           )
@@ -76,25 +82,31 @@ export function SubforumTopics({ subforumId, page, limit, onPageChange }: Subfor
           .range((page - 1) * limit, page * limit - 1)
           .returns<DatabaseThread[]>();
 
-        if (error) throw error;
-
-        if (data) {
-          const formattedThreads: Thread[] = data.map((thread) => ({
-            id: thread.thread_id.toString(),
-            title: thread.thread_title,
-            author: {
-              name: thread.author?.account_username || 'Anonymous',
-              avatar: thread.author?.account_avatar_url?.trim() || undefined
-            },
-            tag: thread.thread_category || 'Discussion',
-            createdAt: new Date(thread.thread_created),
-            replies: thread.comment_count?.count || 0,
-            views: 0 // Placeholder for views
-          }));
-
-          setThreads(formattedThreads);
-          setTotalThreads(count || 0);
+        if (error) {
+          console.error('Supabase error details:', error);
+          throw error;
         }
+
+        if (!data) {
+          console.error('No data returned from Supabase');
+          throw new Error('No data returned from database');
+        }
+
+        const formattedThreads: Thread[] = data.map((thread) => ({
+          id: thread.thread_id.toString(),
+          title: thread.thread_title,
+          author: {
+            name: thread.author?.account_username || 'Anonymous',
+            avatar: thread.author?.account_avatar_url?.trim() || undefined
+          },
+          tag: 'Discussion',
+          createdAt: new Date(thread.thread_created),
+          comments: thread.Comment ? [{ count: thread.Comment[0]?.count || 0 }] : [{ count: 0 }],
+          views: 0
+        }));
+
+        setThreads(formattedThreads);
+        setTotalThreads(count || 0);
       } catch (err) {
         console.error('Error fetching threads:', err);
         setError('Failed to load threads');
