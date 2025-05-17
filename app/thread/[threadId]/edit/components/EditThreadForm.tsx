@@ -66,7 +66,7 @@ export default function EditThreadForm({ thread, user }: EditThreadFormProps) {
       }
 
       toast.success('Thread updated successfully');
-      // Redirect to the profile page
+      // Redirect back to the profile page
       router.push('/profile');
       router.refresh();
     } catch (error: any) {
