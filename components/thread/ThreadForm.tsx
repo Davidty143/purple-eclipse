@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Loader2, X, Type, Tag, ChevronDown } from 'lucide-react';
@@ -8,9 +8,11 @@ import { cn } from '@/lib/utils';
 import { validateForm, FormErrors } from '@/utils/thread/formUtils';
 import RichTextEditor from '@/components/ui/rich-editor-text';
 import Image from 'next/image';
+import { createClient } from '@/app/utils/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ThreadFormProps {
-  onSubmit: (formData: { category: string; title: string; content: string; images: File[] }) => Promise<void>;
+  onSubmit: (data: { category: string; title: string; content: string; images: File[] }) => Promise<void>;
   isSubmitting?: boolean;
 }
 
@@ -20,6 +22,8 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
   const [internalIsSubmitting, setInternalIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [userStatus, setUserStatus] = useState<string | null>(null);
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     category: '',
     title: '',
@@ -27,6 +31,26 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
   });
 
   const isSubmitting = externalIsSubmitting !== undefined ? externalIsSubmitting : internalIsSubmitting;
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (user) {
+        const supabase = createClient();
+        const { data } = await supabase.from('Account').select('account_status').eq('account_id', user.id).single();
+
+        if (data) {
+          setUserStatus(data.account_status);
+          if (data.account_status === 'RESTRICTED') {
+            window.location.href = '/restricted';
+          } else if (data.account_status === 'BANNED') {
+            window.location.href = '/banned';
+          }
+        }
+      }
+    };
+
+    checkUserStatus();
+  }, [user]);
 
   const handleImagesSelected = (files: File[]) => {
     const newImages = files.filter((newFile) => !selectedImages.some((existingFile) => existingFile.name === newFile.name && existingFile.size === newFile.size));
@@ -43,6 +67,15 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (userStatus === 'RESTRICTED' || userStatus === 'BANNED') {
+      if (userStatus === 'RESTRICTED') {
+        window.location.href = '/restricted';
+      } else {
+        window.location.href = '/banned';
+      }
+      return;
+    }
 
     if (!validateForm(formData, setErrors)) return;
 
@@ -67,12 +100,28 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
     }
   };
 
-  const handleContentChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, content: value }));
+  const handleContentChange = (content: string) => {
+    setFormData((prev) => ({ ...prev, content }));
     if (errors.content) {
       setErrors((prev) => ({ ...prev, content: undefined }));
     }
   };
+
+  if (userStatus === 'RESTRICTED') {
+    return (
+      <div className="text-center py-8 bg-yellow-50 rounded-lg border border-yellow-200">
+        <p className="text-yellow-700 text-lg">Your account is currently restricted. You cannot create new threads at this time.</p>
+      </div>
+    );
+  }
+
+  if (userStatus === 'BANNED') {
+    return (
+      <div className="text-center py-8 bg-red-50 rounded-lg border border-red-200">
+        <p className="text-red-700 text-lg">Your account has been banned. You cannot create new threads.</p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -156,9 +205,9 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
       </div>
 
       {/* Submit Button */}
-      <div className="flex justify-end items-center space-x-4 mt-6">
+      <div className="flex justify-end">
         {errors.submit && <p className="text-sm text-red-500 mr-auto">{errors.submit}</p>}
-        <Button type="submit" className="bg-[#267858] text-white hover:bg-[#1f5e4a] min-w-[100px]" disabled={isSubmitting}>
+        <Button type="submit" className="bg-[#267858] text-white hover:bg-[#1f5e4a] min-w-[100px]" disabled={isSubmitting || userStatus === 'RESTRICTED' || userStatus === 'BANNED'}>
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Posting...
