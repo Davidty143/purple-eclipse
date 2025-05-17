@@ -47,10 +47,11 @@ export async function login(formData: FormData) {
     }
 
     let email = emailOrUsername;
+    let userId: string | null = null;
 
     if (!emailOrUsername.includes('@')) {
       console.log('Username detected, looking up email...');
-      const { data: userData, error: userError } = await supabase.from('Account').select('account_email').eq('account_username', emailOrUsername).single();
+      const { data: userData, error: userError } = await supabase.from('Account').select('account_email, account_id, account_status, restriction_end_date').eq('account_username', emailOrUsername).single();
 
       if (userError || !userData?.account_email) {
         console.error('Username lookup failed:', userError?.message || 'No email found');
@@ -58,11 +59,26 @@ export async function login(formData: FormData) {
       }
 
       email = userData.account_email;
-      console.log('Mapped username to email:', email);
+      userId = userData.account_id;
+
+      // Check account status for username login
+      if (userData.account_status === 'BANNED') {
+        return { error: 'This account has been banned. Please contact support for more information.' };
+      }
+      if (userData.account_status === 'RESTRICTED') {
+        if (userData.restriction_end_date) {
+          const restrictionEnd = new Date(userData.restriction_end_date);
+          const now = new Date();
+          if (now <= restrictionEnd) {
+            return { error: `This account is restricted until ${restrictionEnd.toLocaleDateString()}. Please contact support for more information.` };
+          }
+        }
+        return { error: 'This account is currently restricted. Please contact support for more information.' };
+      }
     }
 
     console.log('Attempting login with email:', email);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
@@ -70,6 +86,32 @@ export async function login(formData: FormData) {
     if (error) {
       console.error('Authentication failed:', error.message);
       return { error: 'Invalid username or password.' };
+    }
+
+    // If we haven't checked status yet (email login), check it now
+    if (!userId) {
+      const { data: accountData, error: accountError } = await supabase.from('Account').select('account_status, restriction_end_date').eq('account_id', authData.user.id).single();
+
+      if (accountError) {
+        console.error('Error checking account status:', accountError);
+        return { error: 'Error verifying account status. Please try again.' };
+      }
+
+      if (accountData.account_status === 'BANNED') {
+        await supabase.auth.signOut();
+        return { error: 'This account has been banned. Please contact support for more information.' };
+      }
+      if (accountData.account_status === 'RESTRICTED') {
+        await supabase.auth.signOut();
+        if (accountData.restriction_end_date) {
+          const restrictionEnd = new Date(accountData.restriction_end_date);
+          const now = new Date();
+          if (now <= restrictionEnd) {
+            return { error: `This account is restricted until ${restrictionEnd.toLocaleDateString()}. Please contact support for more information.` };
+          }
+        }
+        return { error: 'This account is currently restricted. Please contact support for more information.' };
+      }
     }
 
     revalidatePath('/', 'layout');
