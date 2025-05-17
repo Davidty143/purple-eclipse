@@ -5,7 +5,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 const protectedRoutes = ['/dashboard', '/admin/settings', '/protected'];
 
 // Define routes that are accessible even when restricted
-const allowedRestrictedRoutes = ['/profile', '/settings', '/restricted'];
+const allowedRestrictedRoutes = ['/profile', '/settings', '/restricted', '/dashboard'];
+
+// Define routes that are not accessible when restricted
+const restrictedRoutes = ['/admin', '/dashboard'];
 
 /**
  * Middleware function to handle session management and route protection
@@ -60,18 +63,11 @@ export const middleware = async (request: NextRequest) => {
         return NextResponse.redirect(new URL('/banned', request.url));
       }
 
-      // Handle restricted users
+      // Handle restricted users - only update status if restriction has expired
       if (account.account_status === 'RESTRICTED') {
-        // Check if restriction has expired
         if (account.restriction_end_date && new Date(account.restriction_end_date) < new Date()) {
           // Restriction has expired, update status to ACTIVE
           await supabase.from('Account').update({ account_status: 'ACTIVE' }).eq('account_id', session.user.id);
-        } else {
-          // Check if the current route is allowed for restricted users
-          const isAllowedRoute = allowedRestrictedRoutes.some((route) => pathname.startsWith(route));
-          if (!isAllowedRoute) {
-            return NextResponse.redirect(new URL('/restricted', request.url));
-          }
         }
       }
     }
