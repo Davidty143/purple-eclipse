@@ -59,11 +59,6 @@ export const middleware = async (request: NextRequest) => {
       if (account.account_status === 'BANNED') {
         return NextResponse.redirect(new URL('/banned', request.url));
       }
-
-      // Handle restricted users - redirect to restricted page unless on allowed routes
-      if (account.account_status === 'RESTRICTED' && !allowedRestrictedRoutes.includes(pathname)) {
-        return NextResponse.redirect(new URL('/restricted', request.url));
-      }
     }
 
     // If the user is authenticated but needs to set their username,
