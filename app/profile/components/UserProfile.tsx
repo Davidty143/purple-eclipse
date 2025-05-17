@@ -322,7 +322,7 @@ export default function UserProfile({ user }: UserProfileProps) {
 
       <Card className="overflow-hidden border border-gray-300">
         <CardHeader className="bg-slate-50 border-b border-gray-300 rounded-t-md">
-          <CardDescription className="text-lg text-gray-800 font-semibold">{`Manage threads you&apos;ve created`}</CardDescription>
+          <CardDescription className="text-lg text-gray-800 font-semibold">{`Manage threads you've created`}</CardDescription>
         </CardHeader>
         <CardContent className="p-6">
           {threadLoading ? (
@@ -345,6 +345,9 @@ export default function UserProfile({ user }: UserProfileProps) {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => router.push(`/thread/${thread.thread_id}/edit`)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => handleDeleteThread(thread.thread_id)} disabled={deleteLoading === thread.thread_id}>
                       {deleteLoading === thread.thread_id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                     </Button>
