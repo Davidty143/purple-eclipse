@@ -40,9 +40,7 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
 
         if (data) {
           setUserStatus(data.account_status);
-          if (data.account_status === 'RESTRICTED') {
-            window.location.href = '/restricted';
-          } else if (data.account_status === 'BANNED') {
+          if (data.account_status === 'BANNED') {
             window.location.href = '/banned';
           }
         }
@@ -69,9 +67,7 @@ const ThreadForm: React.FC<ThreadFormProps> = ({ onSubmit, isSubmitting: externa
     e.preventDefault();
 
     if (userStatus === 'RESTRICTED' || userStatus === 'BANNED') {
-      if (userStatus === 'RESTRICTED') {
-        window.location.href = '/restricted';
-      } else {
+      if (userStatus === 'BANNED') {
         window.location.href = '/banned';
       }
       return;
