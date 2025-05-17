@@ -49,9 +49,11 @@ export default async function RootLayout({
               <div className="menu-header h-[60px] w-full lg:border-b flex items-center justify-center">
                 <div className="menu-header h-[60px] w-full max-w-[1250px] xl:w-[80%] flex justify-between items-center">
                   {/* LOGO Section with Hamburger for Mobile */}
-                  <div className="ml-2 flex items-center justify-start gap-2" style={{ height: '60px' }}>
+                  <div className="ml-2 flex items-center justify-start gap-2 min-h-[60px]">
                     <MobileSidebarMenu />
-                    <Logo />
+                    <div className="w-[160px] h-[60px]">
+                      <Logo />
+                    </div>
                   </div>
 
                   {/* Login Section */}
