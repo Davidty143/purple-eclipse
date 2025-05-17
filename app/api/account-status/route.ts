@@ -4,7 +4,9 @@ import { NextResponse } from 'next/server';
 
 export async function POST() {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    // Create a new cookies instance and await it
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
     // Get the current session
     const {
@@ -20,6 +22,7 @@ export async function POST() {
     const { data: account, error: accountError } = await supabase.from('Account').select('account_status, restriction_end_date').eq('account_id', session.user.id).single();
 
     if (accountError) {
+      console.error('Account error:', accountError);
       return NextResponse.json({ error: 'Account not found' }, { status: 404 });
     }
 
@@ -27,7 +30,6 @@ export async function POST() {
     if (account.account_status === 'RESTRICTED' && account.restriction_end_date) {
       const endDate = new Date(account.restriction_end_date);
       const currentDate = new Date();
-
       // Set both dates to midnight UTC for date-only comparison
       const endDateUTC = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate()));
       const currentDateUTC = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate()));
@@ -47,6 +49,7 @@ export async function POST() {
           .eq('account_id', session.user.id);
 
         if (updateError) {
+          console.error('Update error:', updateError);
           return NextResponse.json({ error: 'Failed to update account status' }, { status: 500 });
         }
 

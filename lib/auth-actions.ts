@@ -96,22 +96,6 @@ export async function login(formData: FormData) {
         console.error('Error checking account status:', accountError);
         return { error: 'Error verifying account status. Please try again.' };
       }
-
-      if (accountData.account_status === 'BANNED') {
-        await supabase.auth.signOut();
-        return { error: 'This account has been banned. Please contact support for more information.' };
-      }
-      if (accountData.account_status === 'RESTRICTED') {
-        await supabase.auth.signOut();
-        if (accountData.restriction_end_date) {
-          const restrictionEnd = new Date(accountData.restriction_end_date);
-          const now = new Date();
-          if (now <= restrictionEnd) {
-            return { error: `This account is restricted until ${restrictionEnd.toLocaleDateString()}. Please contact support for more information.` };
-          }
-        }
-        return { error: 'This account is currently restricted. Please contact support for more information.' };
-      }
     }
 
     revalidatePath('/', 'layout');

@@ -13,7 +13,8 @@ export function AccountStatusChecker() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          credentials: 'include'
         });
 
         if (!response.ok) {
@@ -26,9 +27,7 @@ export function AccountStatusChecker() {
         if (data.status === 'ACTIVE' && data.message === 'Account restriction has been lifted') {
           router.refresh();
         }
-      } catch (error) {
-        console.error('Error checking account status:', error);
-      }
+      } catch (error) {}
     };
 
     // Check immediately when component mounts
