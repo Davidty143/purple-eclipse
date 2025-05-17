@@ -43,7 +43,7 @@ const BodyHeader = () => {
       if (user) {
         const supabase = createClient();
 
-        // First check if account exists and get its status
+        // Get account status
         const { data: accountData, error: fetchError } = await supabase.from('Account').select('account_status').eq('account_id', user.id).single();
 
         if (fetchError) {
@@ -51,17 +51,7 @@ const BodyHeader = () => {
           return;
         }
 
-        // If account exists but status is null, set it to ACTIVE
-        if (accountData && !accountData.account_status) {
-          const { error: updateError } = await supabase.from('Account').update({ account_status: 'ACTIVE' }).eq('account_id', user.id);
-
-          if (updateError) {
-            console.error('Error updating account status:', updateError);
-            return;
-          }
-
-          setUserStatus('ACTIVE');
-        } else if (accountData) {
+        if (accountData) {
           setUserStatus(accountData.account_status);
         }
       }
