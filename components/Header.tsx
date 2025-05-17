@@ -22,12 +22,7 @@ const menus: Record<string, Menu> = {
   home: {
     title: 'Home',
     link: '/',
-    icon: FiHome,
-    items: [
-      { text: "What's New", href: '/newposts' },
-      { text: 'Trending Now', href: '/trendingposts' },
-      { text: 'Popular', href: '/popularposts' }
-    ]
+    icon: FiHome
   },
   forums: {
     title: 'Forums',
