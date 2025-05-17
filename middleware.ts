@@ -51,7 +51,7 @@ export const middleware = async (request: NextRequest) => {
   }
 
   // If the user is authenticated, check their status
-  if (session?.user) {
+  if (session) {
     const { data: account, error: accountError } = await supabase.from('Account').select('account_status, restriction_end_date').eq('account_id', session.user.id).single();
 
     if (!accountError && account) {
@@ -70,7 +70,14 @@ export const middleware = async (request: NextRequest) => {
           // Check if the current route is allowed for restricted users
           const isAllowedRoute = allowedRestrictedRoutes.some((route) => pathname.startsWith(route));
           if (!isAllowedRoute) {
-            return NextResponse.redirect(new URL('/restricted', request.url));
+            // Check if the request is from a mobile device
+            const userAgent = request.headers.get('user-agent') || '';
+            const isMobile = /Mobile|Android|iPhone|iPad|iPod/i.test(userAgent);
+
+            // If it's not a mobile device, redirect to restricted page
+            if (!isMobile) {
+              return NextResponse.redirect(new URL('/restricted', request.url));
+            }
           }
         }
       }
