@@ -44,11 +44,11 @@ export default async function RootLayout({
           <AccountStatusChecker />
           <div className="w-full">
             <div className="topmost-header bg-gray-900 w-full flex justify-center">
-              <div className="w-[1250px] xl:w-[80%]">{}</div>
+              <div className="">{}</div>
             </div>
 
             <div className="menu-header h-[60px] w-full lg:border-b flex items-center justify-center">
-              <div className="menu-header h-[60px] w-[1250px] xl:w-[80%] flex justify-between items-center">
+              <div className="menu-header h-[60px] w-full max-w-[1250px] 2xl:max-w-[80%] mx-auto flex justify-between items-center">
                 {/* LOGO Section with Hamburger for Mobile */}
                 <div className="ml-2 flex items-center justify-start gap-2 min-h-[60px]">
                   <MobileSidebarMenu />
@@ -67,8 +67,8 @@ export default async function RootLayout({
             </div>
 
             {/* ✅ Bottom Green Header */}
-            <div className={cn('menu-header h-16 w-full p-4 items-center justify-center hidden lg:flex ')}>
-              <div className={cn('menu-header h-full w-[1250px] xl:w-[80%] flex justify-between items-center')}>
+            <div className={cn('menu-header h-16 w-full p-4 items-center justify-center hidden lg:flex border-b')}>
+              <div className={cn('menu-header h-full w-[1250px] 2xl:w-[80%] flex justify-between items-center')}>
                 <div className={cn('menu-header h-full w-300px flex items-center justify-center')}>
                   <Suspense fallback={<HeaderFallback />}>
                     <Header />
