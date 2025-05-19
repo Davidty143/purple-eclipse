@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { createClientForServer } from '@/app/utils/supabase/server';
 import MobileSidebarMenu from './layout/components/MobileSidebarMenu';
 import { AccountStatusChecker } from './components/AccountStatusChecker';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -52,9 +53,11 @@ export default async function RootLayout({
                 {/* LOGO Section with Hamburger for Mobile */}
                 <div className="ml-2 flex items-center justify-start gap-2 min-h-[60px]">
                   <MobileSidebarMenu />
-                  <div className="w-[160px] h-[40px]">
-                    <img src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" />
-                  </div>
+                  <Link href="/">
+                    <div className="w-[160px] h-[40px] cursor-pointer">
+                      <img src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" />
+                    </div>
+                  </Link>
                 </div>
 
                 {/* Login Section */}
