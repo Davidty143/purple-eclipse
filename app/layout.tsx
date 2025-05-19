@@ -13,6 +13,7 @@ import { createClientForServer } from '@/app/utils/supabase/server';
 import MobileSidebarMenu from './layout/components/MobileSidebarMenu';
 import { AccountStatusChecker } from './components/AccountStatusChecker';
 import Link from 'next/link';
+import Footer from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -70,7 +71,7 @@ export default async function RootLayout({
             </div>
 
             {/* ✅ Bottom Green Header */}
-            <div className={cn('menu-header h-16 w-full p-3 items-center justify-center hidden lg:flex border-b')}>
+            <div className={cn('menu-header h-16 w-full p-3 2xl:p-4 items-center justify-center hidden lg:flex border-b')}>
               <div className={cn('menu-header h-full w-[1250px] xl:w-[90%] 2xl:w-[80%] flex justify-between items-center')}>
                 <div className={cn('menu-header h-full w-300px flex items-center justify-center')}>
                   <Suspense fallback={<HeaderFallback />}>
@@ -97,6 +98,7 @@ export default async function RootLayout({
                 </div>
               }>
               {children}
+              <Footer />
             </Suspense>
 
             <Toaster />
