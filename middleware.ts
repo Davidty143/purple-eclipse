@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Define the protected routes that should be accessible only by authenticated users
-const protectedRoutes = ['/dashboard', '/admin/settings', '/protected'];
+const protectedRoutes = ['/dashboard', '/admin/settings', '/protected', '/update-password', '/login', '/set-username', '/register', '/signup', '/post-thread', '/profile', '/notifications', '/messages'];
 
 // Define routes that are accessible even when restricted
 const allowedRestrictedRoutes = ['/profile', '/settings'];
@@ -45,9 +45,9 @@ export const middleware = async (request: NextRequest) => {
   } = await supabase.auth.getSession();
 
   // If the user is not authenticated and trying to access a protected route, redirect them
-  if (isProtectedRoute && sessionError) {
+  if (isProtectedRoute && !session) {
     console.log('User is not authenticated, redirecting to login page.');
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // If the user is authenticated, check their status
