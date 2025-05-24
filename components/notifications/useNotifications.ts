@@ -9,16 +9,28 @@ export function useNotifications(userId: string | undefined) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const supabaseRef = useRef<SupabaseClient | null>(null);
   const [channelStatus, setChannelStatus] = useState<REALTIME_SUBSCRIBE_STATES | null>(null);
   const [newNotification, setNewNotification] = useState(false);
-  const channelEstablished = useRef(false);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectAttemptsRef = useRef(0);
+  const MAX_RECONNECT_ATTEMPTS = 5;
+  const RECONNECT_DELAY = 3000; // 3 seconds
 
   // Trigger notification animation effect
   const triggerNewNotificationEffect = useCallback(() => {
-    // Trigger animation
     setNewNotification(true);
+    // Play notification sound if available
+    try {
+      const audio = new Audio('/notification-sound.mp3');
+      audio.play().catch(() => {
+        // Ignore errors if sound can't be played
+      });
+    } catch (e) {
+      // Ignore errors if Audio API is not available
+    }
     setTimeout(() => setNewNotification(false), 1000);
   }, []);
 
@@ -27,24 +39,16 @@ export function useNotifications(userId: string | undefined) {
     if (!userId) return;
 
     setLoading(true);
+    setError(null);
     try {
-      // Validate that environment variables are set
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.error('Supabase environment variables are not set');
-        setNotifications([]);
-        setUnreadCount(0);
-        setLoading(false);
-        return;
+        throw new Error('Supabase environment variables are not set');
       }
 
-      // Always create a fresh client with authenticated user session
       const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-
-      // Store the client for reuse
       supabaseRef.current = supabase;
 
-      // Get notifications using the authenticated session
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('notifications')
         .select(
           `
@@ -60,27 +64,21 @@ export function useNotifications(userId: string | undefined) {
         )
         .eq('recipient_id', userId)
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(50); // Increased limit for better user experience
 
-      if (error) {
-        console.error('Error fetching notifications:', error.message || JSON.stringify(error));
-        setNotifications([]);
-      } else if (data) {
-        try {
-          setNotifications(data as Notification[]);
-          const unread = data.filter((n) => !n.is_read).length;
-          setUnreadCount(unread);
-        } catch (err) {
-          console.error('Error processing notification data:', err);
-          setNotifications([]);
-          setUnreadCount(0);
-        }
+      if (fetchError) throw fetchError;
+
+      if (data) {
+        setNotifications(data as Notification[]);
+        const unread = data.filter((n) => !n.is_read).length;
+        setUnreadCount(unread);
       } else {
         setNotifications([]);
         setUnreadCount(0);
       }
     } catch (err) {
-      console.error('Unexpected error in fetchNotifications:', err);
+      console.error('Error fetching notifications:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch notifications');
       setNotifications([]);
       setUnreadCount(0);
     } finally {
@@ -88,39 +86,112 @@ export function useNotifications(userId: string | undefined) {
     }
   }, [userId]);
 
-  // Set up real-time subscription
-  useEffect(() => {
-    if (!userId) return;
-
-    console.log('Setting up real-time subscription');
+  // Function to setup real-time subscription
+  const setupRealtimeSubscription = useCallback(async () => {
+    if (!userId || !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return;
 
     try {
-      // Create a fresh client with the authenticated session
-      const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      // Cleanup any existing subscription
+      if (channelRef.current) {
+        await channelRef.current.unsubscribe();
+        channelRef.current = null;
+      }
 
-      // Store for future use
+      // Clear any existing reconnect timeout
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+
+      const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
       supabaseRef.current = supabase;
 
+      console.log('Setting up real-time subscription for user:', userId);
+
       const channel = supabase
-        .channel('custom-insert-channel')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${userId}` }, (payload) => {
-          console.log('New notification:', payload);
-          fetchNotifications();
-          triggerNewNotificationEffect();
-        })
-        .subscribe();
+        .channel(`notifications-${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+            schema: 'public',
+            table: 'notifications',
+            filter: `recipient_id=eq.${userId}`
+          },
+          (payload) => {
+            console.log('Notification change received:', payload);
 
-      // Store the channel reference
+            // Handle different types of changes
+            switch (payload.eventType) {
+              case 'INSERT':
+                triggerNewNotificationEffect();
+                fetchNotifications(); // Refresh the list
+                break;
+              case 'UPDATE':
+                // Update local state for the specific notification
+                setNotifications((prev) => prev.map((n) => (n.notification_id === payload.new.notification_id ? { ...n, ...payload.new } : n)));
+                // Recalculate unread count
+                setNotifications((prev) => {
+                  const unread = prev.filter((n) => !n.is_read).length;
+                  setUnreadCount(unread);
+                  return prev;
+                });
+                break;
+              case 'DELETE':
+                // Remove the deleted notification
+                setNotifications((prev) => prev.filter((n) => n.notification_id !== payload.old.notification_id));
+                // Recalculate unread count
+                setNotifications((prev) => {
+                  const unread = prev.filter((n) => !n.is_read).length;
+                  setUnreadCount(unread);
+                  return prev;
+                });
+                break;
+            }
+          }
+        )
+        .subscribe((status) => {
+          console.log('Subscription status:', status);
+          setChannelStatus(status);
+
+          if (status === 'SUBSCRIBED') {
+            reconnectAttemptsRef.current = 0; // Reset reconnect attempts on successful subscription
+          } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+            // Attempt to reconnect
+            if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
+              reconnectAttemptsRef.current += 1;
+              console.log(`Attempting to reconnect (${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})...`);
+              reconnectTimeoutRef.current = setTimeout(setupRealtimeSubscription, RECONNECT_DELAY);
+            } else {
+              console.error('Max reconnection attempts reached');
+              setError('Lost connection to notifications. Please refresh the page.');
+            }
+          }
+        });
+
       channelRef.current = channel;
-
-      // Return cleanup function
-      return () => {
-        channel.unsubscribe();
-      };
     } catch (err) {
       console.error('Error setting up real-time subscription:', err);
+      setError('Failed to setup real-time notifications');
     }
   }, [userId, fetchNotifications, triggerNewNotificationEffect]);
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (userId) {
+      setupRealtimeSubscription();
+    }
+
+    // Cleanup function
+    return () => {
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
+        channelRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+    };
+  }, [userId, setupRealtimeSubscription]);
 
   // Initial data fetch
   useEffect(() => {
@@ -222,10 +293,13 @@ export function useNotifications(userId: string | undefined) {
     notifications,
     unreadCount,
     loading,
+    error,
     newNotification,
+    channelStatus,
     handleMarkAsRead,
     handleMarkAllAsRead,
     handleDeleteNotification,
-    fetchNotifications
+    fetchNotifications,
+    retryConnection: setupRealtimeSubscription
   };
 }

@@ -30,11 +30,87 @@ const insertComment = async (supabase: any, commentData: any) => {
   return data;
 };
 
-const notifyAuthor = async (supabase: any, commentId: number, threadId: number, userId: string, type: 'COMMENT' | 'REPLY') => {
-  const { data: authorData } = await supabase.from('Comment').select('author_id').eq('comment_id', commentId).single();
+const notifyAuthor = async (supabase: any, commentId: number, threadId: number, userId: string, type: 'COMMENT' | 'REPLY', parentCommentId?: number) => {
+  console.log('Starting notifyAuthor:', { commentId, threadId, userId, type, parentCommentId });
 
-  if (authorData && authorData.author_id !== userId) {
-    await createCommentNotification(authorData.author_id, userId, threadId, commentId, type);
+  try {
+    let recipientId: string | null = null;
+
+    if (type === 'COMMENT') {
+      console.log('Fetching thread author for thread:', threadId);
+      // For new comments, notify the thread author
+      const { data: threadData, error: threadError } = await supabase
+        .from('Thread')
+        .select('author_id, thread_title') // Added thread_title for better logging
+        .eq('thread_id', threadId)
+        .single();
+
+      console.log('Thread query result:', { threadData, threadError });
+
+      if (threadError) {
+        console.error('Error fetching thread author:', threadError);
+        return;
+      }
+
+      if (!threadData?.author_id) {
+        console.error('Thread author not found for thread:', threadId);
+        return;
+      }
+
+      recipientId = threadData.author_id;
+      console.log('Found thread author:', {
+        threadId,
+        threadTitle: threadData.thread_title,
+        authorId: recipientId
+      });
+    } else if (type === 'REPLY' && parentCommentId) {
+      // For replies, notify the parent comment author
+      const { data: parentCommentData, error: parentError } = await supabase.from('Comment').select('author_id').eq('comment_id', parentCommentId).single();
+
+      if (parentError) {
+        console.error('Error fetching parent comment author:', parentError);
+        return;
+      }
+
+      if (!parentCommentData?.author_id) {
+        console.error('Parent comment author not found for comment:', parentCommentId);
+        return;
+      }
+
+      recipientId = parentCommentData.author_id;
+    }
+
+    // Don't create notification if:
+    // 1. No recipient found
+    // 2. Recipient is the same as the sender (self-notification)
+    // 3. Missing required data
+    if (!recipientId || recipientId === userId) {
+      console.log('Skipping notification:', {
+        reason: !recipientId ? 'No recipient found' : 'Self notification',
+        recipientId,
+        userId,
+        type
+      });
+      return;
+    }
+
+    console.log('Attempting to create notification:', {
+      type,
+      recipientId,
+      senderId: userId,
+      threadId,
+      commentId,
+      parentCommentId
+    });
+
+    try {
+      await createCommentNotification(recipientId, userId, threadId, commentId, type);
+      console.log('Notification creation completed successfully');
+    } catch (notificationError) {
+      console.error('Error in createCommentNotification:', notificationError);
+    }
+  } catch (error) {
+    console.error('Error in notifyAuthor:', error);
   }
 };
 
@@ -50,6 +126,8 @@ export function useComments(initialThread: Thread, user: any | null): CommentSta
     e.preventDefault();
     if (!user || !newComment.trim() || isSubmitting || isSubmittingRef.current) return;
 
+    console.log('Starting comment submission for user:', user.id);
+
     isSubmittingRef.current = true;
     setIsSubmitting(true);
     const commentContent = newComment.trim();
@@ -62,8 +140,17 @@ export function useComments(initialThread: Thread, user: any | null): CommentSta
     setNewComment('');
 
     try {
+      console.log('Ensuring account exists for user:', user.id);
       await ensureAccountExists(user);
+
       const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      console.log('Created Supabase client');
+
+      console.log('Inserting comment:', {
+        threadId: thread.thread_id,
+        userId: user.id,
+        contentLength: commentContent.length
+      });
 
       const data = await insertComment(supabase, {
         comment_content: commentContent,
@@ -74,6 +161,13 @@ export function useComments(initialThread: Thread, user: any | null): CommentSta
         comment_modified: new Date().toISOString()
       });
 
+      console.log('Comment inserted successfully:', {
+        commentId: data.comment_id,
+        threadId: thread.thread_id
+      });
+
+      // Pass undefined for parentCommentId since this is a new comment
+      console.log('Calling notifyAuthor for new comment');
       await notifyAuthor(supabase, data.comment_id, thread.thread_id, user.id, 'COMMENT');
 
       setThread((prev) => ({
@@ -83,7 +177,7 @@ export function useComments(initialThread: Thread, user: any | null): CommentSta
 
       toast.success('Comment posted successfully');
     } catch (error: any) {
-      console.error('Error posting comment:', error);
+      console.error('Error in handleCommentSubmit:', error);
       if (error.code) {
         console.error(`Error code: ${error.code}, Message: ${error.message}, Details:`, error.details);
       }
@@ -141,7 +235,7 @@ export function useComments(initialThread: Thread, user: any | null): CommentSta
         parent_comment_id: parentCommentId
       });
 
-      await notifyAuthor(supabase, data.comment_id, thread.thread_id, user.id, 'REPLY');
+      await notifyAuthor(supabase, data.comment_id, thread.thread_id, user.id, 'REPLY', parentCommentId);
 
       setThread((prev) => ({
         ...prev,
@@ -219,7 +313,7 @@ export function useComments(initialThread: Thread, user: any | null): CommentSta
         parent_comment_id: replyId
       });
 
-      await notifyAuthor(supabase, data.comment_id, thread.thread_id, user.id, 'REPLY');
+      await notifyAuthor(supabase, data.comment_id, thread.thread_id, user.id, 'REPLY', replyId);
 
       setThread((prev) => {
         const { parentComment, grandParentComment } = findParentComment(prev.comments, replyId);
