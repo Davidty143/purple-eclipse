@@ -20,7 +20,6 @@ interface SubforumCardProps {
 
 export function SubforumCard({ name, subforumId, icon, showActions = false }: SubforumCardProps) {
   const router = useRouter();
-  const { isAdmin } = useUserRole();
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
 
@@ -58,22 +57,6 @@ export function SubforumCard({ name, subforumId, icon, showActions = false }: Su
         {IconComponent ? <IconComponent className="w-5 h-5 text-[#267851]" strokeWidth={2} /> : null}
         <h3 className="font-medium hover:underline">{name}</h3>
       </div>
-
-      {showActions && isAdmin && (
-        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-          <EditSubforumDialog subforumId={subforumId} currentName={name}>
-            <Button variant="ghost" size="icon" className="text-gray-700 hover:text-[#edf4f2] hover:bg-[#267858]" aria-label="Edit subforum">
-              <Edit className="h-4 w-4" />
-            </Button>
-          </EditSubforumDialog>
-
-          <DeleteSubforumDialog subforumId={subforumId} subforumName={name}>
-            <Button variant="ghost" size="icon" className="text-gray-700 hover:text-[#edf4f2] hover:bg-[#267858]" aria-label="Delete subforum">
-              <Trash className="h-4 w-4" />
-            </Button>
-          </DeleteSubforumDialog>
-        </div>
-      )}
     </div>
   );
 }
