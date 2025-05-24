@@ -44,7 +44,7 @@ export function SetUsernameForm() {
       await updateUsername(formData);
       window.location.href = '/'; // Redirect after successful update
     } catch (error: any) {
-      setUsernameError(error.message || 'Failed to set username.');
+      setUsernameError('That username is already taken or invalid. Please choose a different one.');
     } finally {
       setIsLoading(false);
     }

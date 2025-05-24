@@ -206,7 +206,7 @@ const updatePassword = async (state: { error: string; success: string }, formDat
 
   if (error) {
     console.error('Password update error:', error);
-    return { error: error.message, success: '' };
+    return { error: 'Recovery link invalid or expired, please retry the recovery process.', success: '' };
   }
 
   return { error: '', success: 'Password updated successfully' };
@@ -255,7 +255,7 @@ export async function updateUsername(formData: FormData) {
     const { error: accountUpdateError } = await supabase.from('Account').update({ account_username: username }).eq('account_id', session.user.id);
 
     if (accountUpdateError) {
-      throw new Error(accountUpdateError.message);
+      throw new Error('That username is already taken or invalid. Please choose a different one.');
     }
 
     // Success

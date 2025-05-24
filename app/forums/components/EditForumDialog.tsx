@@ -25,7 +25,7 @@ export function EditForumDialog({ children, forumId, currentName, currentDescrip
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset form when dialog opens or when current props change
+  // Reset form when dialog opens or current props change
   useEffect(() => {
     if (open) {
       setFormData({
@@ -59,13 +59,23 @@ export function EditForumDialog({ children, forumId, currentName, currentDescrip
 
       if (!response.ok) {
         const errorData = await response.json();
+
+        if (errorData.error && (errorData.error.toLowerCase().includes('forum name is already taken') || errorData.error.toLowerCase().includes('duplicate') || errorData.error.toLowerCase().includes('unique'))) {
+          throw new Error('Forum name is already taken (including deleted forums). Please choose another name.');
+        }
+
         throw new Error(errorData.error || 'Failed to update forum');
       }
 
       setOpen(false);
       onSuccess?.();
     } catch (err: any) {
-      setError(err.message || 'Failed to update forum');
+      // Fallback error message with custom message for unique name
+      if (err.message === 'Failed to update forum') {
+        setError('Failed to update forum. Please try again.');
+      } else {
+        setError(err.message || 'Failed to update forum');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -101,7 +111,7 @@ export function EditForumDialog({ children, forumId, currentName, currentDescrip
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="bg-[#267858] hover:bg-[#267858] border-[#267858] text-white hover:bg-opacity-95">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

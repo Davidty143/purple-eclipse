@@ -20,19 +20,38 @@ export async function POST(request: Request) {
 
     return NextResponse.json(forum, { status: 201 });
   } catch (error: any) {
-    console.error('[API] Error creating forum:', {
-      message: error.message,
-      stack: error.stack,
-      raw: JSON.stringify(error, Object.getOwnPropertyNames(error))
-    });
+    // Log entire error object to understand its structure
+    console.error('[API] Full error object:', error);
+
+    let errorMessage = 'Internal server error';
+    let statusCode = 500;
+
+    // Extract error code and message from common fields
+    const code = error.code ?? error.statusCode ?? error.status;
+    const message = error.message ?? error.error_description ?? '';
+    const details = error.details ?? '';
+    const hint = error.hint ?? '';
+
+    // Check for unique constraint violation on forum_name
+    if (code === '23505' || code === 409) {
+      if (message.toLowerCase().includes('forum_name') || details.toLowerCase().includes('forum_name') || hint.toLowerCase().includes('forum_name')) {
+        errorMessage = 'Forum name is already taken, choose another name';
+        statusCode = 400;
+      }
+    } else if (message.toLowerCase().includes('required')) {
+      errorMessage = message;
+      statusCode = 400;
+    } else if (message) {
+      errorMessage = message;
+    }
 
     return NextResponse.json(
       {
-        error: error.message || 'Internal server error',
-        code: error.code // Supabase error code if available
+        error: errorMessage,
+        code
       },
       {
-        status: error.message.includes('required') ? 400 : 500
+        status: statusCode
       }
     );
   }

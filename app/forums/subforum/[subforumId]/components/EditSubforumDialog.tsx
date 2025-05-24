@@ -89,7 +89,12 @@ export function EditSubforumDialog({ subforumId, currentTitle, currentDescriptio
       });
       onSuccess?.(updatedSubforum); // Call the onSuccess callback with the updated subforum data
     } catch (err: any) {
-      setError(err.message || 'Failed to update subforum');
+      const rawMessage = err?.message || '';
+      if (rawMessage.includes('duplicate key value') && rawMessage.includes('Subforum_subforum_name_key')) {
+        setError('Subforum name is already taken (including deleted), please choose another one');
+      } else {
+        setError(rawMessage || 'Failed to update subforum');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -154,7 +159,7 @@ export function EditSubforumDialog({ subforumId, currentTitle, currentDescriptio
             <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="bg-[#267858] hover:bg-[#267858] border-[#267858] text-white hover:bg-opacity-95">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
