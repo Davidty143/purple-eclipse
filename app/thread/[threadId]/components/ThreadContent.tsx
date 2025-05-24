@@ -39,7 +39,7 @@ export default function ThreadContent({ thread, optimizeImages, openLightbox }: 
         <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 border-b pb-3 sm:pb-4">
           <div className="flex items-center space-x-2">
             <Avatar className="h-6 w-6 sm:h-8 sm:w-8">
-              <AvatarImage src={thread.author?.account_avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
+              <AvatarImage src={thread.author?.account_avatar_url || 'Anon'} />
               <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
@@ -51,12 +51,15 @@ export default function ThreadContent({ thread, optimizeImages, openLightbox }: 
 
       {/* Main Thread Card */}
       <Card className="mb-6 sm:mb-8 mt-3 sm:mt-4">
-        <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+        <CardHeader className="px-4 sm:px-8 py-4 sm:py-6">
           <div className="flex items-center gap-2 mb-2">{thread.thread_category && <span className="text-xs font-semibold bg-gray-200 px-4 py-0.5 rounded-sm">{thread.thread_category}</span>}</div>
-          <CardTitle className="text-lg sm:text-xl md:text-2xl break-words">{thread.thread_title}</CardTitle>
+          <div className="mb-4 sm:mb-6">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">{thread.thread_title}</h1>
+            <div className="h-px bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded-full"></div>
+          </div>
         </CardHeader>
-        <CardContent className="px-3 sm:px-6 py-3 sm:py-4">
-          <div className="prose max-w-none text-sm sm:text-base" dangerouslySetInnerHTML={{ __html: optimizeImages(thread.thread_content) }} />
+        <CardContent className="px-4 sm:px-8 py-4 sm:py-6">
+          <div className="prose prose-sm sm:prose-base max-w-none break-words overflow-hidden px-2 sm:px-4" dangerouslySetInnerHTML={{ __html: optimizeImages(thread.thread_content) }} />
 
           {/* Thread Images Gallery */}
           {thread.images && thread.images.length > 0 && (
