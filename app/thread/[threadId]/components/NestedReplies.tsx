@@ -46,7 +46,7 @@ export function NestedReplies({ reply, showNestedReplies, toggleNestedReplies }:
             <div className="flex items-start gap-1 sm:gap-2">
               <div className="w-1 h-full bg-gray-100 rounded-full"></div>
               <Avatar className="h-5 w-5 sm:h-7 sm:w-7 shrink-0">
-                <AvatarImage src={nestedReply.author.account_avatar_url || `https://avatar.vercel.sh/${nestedReply.author.account_username || 'anon'}`} alt={nestedReply.author.account_username || 'User'} />
+                <AvatarImage src={nestedReply.author.account_avatar_url || 'anon'} alt={nestedReply.author.account_username || 'User'} />
                 <AvatarFallback>{nestedReply.author.account_username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
