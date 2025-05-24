@@ -8,7 +8,7 @@ import ThreadContent from './ThreadContent';
 import CommentsList from './CommentsList';
 import CommentForm from './CommentForm';
 import Lightbox from './Lightbox';
-import { useComments } from '../hooks/useComments';
+import { useComments } from '../hooks/comments';
 import { useLightbox } from '../hooks/useLightbox';
 
 export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
@@ -32,7 +32,7 @@ export default function ThreadView({ thread: initialThread }: ThreadViewProps) {
         <Lightbox lightboxImage={lightboxImage} closeLightbox={closeLightbox} />
 
         {/* Comments Section */}
-        <CommentsList thread={currentThread} user={user} isSubmitting={isSubmitting} replyingTo={replyingTo} setReplyingTo={setReplyingTo} replyContent={replyContent} setReplyContent={setReplyContent} handleReplySubmit={handleReplySubmit} handleNestedReplySubmit={handleNestedReplySubmit} />
+        <CommentsList thread={currentThread} user={user} isSubmitting={isSubmitting} handleReplySubmit={handleReplySubmit} handleNestedReplySubmit={handleNestedReplySubmit} />
 
         {/* Comment Form */}
         <CommentForm user={user} loading={loading} newComment={newComment} setNewComment={setNewComment} isSubmitting={isSubmitting} handleCommentSubmit={handleCommentSubmit} />

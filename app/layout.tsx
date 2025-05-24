@@ -1,4 +1,5 @@
 import { Inter } from 'next/font/google';
+import Image from 'next/image';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { AuthProvider } from '@/lib/AuthProvider';
@@ -56,7 +57,7 @@ export default async function RootLayout({
                   <MobileSidebarMenu />
                   <Link href="/">
                     <div className="w-[160px] h-[40px] cursor-pointer">
-                      <img src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" />
+                      <Image src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" priority />
                     </div>
                   </Link>
                 </div>

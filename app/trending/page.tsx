@@ -234,7 +234,7 @@ export default function TrendingPage() {
                     <div className="p-4 rounded-lg bg-white hover:bg-gray-50 transition-colors border border-gray-100 shadow-sm">
                       <div className="flex items-start gap-4">
                         <Avatar className="w-10 h-10 shrink-0">
-                          <AvatarImage src={thread.author?.account_avatar_url || `https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} alt={thread.author?.account_username || 'Anonymous'} />
+                          <AvatarImage src={thread.author?.account_avatar_url || 'anon'} alt={thread.author?.account_username || 'Anonymous'} />
                           <AvatarFallback>{thread.author?.account_username?.charAt(0).toUpperCase() || 'A'}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
