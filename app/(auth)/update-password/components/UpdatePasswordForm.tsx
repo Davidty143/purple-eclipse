@@ -1,9 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'; // Make sure this matches your setup
 import { updatePassword } from '@/lib/auth-actions';
 import { useActionState } from 'react';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock } from 'lucide-react';
@@ -16,8 +17,39 @@ export const UpdatePasswordForm = () => {
 
   const { error, success } = state;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabase = createClientComponentClient();
 
-  // Redirect to homepage on success
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Handle Supabase recovery link
+  useEffect(() => {
+    const access_token = searchParams.get('access_token');
+    const type = searchParams.get('type');
+
+    const handleRecovery = async () => {
+      if (access_token && type === 'recovery') {
+        const { error } = await supabase.auth.setSession({
+          access_token,
+          refresh_token: '' // Not required for recovery links
+        });
+
+        if (error) {
+          console.error('Failed to set session:', error.message);
+          router.push('/');
+        } else {
+          setLoading(false);
+        }
+      } else {
+        // No token or invalid type
+        router.push('/');
+      }
+    };
+
+    handleRecovery();
+  }, [searchParams, router, supabase]);
+
+  // ✅ Redirect on success
   useEffect(() => {
     if (success) {
       const timeout = setTimeout(() => router.push('/'), 1000);
@@ -25,10 +57,12 @@ export const UpdatePasswordForm = () => {
     }
   }, [success, router]);
 
-  // Handler for the ✕ button
   const handleClose = () => {
     router.push('/');
   };
+
+  // 🚫 Don't show form until token is processed
+  if (loading) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
