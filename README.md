@@ -26,12 +26,40 @@
     <td> PE.020.000 </td>
     <td> 2025-05-08</td>
   </tr>
+  </tr>
+    <tr>
+    <td> PE.020.001 </td>
+    <td> 2025-05-17</td>
+  </tr>
   <tr>
     <td>...</td>
     <td>...</td>
   </tr>
 </table>
-
+<h2> PE.020.001 Release Notes </h2>
+<ul>
+  <li> What's New </li>
+  <ul>
+    <li> Added Trending Discussions page to display trending threads across all subforums.  </li>
+    <li> Added Latest Discussions page to display the most recent threads across all subforums, categorized by their respective thread categories.</li>
+    <li> Added User management page for administrators, enabling them to ban, unban, restrict, and unrestrict users for better platform management and moderation. </li>
+    <li> Introduced role-based access to allow administrators to manage all forum and subforum-related actions.</li><br>
+    <li> Removed bottom header in mobile view to reduce redundant space and improve UX.  </li>
+    <li> Moved the hamburger menu to the top header next to the logo.</li>
+    <li> Relocated the search bar to the sidebar for mobile view.</li>
+    <li> Added links relative to the header menu, including ‘home’, ‘forums’, ‘trending’ and ‘popular’ and their associated dropdowns.</li>
+    <li> Changed the logo into a transparent and high-quality photo and made the size responsive for all devices. </li>
+    <li> Improved responsiveness for long text inputs on the Homepage, Forum, and Subforum pages.</li>
+    <li> Enhanced skeleton loader performance for thread rows and subforum blocks (popular & new topics).</li>
+    <li> General UI/UX enhancements for a smoother overall experience on Homepage, Forum, and Subforum pages.</li>
+    <li> Added skeleton loaders on real-time messaging for smoother transitions.</li>
+    <li> Improved handling of long messages and introduced character limits to prevent UI issues.</li>
+    <li> Added user avatars to conversation lists in the mobile sidebar for better visual context.</li>
+    <li> Replaced Update Password and Update Username pages with overlay forms for a more seamless experience.</li>
+    <li> Redesigned UI for consistency across all forms.</li>
+    <li> Added input validations and clear error messages to enhance usability.</li> 
+  </ul>
+</ul>
 <h2> PE.020.000 Release Notes </h2>
 <ul>
   <li> What's New </li>
