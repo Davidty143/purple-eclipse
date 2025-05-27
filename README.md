@@ -31,11 +31,24 @@
     <td> PE.020.001 </td>
     <td> 2025-05-17</td>
   </tr>
-  <tr>
-    <td>...</td>
-    <td>...</td>
+  </tr>
+    <tr>
+    <td> PE.020.002 </td>
+    <td> 2025-05-25</td>
   </tr>
 </table>
+<h2> PE.020.002 Release Notes </h2>
+<ul>
+  <li> What's New </li>
+  <ul>
+    <li> Implemented checks ensuring recovery links will only be used once.</li>
+    <li> Added error handling and implemented appropriate error messages to reflect the error status in forgot password.</li>
+    <li> Added error handling and implemented appropriate error messages for issues related to forum and subforum names.</li>
+    <li> Fixed the logo stretching issue on page reload by using a fixed-size image for the logo. </li>
+    <li> Added a character limit of 1000 characters per comment.</li>
+    <li> Fixed overall user interface designs especially its responsiveness in smaller devices.</li>
+  </ul>
+</ul>
 <h2> PE.020.001 Release Notes </h2>
 <ul>
   <li> What's New </li>
@@ -43,7 +56,7 @@
     <li> Added Trending Discussions page to display trending threads across all subforums.  </li>
     <li> Added Latest Discussions page to display the most recent threads across all subforums, categorized by their respective thread categories.</li>
     <li> Added User management page for administrators, enabling them to ban, unban, restrict, and unrestrict users for better platform management and moderation. </li>
-    <li> Introduced role-based access to allow administrators to manage all forum and subforum-related actions.</li><br>
+    <li> Introduced role-based access to allow administrators to manage all forum and subforum-related actions.</li>
     <li> Removed bottom header in mobile view to reduce redundant space and improve UX.  </li>
     <li> Moved the hamburger menu to the top header next to the logo.</li>
     <li> Relocated the search bar to the sidebar for mobile view.</li>
