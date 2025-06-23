@@ -28,10 +28,6 @@ export function ForumComponentWrapper() {
   const [error, setError] = useState<string | null>(null);
   const { isAdmin, loading: roleLoading, userRole } = useUserRole();
 
-  console.log('ForumComponentWrapper - isAdmin:', isAdmin);
-  console.log('ForumComponentWrapper - userRole:', userRole);
-  console.log('ForumComponentWrapper - roleLoading:', roleLoading);
-
   const fetchForums = async () => {
     try {
       const response = await fetch('/api/get-forums-with-subforums');

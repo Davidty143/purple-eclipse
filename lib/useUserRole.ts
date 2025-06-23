@@ -23,8 +23,8 @@ export function useUserRole() {
         data: { session },
         error: sessionError
       } = await createClient().auth.getSession();
-      console.log('Session:', session);
-      console.log('Session error:', sessionError);
+      // console.log('Session:', session);
+      // console.log('Session error:', sessionError);
 
       if (!session || sessionError) {
         setLoading(false);
@@ -35,8 +35,8 @@ export function useUserRole() {
         data: { user },
         error: userError
       } = await createClient().auth.getUser();
-      console.log('User:', user);
-      console.log('User error:', userError);
+      // console.log('User:', user);
+      // console.log('User error:', userError);
 
       if (!user || userError) {
         setLoading(false);
@@ -56,8 +56,8 @@ export function useUserRole() {
         .eq('account_id', user.id)
         .single()) as { data: AccountWithRole | null; error: any };
 
-      console.log('Account data:', accountData);
-      console.log('Account error:', accountError);
+      // console.log('Account data:', accountData);
+      // console.log('Account error:', accountError);
 
       if (!accountData || accountError) {
         setLoading(false);
@@ -65,7 +65,7 @@ export function useUserRole() {
       }
 
       const roleType = accountData.Role?.role_type ?? null;
-      console.log('Role type:', roleType);
+      // console.log('Role type:', roleType);
 
       setUserRole(roleType);
       setAdminStatus(roleType === 'ADMIN');
@@ -82,7 +82,7 @@ export function useUserRole() {
     const {
       data: { subscription }
     } = createClient().auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', _event, session);
+      // console.log('Auth state changed:', _event, session);
       if (session) {
         fetchUserRole(); // Refresh role info on login
       } else {

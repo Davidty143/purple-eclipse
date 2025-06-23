@@ -29,20 +29,16 @@ interface UserRoleData {
 }
 
 export async function login(formData: FormData) {
-  console.log('Starting login process...');
   const supabase = await createClientForServer();
 
   try {
     const emailOrUsername = formData.get('emailOrUsername')?.toString().trim();
     const password = formData.get('password')?.toString().trim();
-    console.log('Received credentials:', { emailOrUsername, password });
 
     if (!emailOrUsername) {
-      console.error('Validation failed: Missing email/username');
       return { error: 'Email or username is required' };
     }
     if (!password) {
-      console.error('Validation failed: Missing password');
       return { error: 'Password is required' };
     }
 
@@ -50,11 +46,9 @@ export async function login(formData: FormData) {
     let userId: string | null = null;
 
     if (!emailOrUsername.includes('@')) {
-      console.log('Username detected, looking up email...');
       const { data: userData, error: userError } = await supabase.from('Account').select('account_email, account_id, account_status, restriction_end_date').eq('account_username', emailOrUsername).single();
 
       if (userError || !userData?.account_email) {
-        console.error('Username lookup failed:', userError?.message || 'No email found');
         return { error: 'Invalid username or password.' };
       }
 
@@ -77,14 +71,12 @@ export async function login(formData: FormData) {
       }
     }
 
-    console.log('Attempting login with email:', email);
     const { data: authData, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
     if (error) {
-      console.error('Authentication failed:', error.message);
       return { error: 'Invalid username or password.' };
     }
 
@@ -93,7 +85,6 @@ export async function login(formData: FormData) {
       const { data: accountData, error: accountError } = await supabase.from('Account').select('account_status, restriction_end_date').eq('account_id', authData.user.id).single();
 
       if (accountError) {
-        console.error('Error checking account status:', accountError);
         return { error: 'Error verifying account status. Please try again.' };
       }
     }
@@ -101,7 +92,6 @@ export async function login(formData: FormData) {
     revalidatePath('/', 'layout');
     return { success: true };
   } catch (error) {
-    console.error('Unexpected login error:', error);
     return { error: 'An unexpected error occurred. Please try again.' };
   }
 }
@@ -136,7 +126,6 @@ export async function signout() {
   const supabase = await createClientForServer();
   const { error } = await supabase.auth.signOut();
   if (error) {
-    console.log(error);
     throw new Error('Logout failed');
   }
   revalidatePath('/');
@@ -163,7 +152,6 @@ const sendResetPasswordEmail = async (formData: FormData) => {
   });
 
   if (error) {
-    console.log('error', error);
     return {
       success: '',
       error: error.message
@@ -205,7 +193,6 @@ const updatePassword = async (state: { error: string; success: string }, formDat
   });
 
   if (error) {
-    console.error('Password update error:', error);
     return { error: 'Recovery link invalid or expired, please retry the recovery process.', success: '' };
   }
 
@@ -232,7 +219,6 @@ export async function updateUsername(formData: FormData) {
     const { data: existingUsers, error: usernameCheckError } = await supabase.from('Account').select('account_username').ilike('account_username', lowercasedUsername);
 
     if (usernameCheckError) {
-      console.error('Error checking username availability:', usernameCheckError.message || usernameCheckError);
       throw new Error('Error checking username availability.');
     }
 
@@ -259,9 +245,7 @@ export async function updateUsername(formData: FormData) {
     }
 
     // Success
-    console.log('Username updated successfully');
   } catch (error: any) {
-    console.error('Error during username update:', error);
     throw new Error(error.message || 'Something went wrong.');
   }
 }
@@ -273,7 +257,6 @@ export async function setAdminRole(accountId: string) {
   const { data: adminRole, error: roleError } = await supabase.from('Role').select('role_id').eq('role_type', 'ADMIN').single();
 
   if (roleError) {
-    console.error('Failed to fetch admin role:', roleError);
     throw new Error('Failed to fetch admin role');
   }
 
@@ -281,7 +264,6 @@ export async function setAdminRole(accountId: string) {
   const { error: updateError } = await supabase.from('Account').update({ account_role_id: adminRole.role_id }).eq('account_id', accountId);
 
   if (updateError) {
-    console.error('Failed to update account role:', updateError);
     throw new Error('Failed to update account role');
   }
 
@@ -307,23 +289,13 @@ export async function restrictUser(userId: string, reason: RestrictionReason, en
     .eq('account_id', userId)
     .single()) as { data: UserRoleData | null; error: any };
 
-  console.log('Role check response:', { userRole, roleError });
-
   if (roleError) {
-    console.error('Error checking user role:', roleError);
     throw new Error('Failed to check user role');
   }
 
   if (!userRole || !userRole.Role || !userRole.Role.role_type) {
-    console.log('User role data:', {
-      hasUserRole: !!userRole,
-      hasRole: !!userRole?.Role,
-      roleType: userRole?.Role?.role_type
-    });
     throw new Error('User role not found');
   }
-
-  console.log('User role type:', userRole.Role.role_type);
 
   if (userRole.Role.role_type !== 'USER') {
     throw new Error('Cannot restrict non-user accounts');
@@ -342,7 +314,6 @@ export async function restrictUser(userId: string, reason: RestrictionReason, en
     .eq('account_id', userId);
 
   if (error) {
-    console.error('Failed to restrict user:', error);
     throw new Error('Failed to restrict user');
   }
 
@@ -368,23 +339,13 @@ export async function banUser(userId: string, reason: RestrictionReason, notes: 
     .eq('account_id', userId)
     .single()) as { data: UserRoleData | null; error: any };
 
-  console.log('Role check response:', { userRole, roleError });
-
   if (roleError) {
-    console.error('Error checking user role:', roleError);
     throw new Error('Failed to check user role');
   }
 
   if (!userRole || !userRole.Role || !userRole.Role.role_type) {
-    console.log('User role data:', {
-      hasUserRole: !!userRole,
-      hasRole: !!userRole?.Role,
-      roleType: userRole?.Role?.role_type
-    });
     throw new Error('User role not found');
   }
-
-  console.log('User role type:', userRole.Role.role_type);
 
   if (userRole.Role.role_type !== 'USER') {
     throw new Error('Cannot ban non-user accounts');
@@ -402,7 +363,6 @@ export async function banUser(userId: string, reason: RestrictionReason, notes: 
     .eq('account_id', userId);
 
   if (error) {
-    console.error('Failed to ban user:', error);
     throw new Error('Failed to ban user');
   }
 
@@ -428,23 +388,13 @@ export async function unrestrictUser(userId: string) {
     .eq('account_id', userId)
     .single()) as { data: UserRoleData | null; error: any };
 
-  console.log('Role check response:', { userRole, roleError });
-
   if (roleError) {
-    console.error('Error checking user role:', roleError);
     throw new Error('Failed to check user role');
   }
 
   if (!userRole || !userRole.Role || !userRole.Role.role_type) {
-    console.log('User role data:', {
-      hasUserRole: !!userRole,
-      hasRole: !!userRole?.Role,
-      roleType: userRole?.Role?.role_type
-    });
     throw new Error('User role not found');
   }
-
-  console.log('User role type:', userRole.Role.role_type);
 
   if (userRole.Role.role_type !== 'USER') {
     throw new Error('Cannot unrestrict non-user accounts');
@@ -463,7 +413,6 @@ export async function unrestrictUser(userId: string) {
     .eq('account_id', userId);
 
   if (error) {
-    console.error('Failed to unrestrict user:', error);
     throw new Error('Failed to unrestrict user');
   }
 
@@ -489,23 +438,13 @@ export async function unbanUser(userId: string) {
     .eq('account_id', userId)
     .single()) as { data: UserRoleData | null; error: any };
 
-  console.log('Role check response:', { userRole, roleError });
-
   if (roleError) {
-    console.error('Error checking user role:', roleError);
     throw new Error('Failed to check user role');
   }
 
   if (!userRole || !userRole.Role || !userRole.Role.role_type) {
-    console.log('User role data:', {
-      hasUserRole: !!userRole,
-      hasRole: !!userRole?.Role,
-      roleType: userRole?.Role?.role_type
-    });
     throw new Error('User role not found');
   }
-
-  console.log('User role type:', userRole.Role.role_type);
 
   if (userRole.Role.role_type !== 'USER') {
     throw new Error('Cannot unban non-user accounts');
@@ -524,7 +463,6 @@ export async function unbanUser(userId: string) {
     .eq('account_id', userId);
 
   if (error) {
-    console.error('Failed to unban user:', error);
     throw new Error('Failed to unban user');
   }
 

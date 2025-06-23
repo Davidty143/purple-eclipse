@@ -2,7 +2,7 @@ import { createBrowserClient } from '@supabase/ssr';
 import { NotificationData } from './types';
 
 const validateNotificationData = (data: NotificationData): { isValid: boolean; missingFields: string[] } => {
-  console.log('Validating notification data:', data);
+  // console.log('Validating notification data:', data);
   const requiredFields = ['recipient_id', 'sender_id', 'thread_id', 'comment_id', 'type'] as const;
   const missingFields = requiredFields.filter((field) => !data[field]);
 
@@ -11,12 +11,12 @@ const validateNotificationData = (data: NotificationData): { isValid: boolean; m
     missingFields
   };
 
-  console.log('Validation result:', result);
+  // console.log('Validation result:', result);
   return result;
 };
 
 export const createNotification = async (notificationData: NotificationData): Promise<void> => {
-  console.log('Starting createNotification with data:', notificationData);
+  // console.log('Starting createNotification with data:', notificationData);
 
   // Validate environment variables
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -33,13 +33,13 @@ export const createNotification = async (notificationData: NotificationData): Pr
 
   // Additional validation
   if (notificationData.recipient_id === notificationData.sender_id) {
-    console.log('Skipping self-notification');
+    // console.log('Skipping self-notification');
     return;
   }
 
   // Create a new client with the current session
   const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-  console.log('Created Supabase client for notification creation');
+  // console.log('Created Supabase client for notification creation');
 
   try {
     // Get the current session and ensure we're authenticated
@@ -155,12 +155,12 @@ export const createNotification = async (notificationData: NotificationData): Pr
         console.log('Notification already exists');
       }
     } else {
-      console.log(`${notificationData.type} notification created successfully:`, {
-        notificationId: notificationResult?.notification_id,
-        recipient: recipientData.account_username,
-        sender: senderData.account_username,
-        type: notificationData.type
-      });
+      // console.log(`${notificationData.type} notification created successfully:`, {
+      //   notificationId: notificationResult?.notification_id,
+      //   recipient: recipientData.account_username,
+      //   sender: senderData.account_username,
+      //   type: notificationData.type
+      // });
     }
   } catch (error) {
     console.error('Unexpected error creating notification:', error);
@@ -168,13 +168,13 @@ export const createNotification = async (notificationData: NotificationData): Pr
 };
 
 export const createCommentNotification = async (recipientId: string, senderId: string, threadId: number, commentId: number, type: 'COMMENT' | 'REPLY'): Promise<void> => {
-  console.log('Creating comment notification:', {
-    recipientId,
-    senderId,
-    threadId,
-    commentId,
-    type
-  });
+  // console.log('Creating comment notification:', {
+  //   recipientId,
+  //   senderId,
+  //   threadId,
+  //   commentId,
+  //   type
+  // });
 
   const notificationData: NotificationData = {
     recipient_id: recipientId,
