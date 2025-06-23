@@ -3,7 +3,7 @@ import { requireAdminRole } from '@/lib/auth-middleware';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-  console.log('[API] Forum creation request received');
+  // console.log('[API] Forum creation request received');
 
   try {
     // Check if user has admin role
@@ -13,15 +13,15 @@ export async function POST(request: Request) {
     }
 
     const formData = await request.json();
-    console.log('[API] Request body:', JSON.stringify(formData, null, 2));
+    // console.log('[API] Request body:', JSON.stringify(formData, null, 2));
 
     const forum = await createForum(formData);
-    console.log('[API] Forum created successfully:', forum);
+    // console.log('[API] Forum created successfully:', forum);
 
     return NextResponse.json(forum, { status: 201 });
   } catch (error: any) {
     // Log entire error object to understand its structure
-    console.error('[API] Full error object:', error);
+    //console.error('[API] Full error object:', error);
 
     let errorMessage = 'Internal server error';
     let statusCode = 500;
