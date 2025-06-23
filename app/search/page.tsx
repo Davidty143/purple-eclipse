@@ -206,7 +206,7 @@ async function SearchResults({ query, searchType }: { query: string; searchType:
             <Link href={`/thread/${thread.thread_id}`} className="block p-5">
               <div className="flex items-start gap-4">
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  <AvatarImage src={`https://avatar.vercel.sh/${thread.author?.account_username || 'anon'}`} />
+                  <AvatarImage src={`https://avatar.vercel.sh/${thread.author?.account_username || ''}`} />
                   <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
 

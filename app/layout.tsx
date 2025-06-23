@@ -57,7 +57,7 @@ export default async function RootLayout({
                   <MobileSidebarMenu />
                   <Link href="/">
                     <div className="w-[160px] h-[40px] cursor-pointer">
-                      <Image src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" priority />
+                      <Image src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" priority style={{ height: 'auto' }} />
                     </div>
                   </Link>
                 </div>
