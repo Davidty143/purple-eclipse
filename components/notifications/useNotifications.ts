@@ -105,7 +105,7 @@ export function useNotifications(userId: string | undefined) {
       const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
       supabaseRef.current = supabase;
 
-      console.log('Setting up real-time subscription for user:', userId);
+      // console.log('Setting up real-time subscription for user:', userId);
 
       const channel = supabase
         .channel(`notifications-${userId}`)
@@ -118,7 +118,7 @@ export function useNotifications(userId: string | undefined) {
             filter: `recipient_id=eq.${userId}`
           },
           (payload) => {
-            console.log('Notification change received:', payload);
+            // console.log('Notification change received:', payload);
 
             // Handle different types of changes
             switch (payload.eventType) {
@@ -150,7 +150,7 @@ export function useNotifications(userId: string | undefined) {
           }
         )
         .subscribe((status) => {
-          console.log('Subscription status:', status);
+          // console.log('Subscription status:', status);
           setChannelStatus(status);
 
           if (status === 'SUBSCRIBED') {
@@ -159,10 +159,10 @@ export function useNotifications(userId: string | undefined) {
             // Attempt to reconnect
             if (reconnectAttemptsRef.current < MAX_RECONNECT_ATTEMPTS) {
               reconnectAttemptsRef.current += 1;
-              console.log(`Attempting to reconnect (${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})...`);
+              // console.log(`Attempting to reconnect (${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})...`);
               reconnectTimeoutRef.current = setTimeout(setupRealtimeSubscription, RECONNECT_DELAY);
             } else {
-              console.error('Max reconnection attempts reached');
+              // console.error('Max reconnection attempts reached');
               setError('Lost connection to notifications. Please refresh the page.');
             }
           }
@@ -170,7 +170,7 @@ export function useNotifications(userId: string | undefined) {
 
       channelRef.current = channel;
     } catch (err) {
-      console.error('Error setting up real-time subscription:', err);
+      // console.error('Error setting up real-time subscription:', err);
       setError('Failed to setup real-time notifications');
     }
   }, [userId, fetchNotifications, triggerNewNotificationEffect]);
@@ -206,7 +206,7 @@ export function useNotifications(userId: string | undefined) {
     try {
       // Validate environment variables
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.error('Supabase environment variables are not set for marking as read');
+        // console.error('Supabase environment variables are not set for marking as read');
         return;
       }
 
@@ -216,14 +216,14 @@ export function useNotifications(userId: string | undefined) {
       const { error } = await supabase.from('notifications').update({ is_read: true }).eq('notification_id', notificationId);
 
       if (error) {
-        console.error('Error marking notification as read:', error.message || JSON.stringify(error));
+        // console.error('Error marking notification as read:', error.message || JSON.stringify(error));
       } else {
         // Update local state
         setNotifications((prev) => prev.map((n) => (n.notification_id === notificationId ? { ...n, is_read: true } : n)));
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (err) {
-      console.error('Unexpected error marking notification as read:', err);
+      // console.error('Unexpected error marking notification as read:', err);
       throw err; // Re-throw the error to be caught by the caller
     }
   };
@@ -234,7 +234,7 @@ export function useNotifications(userId: string | undefined) {
     try {
       // Validate environment variables
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.error('Supabase environment variables are not set for marking all as read');
+        // console.error('Supabase environment variables are not set for marking all as read');
         return;
       }
 
@@ -244,14 +244,14 @@ export function useNotifications(userId: string | undefined) {
       const { error } = await supabase.from('notifications').update({ is_read: true }).eq('recipient_id', userId).eq('is_read', false);
 
       if (error) {
-        console.error('Error marking all notifications as read:', error.message || JSON.stringify(error));
+        // console.error('Error marking all notifications as read:', error.message || JSON.stringify(error));
       } else {
         // Update local state
         setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
         setUnreadCount(0);
       }
     } catch (err) {
-      console.error('Unexpected error marking all notifications as read:', err);
+      // console.error('Unexpected error marking all notifications as read:', err);
       throw err; // Re-throw the error to be caught by the caller
     }
   };
@@ -262,7 +262,7 @@ export function useNotifications(userId: string | undefined) {
     try {
       // Validate environment variables
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        console.error('Supabase environment variables are not set for deleting notification');
+        // console.error('Supabase environment variables are not set for deleting notification');
         return;
       }
 
@@ -272,7 +272,7 @@ export function useNotifications(userId: string | undefined) {
       const { error } = await supabase.from('notifications').delete().eq('notification_id', notificationId).eq('recipient_id', userId);
 
       if (error) {
-        console.error('Error deleting notification:', error.message || JSON.stringify(error));
+        // console.error('Error deleting notification:', error.message || JSON.stringify(error));
       } else {
         // Update local state
         const deletedNotification = notifications.find((n) => n.notification_id === notificationId);
@@ -284,7 +284,7 @@ export function useNotifications(userId: string | undefined) {
         }
       }
     } catch (err) {
-      console.error('Unexpected error deleting notification:', err);
+      // console.error('Unexpected error deleting notification:', err);
       throw err; // Re-throw the error to be caught by the caller
     }
   };
