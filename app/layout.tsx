@@ -55,10 +55,8 @@ export default async function RootLayout({
                 {/* LOGO Section with Hamburger for Mobile */}
                 <div className="ml-2 flex items-center justify-start gap-2 min-h-[60px]">
                   <MobileSidebarMenu />
-                  <Link href="/">
-                    <div className="w-[160px] h-[40px] cursor-pointer">
-                      <Image src="/visconn_transaprent6.png" alt="Visconn Logo" width={160} height={60} className="object-contain w-full h-full" priority style={{ height: 'auto' }} />
-                    </div>
+                  <Link href="/" className="relative w-[160px] h-[40px] cursor-pointer">
+                    <Image src="/visconn_transaprent6.png" alt="Visconn Logo" fill sizes="(max-width: 768px) 100px, 160px" className="object-contain" priority />
                   </Link>
                 </div>
 
@@ -71,7 +69,7 @@ export default async function RootLayout({
               </div>
             </div>
 
-            {/* ✅ Bottom Green Header */}
+            {/* Bottom Green Header */}
             <div className={cn('menu-header h-16 w-full p-3 2xl:p-4 items-center justify-center hidden lg:flex border-b')}>
               <div className={cn('menu-header h-full w-[1250px] xl:w-[90%] 2xl:w-[80%] flex justify-between items-center')}>
                 <div className={cn('menu-header h-full w-300px flex items-center justify-center')}>

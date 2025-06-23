@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@/app/utils/supabase/client';
 import ForumItem from './ForumItem';
@@ -51,7 +51,7 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
                 if (threadError) throw new Error(threadError.message);
 
                 // Get post count (comments)
-                const { count: postCount, error: postError } = await supabase.from('Post').select('*', { count: 'exact', head: true }).eq('subforum_id', subforum.subforum_id).eq('post_deleted', false);
+                const { count: postCount, error: postError } = await supabase.from('Thread').select('*', { count: 'exact', head: true }).eq('subforum_id', subforum.subforum_id).eq('thread_deleted', false);
 
                 if (postError) throw new Error(postError.message);
 
@@ -88,6 +88,7 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Select a Forum</DialogTitle>
+          <DialogDescription>Select a forum from the list below to continue.</DialogDescription>
         </DialogHeader>
         <div className="py-4">
           {loading ? (
