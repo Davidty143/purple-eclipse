@@ -9,7 +9,10 @@ export function AccountStatusChecker() {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!user || isLoading) return;
+    if (isLoading || !user) {
+      return;
+    }
+
     const checkAccountStatus = async () => {
       try {
         const response = await fetch('/api/account-status', {
