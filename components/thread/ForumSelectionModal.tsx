@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { createClient } from '@/app/utils/supabase/client';
 import { Loader2, HelpCircle } from 'lucide-react';
 
@@ -50,8 +50,6 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
 
         if (forumsError) throw new Error(forumsError.message);
 
-        console.log('Fetched Forums:', forumsData); // Log fetched forums data
-
         // Fetch subforums with thread and post counts for each forum
         const forumsWithSubforums = await Promise.all(
           forumsData.map(async (forum) => {
@@ -60,20 +58,16 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
 
             if (subforumsError) throw new Error(subforumsError.message);
 
-            console.log(`Fetched Subforums for Forum ID ${forum.forum_id}:`, subforumsData); // Log fetched subforums data
-
             // Then get the counts for each subforum
             const subforumsWithCounts = await Promise.all(
               (subforumsData || []).map(async (subforum) => {
-                console.log(`Processing Subforum ${subforum.subforum_id} - Icon: ${subforum.subforum_icon}`); // Log subforum icon
-
                 // Get thread count
                 const { count: threadCount, error: threadError } = await supabase.from('Thread').select('*', { count: 'exact', head: true }).eq('subforum_id', subforum.subforum_id).eq('thread_deleted', false);
 
                 if (threadError) throw new Error(threadError.message);
 
                 // Get post count (comments)
-                const { count: postCount, error: postError } = await supabase.from('Post').select('*', { count: 'exact', head: true }).eq('subforum_id', subforum.subforum_id).eq('post_deleted', false);
+                const { count: postCount, error: postError } = await supabase.from('Thread').select('*', { count: 'exact', head: true }).eq('subforum_id', subforum.subforum_id).eq('thread_deleted', false);
 
                 if (postError) throw new Error(postError.message);
 
@@ -115,6 +109,7 @@ const ForumSelectionModal: React.FC<ForumSelectionModalProps> = ({ isOpen, onClo
       <DialogContent className="max-w-[350px] sm:max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto p-4 sm:p-6 md:p-8 overflow-y-auto rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-[#267858] text-center sm:text-left">Select a Subforum to Post</DialogTitle>
+          <DialogDescription>Select a subforum from the list below to post your thread.</DialogDescription>
         </DialogHeader>
         <div className="py-2">
           {loading ? (
