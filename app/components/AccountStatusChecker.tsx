@@ -2,11 +2,14 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/AuthProvider';
 
 export function AccountStatusChecker() {
   const router = useRouter();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
+    if (!user || isLoading) return;
     const checkAccountStatus = async () => {
       try {
         const response = await fetch('/api/account-status', {
@@ -37,7 +40,7 @@ export function AccountStatusChecker() {
     const interval = setInterval(checkAccountStatus, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [router]);
+  }, [router, user, isLoading]);
 
   // This component doesn't render anything
   return null;

@@ -39,7 +39,7 @@ const ThreadRow = ({ thread }: ThreadRowProps) => {
           <div className="flex flex-row gap-4">
             <Avatar className="h-10 w-10">
               <AvatarImage src={avatarUrl} />
-              <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarFallback>{(thread.author?.account_username || '').charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
 
             {/* Thread Details */}

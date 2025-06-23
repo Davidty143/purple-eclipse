@@ -39,7 +39,7 @@ export default function ThreadContent({ thread, optimizeImages, openLightbox }: 
         <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 border-b pb-3 sm:pb-4">
           <div className="flex items-center space-x-2">
             <Avatar className="h-6 w-6 sm:h-8 sm:w-8">
-              <AvatarImage src={thread.author?.account_avatar_url || 'Anon'} />
+              <AvatarImage src={thread.author?.account_avatar_url || ''} />
               <AvatarFallback>{(thread.author?.account_username || 'A').charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <span>Posted by {thread.author?.account_username || 'Anonymous'}</span>
