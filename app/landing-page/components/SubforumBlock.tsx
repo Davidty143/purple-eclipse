@@ -34,8 +34,6 @@ export interface SubforumData {
 const fetchThreadsForSubforum = async (subforumId: number, limit: number = 5): Promise<ThreadData[]> => {
   const supabase = createClient();
 
-  console.log(`Fetching threads for subforumId: ${subforumId}, Limit: ${limit}`);
-
   const { data, error } = await supabase
     .from('Thread')
     .select(
@@ -60,8 +58,6 @@ const fetchThreadsForSubforum = async (subforumId: number, limit: number = 5): P
     console.error('Supabase error:', error.message);
     return [];
   }
-
-  console.log('Fetched data:', data);
 
   // Ensure thread_category is string | null and map data accordingly
   return (data || []).map((thread: any) => {
@@ -106,10 +102,8 @@ export function SubforumBlock({ subforum }: { subforum: SubforumData }) {
   }, [supabase.auth]);
 
   useEffect(() => {
-    console.log('SubforumBlock useEffect triggered');
     fetchThreadsForSubforum(subforum.subforum_id, limit)
       .then((threads) => {
-        console.log('Threads fetched for subforum:', threads);
         setThreads(threads);
       })
       .finally(() => setLoading(false));

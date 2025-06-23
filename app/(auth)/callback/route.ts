@@ -7,8 +7,6 @@ export async function GET(request: Request) {
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/';
 
-  console.log('Code received from Google OAuth:', code);
-
   if (!code) {
     console.error('No code received during OAuth.');
     return NextResponse.redirect(`${origin}/auth/auth-code-error`);
@@ -27,11 +25,8 @@ export async function GET(request: Request) {
     const session = data?.session;
 
     if (session) {
-      console.log('Session created successfully:', session);
-
       // Redirect to /auth/sync and pass the intended "next" page
       const redirectUrl = `${origin}/sync?next=${encodeURIComponent(next)}`;
-      console.log('Redirecting to:', redirectUrl);
 
       return NextResponse.redirect(redirectUrl);
     } else {
